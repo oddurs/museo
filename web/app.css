@@ -144,8 +144,6 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 
 .index__head span:first-child { text-align: right; }
 
-/* The ordinal glyph is already raised; small caps would flatten it. */
-.t-label--numero { font-feature-settings: "lnum" 1, "tnum" 1; text-transform: none; }
 .index__head span:last-child { text-align: right; }
 
 .index__list {

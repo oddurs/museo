@@ -391,7 +391,7 @@
   },
   {
     "id": "merchants-house",
-    "name": "Merchant's House Museum",
+    "name": "Merchant’s House Museum",
     "borough": "Manhattan",
     "neighborhood": "NoHo",
     "address": "29 East 4th Street, New York, NY 10003",
@@ -556,7 +556,7 @@
   },
   {
     "id": "cmom",
-    "name": "Children's Museum of Manhattan",
+    "name": "Children’s Museum of Manhattan",
     "borough": "Manhattan",
     "neighborhood": "Upper West Side",
     "address": "212 West 83rd Street, New York, NY 10024",
@@ -573,7 +573,7 @@
     "id": "intrepid",
     "name": "Intrepid Museum",
     "borough": "Manhattan",
-    "neighborhood": "Hell's Kitchen",
+    "neighborhood": "Hell’s Kitchen",
     "address": "Pier 86, 12th Avenue & West 46th Street, New York, NY 10036",
     "url": "https://intrepidmuseum.org",
     "category": "Science",
@@ -736,7 +736,7 @@
   },
   {
     "id": "sugar-hill",
-    "name": "Sugar Hill Children's Museum of Art & Storytelling",
+    "name": "Sugar Hill Children’s Museum of Art & Storytelling",
     "borough": "Manhattan",
     "neighborhood": "Sugar Hill",
     "address": "898 St Nicholas Avenue, New York, NY 10032",
@@ -901,7 +901,7 @@
   },
   {
     "id": "brooklyn-childrens",
-    "name": "Brooklyn Children's Museum",
+    "name": "Brooklyn Children’s Museum",
     "borough": "Brooklyn",
     "neighborhood": "Crown Heights",
     "address": "145 Brooklyn Avenue, Brooklyn, NY 11213",
@@ -1051,7 +1051,7 @@
   },
   {
     "id": "jewish-childrens-museum",
-    "name": "Jewish Children's Museum",
+    "name": "Jewish Children’s Museum",
     "borough": "Brooklyn",
     "neighborhood": "Crown Heights",
     "address": "792 Eastern Parkway, Brooklyn, NY 11213",
@@ -1531,7 +1531,7 @@
   },
   {
     "id": "si-childrens",
-    "name": "Staten Island Children's Museum",
+    "name": "Staten Island Children’s Museum",
     "borough": "Staten Island",
     "neighborhood": "Snug Harbor",
     "address": "1000 Richmond Terrace, Staten Island, NY 10301",

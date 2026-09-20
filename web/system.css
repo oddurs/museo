@@ -62,10 +62,13 @@
   --primary-wash: #f7eae4;  /* 1.12:1 — the selected row's bed */
 
   /* 1.4 Type families
-     Three cuts of one typeface, chosen by role, not by taste. */
-  --font-display: "Whitney", -apple-system, "Helvetica Neue", Arial, sans-serif;
-  --font-text:    "Whitney SSm", "Whitney", -apple-system, "Helvetica Neue", Arial, sans-serif;
-  --font-figure:  "Whitney Cond", "Whitney SSm", -apple-system, Arial, sans-serif;
+     Three cuts of one typeface, chosen by role, not by taste. Each stack names
+     a metric-matched fallback ahead of the system faces: fonts.css overrides a
+     local Helvetica/Arial to carry Whitney's own x-height and vertical metrics,
+     so the swap from fallback to Whitney does not reflow the page. */
+  --font-display: "Whitney", "Whitney Fallback", -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-text:    "Whitney SSm", "Whitney SSm Fallback", -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-figure:  "Whitney Cond", "Whitney Cond Fallback", -apple-system, Arial, sans-serif;
 
   /* 1.5 Figure sets
      Whitney carries four. Using the right one is most of what separates set
@@ -231,6 +234,7 @@ img, svg { display: block; max-width: 100%; }
   font-weight: 400;
   line-height: var(--leading-body);
   font-feature-settings: var(--figures-text);
+  text-wrap: pretty;      /* no one-word last lines as copy changes */
 }
 
 .t-small {
@@ -239,6 +243,7 @@ img, svg { display: block; max-width: 100%; }
   font-weight: 400;
   line-height: 1.45;
   font-feature-settings: var(--figures-text);
+  text-wrap: pretty;
 }
 
 .t-fine {
@@ -258,7 +263,6 @@ img, svg { display: block; max-width: 100%; }
   line-height: 1;
   letter-spacing: var(--track-smallcap);
   font-feature-settings: "smcp" 1, "c2sc" 1, var(--figures-tabular);
-  text-transform: lowercase; /* feeds smcp; capitals are folded by c2sc */
 }
 
 /* Catalogue figures — Condensed, lining and tabular, so a column of numbers
@@ -270,23 +274,19 @@ img, svg { display: block; max-width: 100%; }
   line-height: 1;
   letter-spacing: 0.05em;
   font-feature-settings: var(--figures-tabular);
-  font-variant-numeric: tabular-nums lining-nums;
 }
 
-/* Superior FIGURES. Whitney's sups feature maps the ten digits and nothing
-   else — it does not letter-substitute — so this is for ordinals and footnote
-   marks. The numero sign is the real ordmasculine glyph (º, U+00BA), typed as
-   a character rather than faked by raising an o. */
-.sup {
-  font-feature-settings: var(--figures-superior);
-  text-transform: none;
-}
+/* Superior figures live in --figures-superior. Whitney's sups feature maps the
+   ten digits and nothing else — it does not letter-substitute — so it is for
+   ordinals and footnote marks. The numero sign is the real ordmasculine glyph
+   (º, U+00BA), typed as a character rather than faked by raising an o, which
+   is why no .sup class is needed here. */
 
 /* Modifiers */
 .u-quiet     { color: var(--ink-tertiary); }
 .u-secondary { color: var(--ink-secondary); }
 .u-primary   { color: var(--primary); }
-.u-tabular   { font-feature-settings: var(--figures-tabular); font-variant-numeric: tabular-nums; }
+.u-tabular   { font-feature-settings: var(--figures-tabular); }
 
 /* --------------------------------------------------------------------------
    4. ELEMENTS
@@ -316,7 +316,6 @@ img, svg { display: block; max-width: 100%; }
   font-weight: 600;
   letter-spacing: var(--track-smallcap);
   font-feature-settings: "smcp" 1, "c2sc" 1, var(--figures-tabular);
-  text-transform: lowercase;
   color: var(--ink-tertiary);
   cursor: pointer;
   padding: var(--space-1) 0;
@@ -348,6 +347,7 @@ img, svg { display: block; max-width: 100%; }
   font-family: var(--font-display);
   font-size: 24px;
   font-weight: 300;
+  line-height: var(--leading-snug);
   letter-spacing: var(--track-heading);
   color: var(--ink);
   background: none;

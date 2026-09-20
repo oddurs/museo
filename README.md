@@ -8,7 +8,7 @@ Static HTML/CSS/JS, no build step, no dependencies to install.
 ```
 npm run fonts   # build the Whitney webfonts — do this first
 npm start       # http://localhost:5173
-npm run check   # validate data/museums.json
+npm run check   # validate data/museums.json, including its typography
 npm run audit   # lint the design system — spacing, borders, tokens
 npm run geocode # fill in coordinates for any new entries
 ```

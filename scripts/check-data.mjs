@@ -28,6 +28,17 @@ for (const m of museums) {
   ) {
     problems.push(`${where}: coordinates outside NYC (${m.lat}, ${m.lng})`)
   }
+  // Typography: the dataset is set, not typed. A straight apostrophe between
+  // letters is a contraction and belongs as U+2019.
+  for (const field of ['name', 'address', 'neighborhood']) {
+    if (m[field] && /(?<=\w)'(?=\w)/.test(m[field])) {
+      problems.push(`${where}: straight apostrophe in ${field} — use \u2019 ("${m[field]}")`)
+    }
+    if (m[field] && /["\u201c\u201d]/.test(m[field])) {
+      problems.push(`${where}: quotation mark in ${field} — unexpected ("${m[field]}")`)
+    }
+  }
+
   try {
     const u = new URL(m.url)
     if (u.protocol !== 'https:') problems.push(`${where}: url is not https`)

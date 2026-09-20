@@ -119,6 +119,45 @@ earlier version raised an `o` and rendered a plain "No".
 Small caps are **true small caps** (`smcp` / `c2sc`), not uppercase at a smaller
 size — which would be heavier than the text beside it and sit wrong on the line.
 
+`c2sc` folds capitals into small caps on its own, so `.t-label` needs **no
+`text-transform`**. It carried `text-transform: lowercase` for a while; measured
+against the same string without it, the rendered width was identical to the
+hundredth of a pixel. All the transform did was mangle the source casing and
+force an exception for `Nº`, which is why both are gone.
+
+**`font-variant-numeric` does not work in this codebase.** `body` sets
+`font-feature-settings`, the low-level property wins wherever both apply, and it
+inherits — so a `font-variant-numeric: tabular-nums` on a descendant is inert.
+Measured three ways, the same string came out at three different widths. Every
+figure set therefore goes through `font-feature-settings` and the `--figures-*`
+tokens, consistently.
+
+### Tracking
+
+Whitney is a signage face: it tightens at display sizes and needs the opposite
+treatment in small caps, where the counters must stay open.
+
+| Token | Value | Applied to |
+| --- | --- | --- |
+| `--track-banner` | `-0.035em` | The tally figure at 72px |
+| `--track-display` | `-0.028em` | Display and title sizes |
+| `--track-heading` | `-0.018em` | Museum names, the search field |
+| `--track-normal` | `0` | All running text |
+| `--track-smallcap` | `0.09em` | Small-cap labels |
+| `--track-wordmark` | `0.17em` | The wordmark only, which absorbs the trailing track with a negative margin |
+
+### Fallbacks that don't reflow
+
+Each stack names a metric-matched fallback ahead of the system faces.
+`build-fonts.py` reads each cut's real metrics and emits an `@font-face` that
+overrides a local Helvetica/Arial to carry them — `size-adjust` to match
+Whitney's x-height, then `ascent-override` and `descent-override` restated
+relative to that scale so the line box is identical either way.
+
+Rendering the app with the webfonts blocked and again with them loaded gives
+the same height for every region and the same top for the index, to 0.0px. The
+swap costs no layout shift.
+
 ### Scale
 
 Eight sizes, spaced by eye rather than by ratio.
@@ -249,6 +288,15 @@ and find them instantly when scanning for a borough.
 
 Selected: a primary rule at the left edge, a warm bed, the figure going to the
 primary, and the name stepping from Book to Medium. Nothing moves.
+
+---
+
+## Setting the data
+
+The dataset is set, not typed. Contractions and possessives take a typographic
+apostrophe (`’`, U+2019); seven museum names shipped with straight ones
+before this was checked. `npm run check` fails on a straight apostrophe between
+letters, or on a stray quotation mark, in any name, address or neighborhood.
 
 ---
 
