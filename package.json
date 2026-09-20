@@ -1,0 +1,12 @@
+{
+  "name": "museo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A browsable directory of New York City museums, all five boroughs.",
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "geocode": "node scripts/geocode.mjs",
+    "check": "node scripts/check-data.mjs"
+  }
+}

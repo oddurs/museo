@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Museo — NYC Museums</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <h1>Museo</h1>
+        <p class="tagline">Every museum in the five boroughs.</p>
+      </div>
+
+      <div class="controls">
+        <label class="search">
+          <span class="sr-only">Search museums</span>
+          <input
+            id="search"
+            type="search"
+            placeholder="Search name, neighborhood, address…"
+            autocomplete="off"
+          />
+        </label>
+
+        <div class="filter-row" id="borough-filters" role="group" aria-label="Filter by borough"></div>
+        <div class="filter-row subtle" id="category-filters" role="group" aria-label="Filter by category"></div>
+
+        <div class="filter-row meta">
+          <label class="toggle">
+            <input type="checkbox" id="viewport-only" />
+            <span>Only what's on the map</span>
+          </label>
+          <span class="count" id="count" aria-live="polite"></span>
+          <button type="button" class="linky" id="reset">Reset</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="list-pane" aria-label="Museum list">
+        <ol id="list" class="list"></ol>
+        <p id="empty" class="empty" hidden>No museums match those filters.</p>
+      </section>
+      <section class="map-pane" aria-label="Map">
+        <div id="map"></div>
+      </section>
+    </main>
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script src="app.js" type="module"></script>
+  </body>
+</html>

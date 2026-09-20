@@ -1,0 +1,1607 @@
+[
+  {
+    "id": "met",
+    "name": "The Metropolitan Museum of Art",
+    "borough": "Manhattan",
+    "neighborhood": "Upper East Side",
+    "address": "1000 Fifth Avenue, New York, NY 10028",
+    "url": "https://www.metmuseum.org",
+    "category": "Art",
+    "lat": 40.77944,
+    "lng": -73.963382,
+    "geocode": {
+      "matched": "The Metropolitan Museum of Art, 1000, 5th Avenue, Upper East Side, Manhattan Community Board 8, Manhattan, New York County, New York, 10075, United States",
+      "query": "The Metropolitan Museum of Art, Manhattan, New York"
+    }
+  },
+  {
+    "id": "met-cloisters",
+    "name": "The Met Cloisters",
+    "borough": "Manhattan",
+    "neighborhood": "Fort Tryon Park",
+    "address": "99 Margaret Corbin Drive, New York, NY 10040",
+    "url": "https://www.metmuseum.org/visit/plan-your-visit/met-cloisters",
+    "category": "Art",
+    "lat": 40.864868,
+    "lng": -73.931923,
+    "geocode": {
+      "matched": "The Met Cloisters, 99, Margaret Corbin Drive, Fort George, Manhattan Community Board 12, Manhattan, New York County, New York, 10040, United States",
+      "query": "The Met Cloisters, 99 Margaret Corbin Drive, New York, NY 10040"
+    }
+  },
+  {
+    "id": "moma",
+    "name": "Museum of Modern Art (MoMA)",
+    "borough": "Manhattan",
+    "neighborhood": "Midtown",
+    "address": "11 West 53rd Street, New York, NY 10019",
+    "url": "https://www.moma.org",
+    "category": "Art",
+    "lat": 40.761612,
+    "lng": -73.977499,
+    "geocode": {
+      "matched": "MoMA, 11, West 53rd Street, Midtown East, Manhattan Community Board 5, Manhattan, New York County, New York, 10019, United States",
+      "query": "11 West 53rd Street, Manhattan, New York"
+    }
+  },
+  {
+    "id": "guggenheim",
+    "name": "Solomon R. Guggenheim Museum",
+    "borough": "Manhattan",
+    "neighborhood": "Upper East Side",
+    "address": "1071 Fifth Avenue, New York, NY 10128",
+    "url": "https://www.guggenheim.org",
+    "category": "Art",
+    "lat": 40.782993,
+    "lng": -73.958925,
+    "geocode": {
+      "matched": "Guggenheim Museum, 1071, 5th Avenue, Carnegie Hill, Manhattan Community Board 8, Manhattan, New York County, New York, 10128, United States",
+      "query": "Solomon R. Guggenheim Museum, Manhattan, New York"
+    }
+  },
+  {
+    "id": "whitney",
+    "name": "Whitney Museum of American Art",
+    "borough": "Manhattan",
+    "neighborhood": "Meatpacking District",
+    "address": "99 Gansevoort Street, New York, NY 10014",
+    "url": "https://whitney.org",
+    "category": "Art",
+    "lat": 40.739645,
+    "lng": -74.008921,
+    "geocode": {
+      "matched": "Whitney Museum of American Art, 99, Gansevoort Street, Meatpacking District, Manhattan, New York County, New York, 10014, United States",
+      "query": "Whitney Museum of American Art, 99 Gansevoort Street, New York, NY 10014"
+    }
+  },
+  {
+    "id": "amnh",
+    "name": "American Museum of Natural History",
+    "borough": "Manhattan",
+    "neighborhood": "Upper West Side",
+    "address": "200 Central Park West, New York, NY 10024",
+    "url": "https://www.amnh.org",
+    "category": "Science",
+    "lat": 40.781101,
+    "lng": -73.974236,
+    "geocode": {
+      "matched": "American Museum of Natural History, 200, Central Park West, Upper West Side, Manhattan Community Board 7, Manhattan, New York County, New York, 10024, United States",
+      "query": "American Museum of Natural History, 200 Central Park West, New York, NY 10024"
+    }
+  },
+  {
+    "id": "frick",
+    "name": "The Frick Collection",
+    "borough": "Manhattan",
+    "neighborhood": "Upper East Side",
+    "address": "1 East 70th Street, New York, NY 10021",
+    "url": "https://www.frick.org",
+    "category": "Art",
+    "lat": 40.771259,
+    "lng": -73.967168,
+    "geocode": {
+      "matched": "Frick Collection, 1, East 70th Street, Lenox Hill, Manhattan Community Board 8, Manhattan, New York County, New York, 10021, United States",
+      "query": "1 East 70th Street, Manhattan, New York"
+    }
+  },
+  {
+    "id": "neue-galerie",
+    "name": "Neue Galerie New York",
+    "borough": "Manhattan",
+    "neighborhood": "Upper East Side",
+    "address": "1048 Fifth Avenue, New York, NY 10028",
+    "url": "https://www.neuegalerie.org",
+    "category": "Art",
+    "lat": 40.781224,
+    "lng": -73.960237,
+    "geocode": {
+      "matched": "Neue Galerie New York, 1048, 5th Avenue, Upper East Side, Manhattan Community Board 8, Manhattan, New York County, New York, 10028, United States",
+      "query": "Neue Galerie New York, Manhattan, New York"
+    }
+  },
+  {
+    "id": "morgan",
+    "name": "The Morgan Library & Museum",
+    "borough": "Manhattan",
+    "neighborhood": "Murray Hill",
+    "address": "225 Madison Avenue, New York, NY 10016",
+    "url": "https://www.themorgan.org",
+    "category": "Art",
+    "lat": 40.749268,
+    "lng": -73.981465,
+    "geocode": {
+      "matched": "The Morgan Library & Museum, 225, Madison Avenue, Midtown South, Manhattan Community Board 6, Manhattan, New York County, New York, 10016, United States",
+      "query": "The Morgan Library & Museum, 225 Madison Avenue, New York, NY 10016"
+    }
+  },
+  {
+    "id": "cooper-hewitt",
+    "name": "Cooper Hewitt, Smithsonian Design Museum",
+    "borough": "Manhattan",
+    "neighborhood": "Carnegie Hill",
+    "address": "2 East 91st Street, New York, NY 10128",
+    "url": "https://www.cooperhewitt.org",
+    "category": "Design",
+    "lat": 40.784284,
+    "lng": -73.957699,
+    "geocode": {
+      "matched": "Cooper–Hewitt, Smithsonian Design Museum, 2, East 91st Street, Carnegie Hill, Manhattan Community Board 8, Manhattan, New York County, New York, 10128, United States",
+      "query": "2 East 91st Street, Manhattan, New York"
+    }
+  },
+  {
+    "id": "jewish-museum",
+    "name": "The Jewish Museum",
+    "borough": "Manhattan",
+    "neighborhood": "Carnegie Hill",
+    "address": "1109 Fifth Avenue, New York, NY 10128",
+    "url": "https://thejewishmuseum.org",
+    "category": "Culture",
+    "lat": 40.78541,
+    "lng": -73.957183,
+    "geocode": {
+      "matched": "The Jewish Museum, 1109, 5th Avenue, Carnegie Hill, Manhattan Community Board 8, Manhattan, New York County, New York, 10128, United States",
+      "query": "The Jewish Museum, Manhattan, New York"
+    }
+  },
+  {
+    "id": "el-museo",
+    "name": "El Museo del Barrio",
+    "borough": "Manhattan",
+    "neighborhood": "East Harlem",
+    "address": "1230 Fifth Avenue, New York, NY 10029",
+    "url": "https://www.elmuseo.org",
+    "category": "Culture",
+    "lat": 40.793121,
+    "lng": -73.951335,
+    "geocode": {
+      "matched": "El Museo Del Barrio, 1230, 5th Avenue, Manhattan Community Board 11, Manhattan, New York County, New York, 10029, United States",
+      "query": "El Museo del Barrio, Manhattan, New York"
+    }
+  },
+  {
+    "id": "mcny",
+    "name": "Museum of the City of New York",
+    "borough": "Manhattan",
+    "neighborhood": "East Harlem",
+    "address": "1220 Fifth Avenue, New York, NY 10029",
+    "url": "https://www.mcny.org",
+    "category": "History",
+    "lat": 40.792527,
+    "lng": -73.951802,
+    "geocode": {
+      "matched": "Museum of the City of New York, 1220, 5th Avenue, Manhattan Community Board 11, Manhattan, New York County, New York, 10029, United States",
+      "query": "Museum of the City of New York, Manhattan, New York"
+    }
+  },
+  {
+    "id": "ny-historical",
+    "name": "New-York Historical",
+    "borough": "Manhattan",
+    "neighborhood": "Upper West Side",
+    "address": "170 Central Park West, New York, NY 10024",
+    "url": "https://www.nyhistory.org",
+    "category": "History",
+    "lat": 40.779249,
+    "lng": -73.974304,
+    "geocode": {
+      "matched": "New-York Historical Society, 170, Central Park West, Upper West Side, Manhattan Community Board 7, Manhattan, New York County, New York, 10024, United States",
+      "query": "New-York Historical, 170 Central Park West, New York, NY 10024"
+    }
+  },
+  {
+    "id": "new-museum",
+    "name": "New Museum",
+    "borough": "Manhattan",
+    "neighborhood": "Bowery",
+    "address": "235 Bowery, New York, NY 10002",
+    "url": "https://www.newmuseum.org",
+    "category": "Art",
+    "lat": 40.722346,
+    "lng": -73.992841,
+    "geocode": {
+      "matched": "New Museum, 235, Bowery, Manhattan Community Board 3, Manhattan, New York County, New York, 10002, United States",
+      "query": "New Museum, 235 Bowery, New York, NY 10002"
+    }
+  },
+  {
+    "id": "icp",
+    "name": "International Center of Photography",
+    "borough": "Manhattan",
+    "neighborhood": "Lower East Side",
+    "address": "84 Ludlow Street, New York, NY 10002",
+    "url": "https://www.icp.org",
+    "category": "Art",
+    "lat": 40.7182,
+    "lng": -73.989185,
+    "geocode": {
+      "matched": "International Center of Photography, 84, Ludlow Street, Lower East Side, Manhattan Community Board 3, Manhattan, New York County, New York, 10002, United States",
+      "query": "International Center of Photography, 84 Ludlow Street, New York, NY 10002"
+    }
+  },
+  {
+    "id": "eldridge-street",
+    "name": "Museum at Eldridge Street",
+    "borough": "Manhattan",
+    "neighborhood": "Lower East Side",
+    "address": "12 Eldridge Street, New York, NY 10002",
+    "url": "https://www.eldridgestreet.org",
+    "category": "History",
+    "lat": 40.714729,
+    "lng": -73.993461,
+    "geocode": {
+      "matched": "Museum at Eldridge Street, 12, Eldridge Street, Two Bridges, Manhattan Community Board 3, Manhattan, New York County, New York, 10002, United States",
+      "query": "Museum at Eldridge Street, 12 Eldridge Street, New York, NY 10002"
+    }
+  },
+  {
+    "id": "tenement",
+    "name": "Tenement Museum",
+    "borough": "Manhattan",
+    "neighborhood": "Lower East Side",
+    "address": "103 Orchard Street, New York, NY 10002",
+    "url": "https://www.tenement.org",
+    "category": "History",
+    "lat": 40.718784,
+    "lng": -73.990027,
+    "geocode": {
+      "matched": "Lower East Side Tenement Museum, 103, Orchard Street, Lower East Side, Manhattan Community Board 3, Manhattan, New York County, New York, 10002, United States",
+      "query": "Tenement Museum, 103 Orchard Street, New York, NY 10002"
+    }
+  },
+  {
+    "id": "mjh",
+    "name": "Museum of Jewish Heritage",
+    "borough": "Manhattan",
+    "neighborhood": "Battery Park City",
+    "address": "36 Battery Place, New York, NY 10280",
+    "url": "https://mjhnyc.org",
+    "category": "History",
+    "lat": 40.706002,
+    "lng": -74.018574,
+    "geocode": {
+      "matched": "Museum of Jewish Heritage, 1st Place, Whitehall, Manhattan, New York County, New York, 10280, United States",
+      "query": "Museum of Jewish Heritage, Manhattan, New York"
+    }
+  },
+  {
+    "id": "nmai-ny",
+    "name": "National Museum of the American Indian, Heye Center",
+    "borough": "Manhattan",
+    "neighborhood": "Financial District",
+    "address": "1 Bowling Green, New York, NY 10004",
+    "url": "https://americanindian.si.edu/visit/newyork",
+    "category": "Culture",
+    "lat": 40.704057,
+    "lng": -74.013755,
+    "geocode": {
+      "matched": "Alexander Hamilton U.S. Custom House, 1, Bowling Green, Whitehall, Lower Manhattan, Manhattan, New York County, New York, 10275, United States",
+      "query": "1 Bowling Green, Manhattan, New York"
+    }
+  },
+  {
+    "id": "911-museum",
+    "name": "9/11 Memorial & Museum",
+    "borough": "Manhattan",
+    "neighborhood": "Financial District",
+    "address": "180 Greenwich Street, New York, NY 10007",
+    "url": "https://www.911memorial.org",
+    "category": "History",
+    "lat": 40.711453,
+    "lng": -74.01267,
+    "geocode": {
+      "matched": "9/11 Memorial & Museum, 180, Greenwich Street, Tribeca, Lower Manhattan, Manhattan, New York County, New York, 10007, United States",
+      "query": "9/11 Memorial & Museum, 180 Greenwich Street, New York, NY 10007"
+    }
+  },
+  {
+    "id": "fraunces-tavern",
+    "name": "Fraunces Tavern Museum",
+    "borough": "Manhattan",
+    "neighborhood": "Financial District",
+    "address": "54 Pearl Street, New York, NY 10004",
+    "url": "https://www.frauncestavernmuseum.org",
+    "category": "History",
+    "lat": 40.703387,
+    "lng": -74.011354,
+    "geocode": {
+      "matched": "Fraunces Tavern Museum, 54, Pearl Street, Whitehall, Manhattan, New York County, New York, 10004, United States",
+      "query": "Fraunces Tavern Museum, 54 Pearl Street, New York, NY 10004"
+    }
+  },
+  {
+    "id": "federal-hall",
+    "name": "Federal Hall National Memorial",
+    "borough": "Manhattan",
+    "neighborhood": "Financial District",
+    "address": "26 Wall Street, New York, NY 10005",
+    "url": "https://www.nps.gov/feha",
+    "category": "History",
+    "lat": 40.707322,
+    "lng": -74.010253,
+    "geocode": {
+      "matched": "Federal Hall National Memorial, 26, Wall Street, Financial District, Lower Manhattan, Manhattan, New York County, New York, 10271, United States",
+      "query": "Federal Hall National Memorial, 26 Wall Street, New York, NY 10005"
+    }
+  },
+  {
+    "id": "skyscraper",
+    "name": "The Skyscraper Museum",
+    "borough": "Manhattan",
+    "neighborhood": "Battery Park City",
+    "address": "39 Battery Place, New York, NY 10280",
+    "url": "https://skyscraper.org",
+    "category": "Design",
+    "lat": 40.70575,
+    "lng": -74.017691,
+    "geocode": {
+      "matched": "Skyscraper Museum, 39, Battery Place, Whitehall, Manhattan, New York County, New York, 10280, United States",
+      "query": "39 Battery Place, Manhattan, New York"
+    }
+  },
+  {
+    "id": "poster-house",
+    "name": "Poster House",
+    "borough": "Manhattan",
+    "neighborhood": "Chelsea",
+    "address": "119 West 23rd Street, New York, NY 10011",
+    "url": "https://posterhouse.org",
+    "category": "Design",
+    "lat": 40.743588,
+    "lng": -73.993336,
+    "geocode": {
+      "matched": "Poster House, 119, West 23rd Street, Chelsea District, Manhattan Community Board 4, Manhattan, New York County, New York, 10011, United States",
+      "query": "Poster House, 119 West 23rd Street, New York, NY 10011"
+    }
+  },
+  {
+    "id": "museum-of-sex",
+    "name": "Museum of Sex",
+    "borough": "Manhattan",
+    "neighborhood": "NoMad",
+    "address": "233 Fifth Avenue, New York, NY 10016",
+    "url": "https://www.museumofsex.com",
+    "category": "Culture",
+    "lat": 40.744037,
+    "lng": -73.987358,
+    "geocode": {
+      "matched": "Museum of Sex, 233, 5th Avenue, NoMad, Manhattan Community Board 5, Manhattan, New York County, New York, 10016, United States",
+      "query": "Museum of Sex, Manhattan, New York"
+    }
+  },
+  {
+    "id": "merchants-house",
+    "name": "Merchant's House Museum",
+    "borough": "Manhattan",
+    "neighborhood": "NoHo",
+    "address": "29 East 4th Street, New York, NY 10003",
+    "url": "https://merchantshouse.org",
+    "category": "History",
+    "lat": 40.727659,
+    "lng": -73.992342,
+    "geocode": {
+      "matched": "Merchant's House Museum, 29, East 4th Street, NoHo, Manhattan, New York County, New York, 10003, United States",
+      "query": "Merchant's House Museum, 29 East 4th Street, New York, NY 10003"
+    }
+  },
+  {
+    "id": "grey-art",
+    "name": "Grey Art Museum, NYU",
+    "borough": "Manhattan",
+    "neighborhood": "Greenwich Village",
+    "address": "18 Cooper Square, New York, NY 10003",
+    "url": "https://greyartmuseum.nyu.edu",
+    "category": "Art",
+    "lat": 40.72781,
+    "lng": -73.991541,
+    "geocode": {
+      "matched": "Grey Art Museum, 18, Cooper Square, NoHo, Manhattan, New York County, New York, 10003, United States",
+      "query": "Grey Art Museum, NYU, Manhattan, New York"
+    }
+  },
+  {
+    "id": "asia-society",
+    "name": "Asia Society Museum",
+    "borough": "Manhattan",
+    "neighborhood": "Upper East Side",
+    "address": "725 Park Avenue, New York, NY 10021",
+    "url": "https://asiasociety.org/new-york/museum",
+    "category": "Culture",
+    "lat": 40.769839,
+    "lng": -73.964291,
+    "geocode": {
+      "matched": "Asia Society, 725, Park Avenue, Carnegie Hill, Manhattan Community Board 8, Manhattan, New York County, New York, 10021, United States",
+      "query": "Asia Society Museum, 725 Park Avenue, New York, NY 10021"
+    }
+  },
+  {
+    "id": "africa-center",
+    "name": "The Africa Center",
+    "borough": "Manhattan",
+    "neighborhood": "East Harlem",
+    "address": "1280 Fifth Avenue, New York, NY 10029",
+    "url": "https://theafricacenter.org",
+    "category": "Culture",
+    "lat": 40.796342,
+    "lng": -73.949334,
+    "geocode": {
+      "matched": "The Africa Center, 1280, 5th Avenue, Manhattan Community Board 11, Manhattan, New York County, New York, 10029, United States",
+      "query": "The Africa Center, Manhattan, New York"
+    }
+  },
+  {
+    "id": "studio-museum",
+    "name": "The Studio Museum in Harlem",
+    "borough": "Manhattan",
+    "neighborhood": "Harlem",
+    "address": "144 West 125th Street, New York, NY 10027",
+    "url": "https://studiomuseum.org",
+    "category": "Art",
+    "lat": 40.808418,
+    "lng": -73.947616,
+    "geocode": {
+      "matched": "The Studio Museum In Harlem, 144, West 125th Street, Harlem, Manhattan Community Board 10, Manhattan, New York County, New York, 10027, United States",
+      "query": "The Studio Museum in Harlem, 144 West 125th Street, New York, NY 10027"
+    }
+  },
+  {
+    "id": "hispanic-society",
+    "name": "Hispanic Society Museum & Library",
+    "borough": "Manhattan",
+    "neighborhood": "Washington Heights",
+    "address": "613 West 155th Street, New York, NY 10032",
+    "url": "https://hispanicsociety.org",
+    "category": "Art",
+    "lat": 40.83336,
+    "lng": -73.946635,
+    "geocode": {
+      "matched": "Hispanic Society of America, 613, West 155th Street, Washington Heights, Manhattan Community Board 12, Manhattan, New York County, New York, 10032, United States",
+      "query": "613 West 155th Street, Manhattan, New York"
+    }
+  },
+  {
+    "id": "morris-jumel",
+    "name": "Morris-Jumel Mansion",
+    "borough": "Manhattan",
+    "neighborhood": "Washington Heights",
+    "address": "65 Jumel Terrace, New York, NY 10032",
+    "url": "https://www.morrisjumel.org",
+    "category": "History",
+    "lat": 40.834429,
+    "lng": -73.93858,
+    "geocode": {
+      "matched": "Morris-Jumel Mansion, Jumel Terrace, Washington Heights, Manhattan Community Board 12, Manhattan, New York County, New York, 10032, United States",
+      "query": "Morris-Jumel Mansion, Manhattan, New York"
+    }
+  },
+  {
+    "id": "dyckman",
+    "name": "Dyckman Farmhouse Museum",
+    "borough": "Manhattan",
+    "neighborhood": "Inwood",
+    "address": "4881 Broadway, New York, NY 10034",
+    "url": "https://dyckmanfarmhouse.org",
+    "category": "History",
+    "lat": 40.867382,
+    "lng": -73.922886,
+    "geocode": {
+      "matched": "Dyckman Farmhouse Museum, 4881, Broadway, Inwood, Manhattan Community Board 12, Manhattan, New York County, New York, 10034, United States",
+      "query": "Dyckman Farmhouse Museum, 4881 Broadway, New York, NY 10034"
+    }
+  },
+  {
+    "id": "moca",
+    "name": "Museum of Chinese in America (MOCA)",
+    "borough": "Manhattan",
+    "neighborhood": "Chinatown",
+    "address": "215 Centre Street, New York, NY 10013",
+    "url": "https://www.mocanyc.org",
+    "category": "Culture",
+    "lat": 40.719441,
+    "lng": -73.999078,
+    "geocode": {
+      "matched": "Museum of Chinese in America, 215, Centre Street, Little Italy, Lower Manhattan, Manhattan, New York County, New York, 10013, United States",
+      "query": "215 Centre Street, Manhattan, New York"
+    }
+  },
+  {
+    "id": "drawing-center",
+    "name": "The Drawing Center",
+    "borough": "Manhattan",
+    "neighborhood": "SoHo",
+    "address": "35 Wooster Street, New York, NY 10013",
+    "url": "https://drawingcenter.org",
+    "category": "Art",
+    "lat": 40.722444,
+    "lng": -74.002891,
+    "geocode": {
+      "matched": "The Drawing Center, 35, Wooster Street, Little Italy, Lower Manhattan, Manhattan, New York County, New York, 10013, United States",
+      "query": "The Drawing Center, 35 Wooster Street, New York, NY 10013"
+    }
+  },
+  {
+    "id": "leslie-lohman",
+    "name": "Leslie-Lohman Museum of Art",
+    "borough": "Manhattan",
+    "neighborhood": "SoHo",
+    "address": "26 Wooster Street, New York, NY 10013",
+    "url": "https://www.leslielohman.org",
+    "category": "Art",
+    "lat": 40.721768,
+    "lng": -74.003032,
+    "geocode": {
+      "matched": "Leslie-Lohman Museum of Art, 26, Wooster Street, Little Italy, Lower Manhattan, Manhattan, New York County, New York, 10013, United States",
+      "query": "Leslie-Lohman Museum of Art, 26 Wooster Street, New York, NY 10013"
+    }
+  },
+  {
+    "id": "cmom",
+    "name": "Children's Museum of Manhattan",
+    "borough": "Manhattan",
+    "neighborhood": "Upper West Side",
+    "address": "212 West 83rd Street, New York, NY 10024",
+    "url": "https://cmom.org",
+    "category": "Children",
+    "lat": 40.785878,
+    "lng": -73.977261,
+    "geocode": {
+      "matched": "Children's Museum of Manhattan, 212, West 83rd Street, Upper West Side, Manhattan Community Board 7, Manhattan, New York County, New York, 10024, United States",
+      "query": "Children's Museum of Manhattan, 212 West 83rd Street, New York, NY 10024"
+    }
+  },
+  {
+    "id": "intrepid",
+    "name": "Intrepid Museum",
+    "borough": "Manhattan",
+    "neighborhood": "Hell's Kitchen",
+    "address": "Pier 86, 12th Avenue & West 46th Street, New York, NY 10036",
+    "url": "https://intrepidmuseum.org",
+    "category": "Science",
+    "lat": 40.764597,
+    "lng": -73.999597,
+    "geocode": {
+      "matched": "Intrepid Museum, 86, West 46th Street, Clinton, Manhattan Community Board 4, Manhattan, New York County, New York, 10036, United States",
+      "query": "Intrepid Museum, Manhattan, New York"
+    }
+  },
+  {
+    "id": "mad",
+    "name": "Museum of Arts and Design (MAD)",
+    "borough": "Manhattan",
+    "neighborhood": "Columbus Circle",
+    "address": "2 Columbus Circle, New York, NY 10019",
+    "url": "https://madmuseum.org",
+    "category": "Design",
+    "lat": 40.767332,
+    "lng": -73.981936,
+    "geocode": {
+      "matched": "Museum of Arts and Design, 2, Columbus Circle, Manhattan Community Board 5, Manhattan, New York County, New York, 10107, United States",
+      "query": "2 Columbus Circle, Manhattan, New York"
+    }
+  },
+  {
+    "id": "cjh",
+    "name": "Center for Jewish History",
+    "borough": "Manhattan",
+    "neighborhood": "Flatiron",
+    "address": "15 West 16th Street, New York, NY 10011",
+    "url": "https://www.cjh.org",
+    "category": "History",
+    "lat": 40.73759,
+    "lng": -73.993718,
+    "geocode": {
+      "matched": "Center for Jewish History, West 16th Street, Union Square, Manhattan Community Board 5, Manhattan, New York County, New York, 10011, United States",
+      "query": "Center for Jewish History, Manhattan, New York"
+    }
+  },
+  {
+    "id": "yu-museum",
+    "name": "Yeshiva University Museum",
+    "borough": "Manhattan",
+    "neighborhood": "Flatiron",
+    "address": "15 West 16th Street, New York, NY 10011",
+    "url": "https://www.yumuseum.org",
+    "category": "Culture",
+    "lat": 40.737978,
+    "lng": -73.993831,
+    "geocode": {
+      "matched": "Yeshiva University Museum, West 16th Street, Union Square, Manhattan Community Board 5, Manhattan, New York County, New York, 10011, United States",
+      "query": "Yeshiva University Museum, Manhattan, New York"
+    }
+  },
+  {
+    "id": "roerich",
+    "name": "Nicholas Roerich Museum",
+    "borough": "Manhattan",
+    "neighborhood": "Upper West Side",
+    "address": "319 West 107th Street, New York, NY 10025",
+    "url": "https://www.roerich.org",
+    "category": "Art",
+    "lat": 40.802924,
+    "lng": -73.969013,
+    "geocode": {
+      "matched": "Nicholas Roerich Museum, 319, West 107th Street, Manhattan Valley, Manhattan Community Board 7, Manhattan, New York County, New York, 10025, United States",
+      "query": "Nicholas Roerich Museum, 319 West 107th Street, New York, NY 10025"
+    }
+  },
+  {
+    "id": "jazz-museum-harlem",
+    "name": "National Jazz Museum in Harlem",
+    "borough": "Manhattan",
+    "neighborhood": "Harlem",
+    "address": "58 West 129th Street, New York, NY 10027",
+    "url": "https://jazzmuseuminharlem.org",
+    "category": "Culture",
+    "lat": 40.80995,
+    "lng": -73.94309,
+    "geocode": {
+      "matched": "National Jazz Museum in Harlem, 58, West 129th Street, Harlem, Manhattan Community Board 10, Manhattan, New York County, New York, 10027, United States",
+      "query": "National Jazz Museum in Harlem, 58 West 129th Street, New York, NY 10027"
+    }
+  },
+  {
+    "id": "tr-birthplace",
+    "name": "Theodore Roosevelt Birthplace",
+    "borough": "Manhattan",
+    "neighborhood": "Flatiron",
+    "address": "28 East 20th Street, New York, NY 10003",
+    "url": "https://www.nps.gov/thrb",
+    "category": "History",
+    "lat": 40.738617,
+    "lng": -73.989062,
+    "geocode": {
+      "matched": "Theodore Roosevelt Birthplace National Historic Site, Manhattan Community Board 5, Manhattan, New York County, New York, 10010, United States",
+      "query": "Theodore Roosevelt Birthplace, Manhattan, New York"
+    }
+  },
+  {
+    "id": "mount-vernon-hotel",
+    "name": "Mount Vernon Hotel Museum & Garden",
+    "borough": "Manhattan",
+    "neighborhood": "Lenox Hill",
+    "address": "421 East 61st Street, New York, NY 10065",
+    "url": "https://mvhm.org",
+    "category": "History",
+    "lat": 40.760522,
+    "lng": -73.959713,
+    "geocode": {
+      "matched": "Mount Vernon Hotel Museum, 421, East 61st Street, Manhattan Community Board 8, Manhattan, New York County, New York, 10065, United States",
+      "query": "Mount Vernon Hotel Museum & Garden, 421 East 61st Street, New York, NY 10065"
+    }
+  },
+  {
+    "id": "museum-of-broadway",
+    "name": "Museum of Broadway",
+    "borough": "Manhattan",
+    "neighborhood": "Theater District",
+    "address": "145 West 45th Street, New York, NY 10036",
+    "url": "https://www.themuseumofbroadway.com",
+    "category": "Culture",
+    "lat": 40.757593,
+    "lng": -73.984337,
+    "geocode": {
+      "matched": "Museum of Broadway, West 45th Street, Times Square, Manhattan Community Board 5, Manhattan, New York County, New York, 10112, United States",
+      "query": "Museum of Broadway, Manhattan, New York"
+    }
+  },
+  {
+    "id": "ukrainian-museum",
+    "name": "The Ukrainian Museum",
+    "borough": "Manhattan",
+    "neighborhood": "East Village",
+    "address": "222 East 6th Street, New York, NY 10003",
+    "url": "https://www.ukrainianmuseum.org",
+    "category": "Culture",
+    "lat": 40.72765,
+    "lng": -73.989774,
+    "geocode": {
+      "matched": "The Ukrainian Museum, 222, East 6th Street, East Village, Manhattan Community Board 3, Manhattan, New York County, New York, 10003, United States",
+      "query": "The Ukrainian Museum, 222 East 6th Street, New York, NY 10003"
+    }
+  },
+  {
+    "id": "japan-society",
+    "name": "Japan Society Gallery",
+    "borough": "Manhattan",
+    "neighborhood": "Turtle Bay",
+    "address": "333 East 47th Street, New York, NY 10017",
+    "url": "https://japansociety.org/gallery",
+    "category": "Culture",
+    "lat": 40.752557,
+    "lng": -73.968246,
+    "geocode": {
+      "matched": "Japan Society, 333, East 47th Street, Turtle Bay, Manhattan Community Board 6, Manhattan, New York County, New York, 10017, United States",
+      "query": "333 East 47th Street, Manhattan, New York"
+    }
+  },
+  {
+    "id": "sugar-hill",
+    "name": "Sugar Hill Children's Museum of Art & Storytelling",
+    "borough": "Manhattan",
+    "neighborhood": "Sugar Hill",
+    "address": "898 St Nicholas Avenue, New York, NY 10032",
+    "url": "https://www.sugarhillmuseum.org",
+    "category": "Children",
+    "lat": 40.830454,
+    "lng": -73.941171,
+    "geocode": {
+      "matched": "Sugar Hill Children's Museum of Art and Story Telling, 898, Saint Nicholas Avenue, Sugar Hill, Manhattan Community Board 9, Manhattan, New York County, New York, 10032, United States",
+      "query": "898 St Nicholas Avenue, Manhattan, New York"
+    }
+  },
+  {
+    "id": "folk-art",
+    "name": "American Folk Art Museum",
+    "borough": "Manhattan",
+    "neighborhood": "Lincoln Square",
+    "address": "2 Lincoln Square, Columbus Avenue at 66th Street, New York, NY 10023",
+    "url": "https://folkartmuseum.org",
+    "category": "Art",
+    "lat": 40.77323,
+    "lng": -73.981596,
+    "geocode": {
+      "matched": "American Folk Art Museum, 2, Columbus Avenue, Lincoln Square, Manhattan Community Board 7, Manhattan, New York County, New York, 10023, United States",
+      "query": "American Folk Art Museum, Manhattan, New York"
+    }
+  },
+  {
+    "id": "akc-dog",
+    "name": "AKC Museum of the Dog",
+    "borough": "Manhattan",
+    "neighborhood": "Murray Hill",
+    "address": "101 Park Avenue, New York, NY 10178",
+    "url": "https://museumofthedog.org",
+    "category": "Specialty",
+    "lat": 40.750831,
+    "lng": -73.977612,
+    "geocode": {
+      "matched": "101, Park Avenue, Midtown South, Manhattan Community Board 5, Manhattan, New York County, New York, 10016, United States",
+      "query": "101 Park Avenue, Manhattan, New York"
+    }
+  },
+  {
+    "id": "museum-at-fit",
+    "name": "The Museum at FIT",
+    "borough": "Manhattan",
+    "neighborhood": "Chelsea",
+    "address": "227 West 27th Street, New York, NY 10001",
+    "url": "https://www.fitnyc.edu/museum",
+    "category": "Design",
+    "lat": 40.746654,
+    "lng": -73.994147,
+    "geocode": {
+      "matched": "The Museum at FIT, West 27th Street, Chelsea District, Manhattan Community Board 5, Manhattan, New York County, New York, 10001, United States",
+      "query": "The Museum at FIT, Manhattan, New York"
+    }
+  },
+  {
+    "id": "momath",
+    "name": "National Museum of Mathematics (MoMath)",
+    "borough": "Manhattan",
+    "neighborhood": "NoMad",
+    "address": "11 East 26th Street, New York, NY 10010",
+    "url": "https://momath.org",
+    "category": "Science",
+    "lat": 40.743421,
+    "lng": -73.987246,
+    "geocode": {
+      "matched": "11, East 26th Street, NoMad, Manhattan Community Board 5, Manhattan, New York County, New York, 10010, United States",
+      "query": "11 East 26th Street, Manhattan, New York"
+    }
+  },
+  {
+    "id": "center-for-architecture",
+    "name": "Center for Architecture",
+    "borough": "Manhattan",
+    "neighborhood": "Greenwich Village",
+    "address": "536 LaGuardia Place, New York, NY 10012",
+    "url": "https://www.centerforarchitecture.org",
+    "category": "Design",
+    "lat": 40.72873,
+    "lng": -73.998581,
+    "geocode": {
+      "matched": "Center for Architecture, 546, LaGuardia Place, University Village, Manhattan, New York County, New York, 10012, United States",
+      "query": "Center for Architecture, Manhattan, New York"
+    }
+  },
+  {
+    "id": "bard-graduate-center",
+    "name": "Bard Graduate Center Gallery",
+    "borough": "Manhattan",
+    "neighborhood": "Upper West Side",
+    "address": "18 West 86th Street, New York, NY 10024",
+    "url": "https://www.bgc.bard.edu/gallery",
+    "category": "Design",
+    "lat": 40.785542,
+    "lng": -73.970589,
+    "geocode": {
+      "matched": "18, West 86th Street, Upper West Side, Manhattan Community Board 7, Manhattan, New York County, New York, 10024, United States",
+      "query": "18 West 86th Street, Manhattan, New York"
+    }
+  },
+  {
+    "id": "isaw",
+    "name": "Institute for the Study of the Ancient World",
+    "borough": "Manhattan",
+    "neighborhood": "Upper East Side",
+    "address": "15 East 84th Street, New York, NY 10028",
+    "url": "https://isaw.nyu.edu",
+    "category": "History",
+    "lat": 40.779996,
+    "lng": -73.960211,
+    "geocode": {
+      "matched": "Institute for the Study of the Ancient World, 15, East 85th Street, Upper East Side, Manhattan Community Board 8, Manhattan, New York County, New York, 10028, United States",
+      "query": "Institute for the Study of the Ancient World, Manhattan, New York"
+    }
+  },
+  {
+    "id": "transit-annex",
+    "name": "New York Transit Museum Gallery Annex",
+    "borough": "Manhattan",
+    "neighborhood": "Midtown",
+    "address": "Grand Central Terminal, Shuttle Passage, New York, NY 10017",
+    "url": "https://www.nytransitmuseum.org",
+    "category": "History",
+    "lat": 40.752694,
+    "lng": -73.977253,
+    "geocode": {
+      "matched": "Grand Central Terminal, 89, East 42nd Street, Midtown South, Manhattan Community Board 5, Manhattan, New York County, New York, 10178, United States",
+      "query": "Grand Central Terminal, Manhattan, New York"
+    }
+  },
+  {
+    "id": "brooklyn-museum",
+    "name": "Brooklyn Museum",
+    "borough": "Brooklyn",
+    "neighborhood": "Prospect Heights",
+    "address": "200 Eastern Parkway, Brooklyn, NY 11238",
+    "url": "https://www.brooklynmuseum.org",
+    "category": "Art",
+    "lat": 40.670955,
+    "lng": -73.963295,
+    "geocode": {
+      "matched": "Brooklyn Museum, 200, Eastern Parkway, Brooklyn, Kings County, New York, 11238, United States",
+      "query": "Brooklyn Museum, 200 Eastern Parkway, Brooklyn, NY 11238"
+    }
+  },
+  {
+    "id": "transit-museum",
+    "name": "New York Transit Museum",
+    "borough": "Brooklyn",
+    "neighborhood": "Brooklyn Heights",
+    "address": "99 Schermerhorn Street, Brooklyn, NY 11201",
+    "url": "https://www.nytransitmuseum.org",
+    "category": "History",
+    "lat": 40.690518,
+    "lng": -73.98998,
+    "geocode": {
+      "matched": "New York Transit Museum, 99, Schermerhorn Street, Downtown Brooklyn, Brooklyn, Kings County, New York, 11201, United States",
+      "query": "New York Transit Museum, 99 Schermerhorn Street, Brooklyn, NY 11201"
+    }
+  },
+  {
+    "id": "brooklyn-childrens",
+    "name": "Brooklyn Children's Museum",
+    "borough": "Brooklyn",
+    "neighborhood": "Crown Heights",
+    "address": "145 Brooklyn Avenue, Brooklyn, NY 11213",
+    "url": "https://www.brooklynkids.org",
+    "category": "Children",
+    "lat": 40.674397,
+    "lng": -73.944046,
+    "geocode": {
+      "matched": "Brooklyn Children's Museum, 145, Brooklyn Avenue, Crown Heights, Brooklyn, Kings County, New York, 11213, United States",
+      "query": "Brooklyn Children's Museum, 145 Brooklyn Avenue, Brooklyn, NY 11213"
+    }
+  },
+  {
+    "id": "center-brooklyn-history",
+    "name": "Center for Brooklyn History",
+    "borough": "Brooklyn",
+    "neighborhood": "Brooklyn Heights",
+    "address": "128 Pierrepont Street, Brooklyn, NY 11201",
+    "url": "https://www.bklynlibrary.org/center-for-brooklyn-history",
+    "category": "History",
+    "lat": 40.694757,
+    "lng": -73.99243,
+    "geocode": {
+      "matched": "Center for Brooklyn History, 128, Pierrepont Street, Brooklyn Heights, Brooklyn, Kings County, New York, 11201, United States",
+      "query": "Center for Brooklyn History, 128 Pierrepont Street, Brooklyn, NY 11201"
+    }
+  },
+  {
+    "id": "mocada",
+    "name": "Museum of Contemporary African Diasporan Arts (MoCADA)",
+    "borough": "Brooklyn",
+    "neighborhood": "Fort Greene",
+    "address": "80 Hanson Place, Brooklyn, NY 11217",
+    "url": "https://mocada.org",
+    "category": "Art",
+    "lat": 40.685252,
+    "lng": -73.974427,
+    "geocode": {
+      "matched": "80, Hanson Place, Fort Greene, Brooklyn, Kings County, New York, 11217, United States",
+      "query": "80 Hanson Place, Brooklyn, New York"
+    }
+  },
+  {
+    "id": "waterfront-museum",
+    "name": "Waterfront Museum",
+    "borough": "Brooklyn",
+    "neighborhood": "Red Hook",
+    "address": "290 Conover Street, Brooklyn, NY 11231",
+    "url": "https://waterfrontmuseum.org",
+    "category": "History",
+    "lat": 40.675258,
+    "lng": -74.018288,
+    "geocode": {
+      "matched": "The Waterfront Museum, 290, Conover Street, Brooklyn, Kings County, New York, 11231, United States",
+      "query": "Waterfront Museum, 290 Conover Street, Brooklyn, NY 11231"
+    }
+  },
+  {
+    "id": "city-reliquary",
+    "name": "City Reliquary",
+    "borough": "Brooklyn",
+    "neighborhood": "Williamsburg",
+    "address": "370 Metropolitan Avenue, Brooklyn, NY 11211",
+    "url": "https://cityreliquary.org",
+    "category": "Specialty",
+    "lat": 40.713954,
+    "lng": -73.955741,
+    "geocode": {
+      "matched": "The City Reliquary, 370, Metropolitan Avenue, Williamsburg, Brooklyn, Kings County, New York, 11211, United States",
+      "query": "City Reliquary, 370 Metropolitan Avenue, Brooklyn, NY 11211"
+    }
+  },
+  {
+    "id": "weeksville",
+    "name": "Weeksville Heritage Center",
+    "borough": "Brooklyn",
+    "neighborhood": "Crown Heights",
+    "address": "158 Buffalo Avenue, Brooklyn, NY 11213",
+    "url": "https://www.weeksvillesociety.org",
+    "category": "History",
+    "lat": 40.674227,
+    "lng": -73.925234,
+    "geocode": {
+      "matched": "Weeksville Heritage Center, 158, Buffalo Avenue, Brooklyn, Kings County, New York, 11233, United States",
+      "query": "Weeksville Heritage Center, 158 Buffalo Avenue, Brooklyn, NY 11213"
+    }
+  },
+  {
+    "id": "wyckoff-house",
+    "name": "Wyckoff House Museum",
+    "borough": "Brooklyn",
+    "neighborhood": "East Flatbush",
+    "address": "5816 Clarendon Road, Brooklyn, NY 11203",
+    "url": "https://wyckoffmuseum.org",
+    "category": "History",
+    "lat": 40.644362,
+    "lng": -73.920876,
+    "geocode": {
+      "matched": "Wyckoff House Museum, 5816, Clarendon Road, Brooklyn Community District 17, Brooklyn, Kings County, New York, 11203, United States",
+      "query": "Wyckoff House Museum, 5816 Clarendon Road, Brooklyn, NY 11203"
+    }
+  },
+  {
+    "id": "lefferts",
+    "name": "Lefferts Historic House",
+    "borough": "Brooklyn",
+    "neighborhood": "Prospect Park",
+    "address": "452 Flatbush Avenue, Prospect Park, Brooklyn, NY 11225",
+    "url": "https://www.prospectpark.org/visit-the-park/places-to-go/lefferts-historic-house",
+    "category": "History",
+    "lat": 40.664347,
+    "lng": -73.96378,
+    "geocode": {
+      "matched": "Lefferts Historic House, 452, Flatbush Avenue, Brooklyn, Kings County, New York, 11215, United States",
+      "query": "Lefferts Historic House, Brooklyn, New York"
+    }
+  },
+  {
+    "id": "old-stone-house",
+    "name": "Old Stone House",
+    "borough": "Brooklyn",
+    "neighborhood": "Park Slope",
+    "address": "336 3rd Street, Brooklyn, NY 11215",
+    "url": "https://theoldstonehouse.org",
+    "category": "History",
+    "lat": 40.67301,
+    "lng": -73.984602,
+    "geocode": {
+      "matched": "Old Stone House, 336, 3rd Street, Park Slope, Brooklyn, Kings County, New York, 11215, United States",
+      "query": "Old Stone House, 336 3rd Street, Brooklyn, NY 11215"
+    }
+  },
+  {
+    "id": "coney-island-museum",
+    "name": "Coney Island Museum",
+    "borough": "Brooklyn",
+    "neighborhood": "Coney Island",
+    "address": "1208 Surf Avenue, Brooklyn, NY 11224",
+    "url": "https://www.coneyisland.com/programs/coney-island-museum",
+    "category": "Culture",
+    "lat": 40.575262,
+    "lng": -73.97985,
+    "geocode": {
+      "matched": "1208, Surf Avenue, West Brighton, Brooklyn, Kings County, New York, 11224, United States",
+      "query": "1208 Surf Avenue, Brooklyn, New York"
+    }
+  },
+  {
+    "id": "jewish-childrens-museum",
+    "name": "Jewish Children's Museum",
+    "borough": "Brooklyn",
+    "neighborhood": "Crown Heights",
+    "address": "792 Eastern Parkway, Brooklyn, NY 11213",
+    "url": "https://www.jcm.museum",
+    "category": "Children",
+    "lat": 40.668879,
+    "lng": -73.941965,
+    "geocode": {
+      "matched": "Jewish Childrens Museum, 792, Eastern Parkway, Brooklyn, Kings County, New York, 11213, United States",
+      "query": "792 Eastern Parkway, Brooklyn, New York"
+    }
+  },
+  {
+    "id": "pioneer-works",
+    "name": "Pioneer Works",
+    "borough": "Brooklyn",
+    "neighborhood": "Red Hook",
+    "address": "159 Pioneer Street, Brooklyn, NY 11231",
+    "url": "https://pioneerworks.org",
+    "category": "Art",
+    "lat": 40.67913,
+    "lng": -74.012225,
+    "geocode": {
+      "matched": "Pioneer Works, Pioneer Street, Red Hook, Brooklyn, Kings County, New York, 11231, United States",
+      "query": "Pioneer Works, Brooklyn, New York"
+    }
+  },
+  {
+    "id": "bric-house",
+    "name": "BRIC House",
+    "borough": "Brooklyn",
+    "neighborhood": "Fort Greene",
+    "address": "647 Fulton Street, Brooklyn, NY 11217",
+    "url": "https://www.bricartsmedia.org",
+    "category": "Art",
+    "lat": 40.688508,
+    "lng": -73.979164,
+    "geocode": {
+      "matched": "BRIC, 647, Fulton Street, Fort Greene, Brooklyn, Kings County, New York, 11217, United States",
+      "query": "647 Fulton Street, Brooklyn, New York"
+    }
+  },
+  {
+    "id": "harbor-defense",
+    "name": "Harbor Defense Museum",
+    "borough": "Brooklyn",
+    "neighborhood": "Bay Ridge",
+    "address": "230 Sheridan Loop, Fort Hamilton, Brooklyn, NY 11252",
+    "url": "https://home.army.mil/hamilton/about/harbor-defense-museum",
+    "category": "History",
+    "lat": 40.608911,
+    "lng": -74.032085,
+    "geocode": {
+      "matched": "Harbor Defense Museum, 230, Sheridan Loop, Brooklyn, Kings County, New York, 11209, United States",
+      "query": "Harbor Defense Museum, Brooklyn, New York"
+    }
+  },
+  {
+    "id": "moma-ps1",
+    "name": "MoMA PS1",
+    "borough": "Queens",
+    "neighborhood": "Long Island City",
+    "address": "22-25 Jackson Avenue, Queens, NY 11101",
+    "url": "https://www.momaps1.org",
+    "category": "Art",
+    "lat": 40.745582,
+    "lng": -73.947467,
+    "geocode": {
+      "matched": "MoMA PS1, 46th Road, Court Square, Long Island City, Queens, Queens County, New York, 11109, United States",
+      "query": "MoMA PS1, Queens, New York"
+    }
+  },
+  {
+    "id": "queens-museum",
+    "name": "Queens Museum",
+    "borough": "Queens",
+    "neighborhood": "Flushing Meadows Corona Park",
+    "address": "New York City Building, Flushing Meadows Corona Park, Queens, NY 11368",
+    "url": "https://queensmuseum.org",
+    "category": "Art",
+    "lat": 40.745869,
+    "lng": -73.846741,
+    "geocode": {
+      "matched": "Queens Museum, Meridian Road, Queens, Queens County, New York, 11368, United States",
+      "query": "Queens Museum, Queens, New York"
+    }
+  },
+  {
+    "id": "noguchi",
+    "name": "The Noguchi Museum",
+    "borough": "Queens",
+    "neighborhood": "Long Island City",
+    "address": "9-01 33rd Road, Queens, NY 11106",
+    "url": "https://www.noguchi.org",
+    "category": "Art",
+    "lat": 40.76699,
+    "lng": -73.937607,
+    "geocode": {
+      "matched": "The Noguchi Museum, 9-01, 33rd Road, Queens, Queens County, New York, 11106, United States",
+      "query": "The Noguchi Museum, 9-01 33rd Road, Queens, NY 11106"
+    }
+  },
+  {
+    "id": "moving-image",
+    "name": "Museum of the Moving Image",
+    "borough": "Queens",
+    "neighborhood": "Astoria",
+    "address": "36-01 35th Avenue, Queens, NY 11106",
+    "url": "https://movingimage.org",
+    "category": "Culture",
+    "lat": 40.756298,
+    "lng": -73.923916,
+    "geocode": {
+      "matched": "Museum of the Moving Image, 36-01, 35th Avenue, Queens, Queens County, New York, 11106, United States",
+      "query": "Museum of the Moving Image, 36-01 35th Avenue, Queens, NY 11106"
+    }
+  },
+  {
+    "id": "louis-armstrong",
+    "name": "Louis Armstrong House Museum",
+    "borough": "Queens",
+    "neighborhood": "Corona",
+    "address": "34-56 107th Street, Queens, NY 11368",
+    "url": "https://www.louisarmstronghouse.org",
+    "category": "Culture",
+    "lat": 40.754568,
+    "lng": -73.861543,
+    "geocode": {
+      "matched": "Louis Armstrong House Museum, 34-56, 107th Street, Queens, Queens County, New York, 11368, United States",
+      "query": "Louis Armstrong House Museum, 34-56 107th Street, Queens, NY 11368"
+    }
+  },
+  {
+    "id": "nysci",
+    "name": "New York Hall of Science",
+    "borough": "Queens",
+    "neighborhood": "Corona",
+    "address": "47-01 111th Street, Queens, NY 11368",
+    "url": "https://nysci.org",
+    "category": "Science",
+    "lat": 40.747377,
+    "lng": -73.851614,
+    "geocode": {
+      "matched": "New York Hall of Science, 47-01, 111th Street, Queens, Queens County, New York, 11368, United States",
+      "query": "New York Hall of Science, 47-01 111th Street, Queens, NY 11368"
+    }
+  },
+  {
+    "id": "socrates",
+    "name": "Socrates Sculpture Park",
+    "borough": "Queens",
+    "neighborhood": "Astoria",
+    "address": "32-01 Vernon Boulevard, Queens, NY 11106",
+    "url": "https://socratessculpturepark.org",
+    "category": "Art",
+    "lat": 40.768254,
+    "lng": -73.936712,
+    "geocode": {
+      "matched": "Socrates Sculpture Park, Queens, Queens County, New York, United States",
+      "query": "Socrates Sculpture Park, Queens, New York"
+    }
+  },
+  {
+    "id": "sculpturecenter",
+    "name": "SculptureCenter",
+    "borough": "Queens",
+    "neighborhood": "Long Island City",
+    "address": "44-19 Purves Street, Queens, NY 11101",
+    "url": "https://www.sculpture-center.org",
+    "category": "Art",
+    "lat": 40.746908,
+    "lng": -73.940864,
+    "geocode": {
+      "matched": "Sculpture Center, 44-19, Purves Street, Court Square, Long Island City, Queens, Queens County, New York, 11101, United States",
+      "query": "44-19 Purves Street, Queens, New York"
+    }
+  },
+  {
+    "id": "queens-farm",
+    "name": "Queens County Farm Museum",
+    "borough": "Queens",
+    "neighborhood": "Floral Park",
+    "address": "73-50 Little Neck Parkway, Queens, NY 11004",
+    "url": "https://www.queensfarm.org",
+    "category": "History",
+    "lat": 40.747748,
+    "lng": -73.722249,
+    "geocode": {
+      "matched": "Queens County Farm Museum, Queens, Queens County, New York, United States",
+      "query": "Queens County Farm Museum, Queens, New York"
+    }
+  },
+  {
+    "id": "king-manor",
+    "name": "King Manor Museum",
+    "borough": "Queens",
+    "neighborhood": "Jamaica",
+    "address": "150-03 Jamaica Avenue, Queens, NY 11432",
+    "url": "https://www.kingmanor.org",
+    "category": "History",
+    "lat": 40.703159,
+    "lng": -73.80375,
+    "geocode": {
+      "matched": "King Manor Museum, 150-05, Jamaica Avenue, Queens, Queens County, New York, 11432, United States",
+      "query": "King Manor Museum, Queens, New York"
+    }
+  },
+  {
+    "id": "kingsland-homestead",
+    "name": "Kingsland Homestead / Queens Historical Society",
+    "borough": "Queens",
+    "neighborhood": "Flushing",
+    "address": "143-35 37th Avenue, Queens, NY 11354",
+    "url": "https://queenshistoricalsociety.org",
+    "category": "History",
+    "lat": 40.763631,
+    "lng": -73.824149,
+    "geocode": {
+      "matched": "Kingsland Homestead, 143-35, 37th Avenue, Flushing Chinatown, Flushing, Queens, Queens County, New York, 11354, United States",
+      "query": "143-35 37th Avenue, Queens, New York"
+    }
+  },
+  {
+    "id": "bowne-house",
+    "name": "Bowne House",
+    "borough": "Queens",
+    "neighborhood": "Flushing",
+    "address": "37-01 Bowne Street, Queens, NY 11354",
+    "url": "https://www.bownehouse.org",
+    "category": "History",
+    "lat": 40.762891,
+    "lng": -73.824883,
+    "geocode": {
+      "matched": "John Bowne House, 37-01, Bowne Street, Flushing Chinatown, Flushing, Queens, Queens County, New York, 11354, United States",
+      "query": "Bowne House, 37-01 Bowne Street, Queens, NY 11354"
+    }
+  },
+  {
+    "id": "voelker-orth",
+    "name": "Voelker Orth Museum",
+    "borough": "Queens",
+    "neighborhood": "Flushing",
+    "address": "149-19 38th Avenue, Queens, NY 11354",
+    "url": "https://vomuseum.org",
+    "category": "History",
+    "lat": 40.764736,
+    "lng": -73.816204,
+    "geocode": {
+      "matched": "The Voelker Orth Museum, 149-19, 38th Avenue, Murray Hill, Flushing, Queens, Queens County, New York, 11354, United States",
+      "query": "Voelker Orth Museum, 149-19 38th Avenue, Queens, NY 11354"
+    }
+  },
+  {
+    "id": "greater-astoria",
+    "name": "Greater Astoria Historical Society",
+    "borough": "Queens",
+    "neighborhood": "Astoria",
+    "address": "35-20 Broadway, Queens, NY 11106",
+    "url": "https://www.astorialic.org",
+    "category": "History",
+    "lat": 40.760118,
+    "lng": -73.92172,
+    "geocode": {
+      "matched": "35-20, Broadway, Queens, Queens County, New York, 11106, United States",
+      "query": "35-20 Broadway, Queens, New York"
+    }
+  },
+  {
+    "id": "poppenhusen",
+    "name": "Poppenhusen Institute",
+    "borough": "Queens",
+    "neighborhood": "College Point",
+    "address": "114-04 14th Road, Queens, NY 11356",
+    "url": "https://poppenhuseninstitute.org",
+    "category": "History",
+    "lat": 40.7844,
+    "lng": -73.852926,
+    "geocode": {
+      "matched": "Poppenhusen Institute, 14th Road, College Point, Queens, Queens County, New York, 11356, United States",
+      "query": "Poppenhusen Institute, Queens, New York"
+    }
+  },
+  {
+    "id": "bronx-museum",
+    "name": "The Bronx Museum of the Arts",
+    "borough": "Bronx",
+    "neighborhood": "Concourse",
+    "address": "1040 Grand Concourse, Bronx, NY 10456",
+    "url": "https://www.bronxmuseum.org",
+    "category": "Art",
+    "lat": 40.831091,
+    "lng": -73.919947,
+    "geocode": {
+      "matched": "Bronx Museum of the Arts, 1040, Grand Concourse, South Bronx, The Bronx, Bronx County, New York, 10456, United States",
+      "query": "1040 Grand Concourse, Bronx, New York"
+    }
+  },
+  {
+    "id": "wave-hill",
+    "name": "Wave Hill",
+    "borough": "Bronx",
+    "neighborhood": "Riverdale",
+    "address": "4900 Independence Avenue, Bronx, NY 10471",
+    "url": "https://www.wavehill.org",
+    "category": "Culture",
+    "lat": 40.898654,
+    "lng": -73.912258,
+    "geocode": {
+      "matched": "Wave Hill, 4900, The Bronx, Bronx County, New York, 10471, United States",
+      "query": "Wave Hill, Bronx, New York"
+    }
+  },
+  {
+    "id": "poe-cottage",
+    "name": "Edgar Allan Poe Cottage",
+    "borough": "Bronx",
+    "neighborhood": "Fordham",
+    "address": "2640 Grand Concourse, Bronx, NY 10458",
+    "url": "https://bronxhistoricalsociety.org/poe-cottage",
+    "category": "History",
+    "lat": 40.864955,
+    "lng": -73.894881,
+    "geocode": {
+      "matched": "2640, Grand Concourse, The Bronx, Bronx County, New York, 10458, United States",
+      "query": "2640 Grand Concourse, Bronx, New York"
+    }
+  },
+  {
+    "id": "van-cortlandt-house",
+    "name": "Van Cortlandt House Museum",
+    "borough": "Bronx",
+    "neighborhood": "Van Cortlandt Park",
+    "address": "6036 Broadway, Bronx, NY 10471",
+    "url": "https://vchm.org",
+    "category": "History",
+    "lat": 40.891131,
+    "lng": -73.894813,
+    "geocode": {
+      "matched": "Van Cortlandt House Museum, John Muir Trail, The Bronx, Bronx County, New York, 10471, United States",
+      "query": "Van Cortlandt House Museum, Bronx, New York"
+    }
+  },
+  {
+    "id": "bartow-pell",
+    "name": "Bartow-Pell Mansion Museum",
+    "borough": "Bronx",
+    "neighborhood": "Pelham Bay Park",
+    "address": "895 Shore Road, Bronx, NY 10464",
+    "url": "https://www.bartowpellmansionmuseum.org",
+    "category": "History",
+    "lat": 40.871781,
+    "lng": -73.80564,
+    "geocode": {
+      "matched": "Bartow-Pell Mansion Museum, Siwanoy Trail, The Bronx, Bronx County, New York, 10475, United States",
+      "query": "Bartow-Pell Mansion Museum, Bronx, New York"
+    }
+  },
+  {
+    "id": "museum-bronx-history",
+    "name": "Museum of Bronx History (Valentine-Varian House)",
+    "borough": "Bronx",
+    "neighborhood": "Norwood",
+    "address": "3266 Bainbridge Avenue, Bronx, NY 10467",
+    "url": "https://bronxhistoricalsociety.org/valentine-varian-house",
+    "category": "History",
+    "lat": 40.87738,
+    "lng": -73.879431,
+    "geocode": {
+      "matched": "Museum of Bronx History, 3266, Bainbridge Avenue, Norwood, The Bronx, Bronx County, New York, 10467, United States",
+      "query": "3266 Bainbridge Avenue, Bronx, New York"
+    }
+  },
+  {
+    "id": "hall-of-fame",
+    "name": "Hall of Fame for Great Americans",
+    "borough": "Bronx",
+    "neighborhood": "University Heights",
+    "address": "2155 University Avenue, Bronx, NY 10453",
+    "url": "https://www.bcc.cuny.edu/hall-of-fame",
+    "category": "History",
+    "lat": 40.858762,
+    "lng": -73.914306,
+    "geocode": {
+      "matched": "Hall of Fame for Great Americans, Sedgwick Avenue, University Heights, The Bronx, Bronx County, New York, 10453, United States",
+      "query": "Hall of Fame for Great Americans, Bronx, New York"
+    }
+  },
+  {
+    "id": "maritime-industry",
+    "name": "Maritime Industry Museum",
+    "borough": "Bronx",
+    "neighborhood": "Throggs Neck",
+    "address": "6 Pennyfield Avenue, Fort Schuyler, Bronx, NY 10465",
+    "url": "https://www.sunymaritime.edu/maritime-industry-museum",
+    "category": "History",
+    "lat": 40.807098,
+    "lng": -73.795733,
+    "geocode": {
+      "matched": "SUNY Maritime College, 6, Pennyfield Avenue, Silver Beach, The Bronx, Bronx County, New York, 10465, United States",
+      "query": "6 Pennyfield Avenue, Bronx, New York"
+    }
+  },
+  {
+    "id": "staten-island-museum",
+    "name": "Staten Island Museum",
+    "borough": "Staten Island",
+    "neighborhood": "Snug Harbor",
+    "address": "1000 Richmond Terrace, Building A, Staten Island, NY 10301",
+    "url": "https://www.statenislandmuseum.org",
+    "category": "Science",
+    "lat": 40.644521,
+    "lng": -74.102749,
+    "geocode": {
+      "matched": "Staten Island Museum, Shinbone Alley, Staten Island, Richmond County, New York, 10301, United States",
+      "query": "Staten Island Museum, Staten Island, New York"
+    }
+  },
+  {
+    "id": "historic-richmond-town",
+    "name": "Historic Richmond Town",
+    "borough": "Staten Island",
+    "neighborhood": "Richmondtown",
+    "address": "441 Clarke Avenue, Staten Island, NY 10306",
+    "url": "https://www.historicrichmondtown.org",
+    "category": "History",
+    "lat": 40.570877,
+    "lng": -74.145896,
+    "geocode": {
+      "matched": "Historic Richmond Town, Staten Island, Richmond County, New York, United States",
+      "query": "Historic Richmond Town, Staten Island, New York"
+    }
+  },
+  {
+    "id": "jacques-marchais",
+    "name": "Jacques Marchais Museum of Tibetan Art",
+    "borough": "Staten Island",
+    "neighborhood": "Lighthouse Hill",
+    "address": "338 Lighthouse Avenue, Staten Island, NY 10306",
+    "url": "https://www.tibetanmuseum.org",
+    "category": "Art",
+    "lat": 40.576305,
+    "lng": -74.138248,
+    "geocode": {
+      "matched": "Jacques Marchais Museum of Tibetan Art, 338, Lighthouse Avenue, Richmond, Staten Island, Richmond County, New York, 10306, United States",
+      "query": "Jacques Marchais Museum of Tibetan Art, 338 Lighthouse Avenue, Staten Island, NY 10306"
+    }
+  },
+  {
+    "id": "alice-austen",
+    "name": "Alice Austen House",
+    "borough": "Staten Island",
+    "neighborhood": "Rosebank",
+    "address": "2 Hylan Boulevard, Staten Island, NY 10305",
+    "url": "https://aliceausten.org",
+    "category": "History",
+    "lat": 40.615121,
+    "lng": -74.063036,
+    "geocode": {
+      "matched": "Alice Austen House, 2, Hylan Boulevard, Rosebank, Staten Island, Richmond County, New York, 10305, United States",
+      "query": "Alice Austen House, 2 Hylan Boulevard, Staten Island, NY 10305"
+    }
+  },
+  {
+    "id": "snug-harbor",
+    "name": "Snug Harbor Cultural Center & Botanical Garden",
+    "borough": "Staten Island",
+    "neighborhood": "Livingston",
+    "address": "1000 Richmond Terrace, Staten Island, NY 10301",
+    "url": "https://snug-harbor.org",
+    "category": "Culture",
+    "lat": 40.641876,
+    "lng": -74.101942,
+    "geocode": {
+      "matched": "Tuscan Villa, 1000, Richmond Terrace, New Brighton, Staten Island, Richmond County, New York, 10301, United States",
+      "query": "1000 Richmond Terrace, Staten Island, New York"
+    }
+  },
+  {
+    "id": "si-childrens",
+    "name": "Staten Island Children's Museum",
+    "borough": "Staten Island",
+    "neighborhood": "Snug Harbor",
+    "address": "1000 Richmond Terrace, Staten Island, NY 10301",
+    "url": "https://www.sichildrensmuseum.org",
+    "category": "Children",
+    "lat": 40.642711,
+    "lng": -74.101893,
+    "geocode": {
+      "matched": "Staten Island Children’s Museum, Chapel Road, Staten Island, Richmond County, New York, 10301, United States",
+      "query": "Staten Island Children's Museum, Staten Island, New York"
+    }
+  },
+  {
+    "id": "noble-maritime",
+    "name": "Noble Maritime Collection",
+    "borough": "Staten Island",
+    "neighborhood": "Snug Harbor",
+    "address": "1000 Richmond Terrace, Building D, Staten Island, NY 10301",
+    "url": "https://noblemaritime.org",
+    "category": "History",
+    "lat": 40.644307,
+    "lng": -74.101763,
+    "geocode": {
+      "matched": "Noble Maritime Collection, Shinbone Alley, Staten Island, Richmond County, New York, 10301, United States",
+      "query": "Noble Maritime Collection, Staten Island, New York"
+    }
+  },
+  {
+    "id": "garibaldi-meucci",
+    "name": "Garibaldi-Meucci Museum",
+    "borough": "Staten Island",
+    "neighborhood": "Rosebank",
+    "address": "420 Tompkins Avenue, Staten Island, NY 10305",
+    "url": "https://www.garibaldimeuccimuseum.org",
+    "category": "History",
+    "lat": 40.615193,
+    "lng": -74.07381,
+    "geocode": {
+      "matched": "Garibaldi-Meucci Museum, Tompkins Avenue, Clifton, Staten Island, Richmond County, New York, 10304, United States",
+      "query": "Garibaldi-Meucci Museum, Staten Island, New York"
+    }
+  },
+  {
+    "id": "conference-house",
+    "name": "Conference House",
+    "borough": "Staten Island",
+    "neighborhood": "Tottenville",
+    "address": "298 Satterlee Street, Staten Island, NY 10307",
+    "url": "https://conferencehouse.org",
+    "category": "History",
+    "lat": 40.502262,
+    "lng": -74.251681,
+    "geocode": {
+      "matched": "Visitor Center & Lenape Gallery, 298, Satterlee Street, Staten Island, Richmond County, New York, 10307",
+      "query": "298 Satterlee Street, Staten Island, NY"
+    }
+  },
+  {
+    "id": "lighthouse-museum",
+    "name": "National Lighthouse Museum",
+    "borough": "Staten Island",
+    "neighborhood": "St. George",
+    "address": "200 The Promenade at Lighthouse Point, Staten Island, NY 10301",
+    "url": "https://lighthousemuseum.org",
+    "category": "History",
+    "lat": 40.640726,
+    "lng": -74.073411,
+    "geocode": {
+      "matched": "National Lighthouse Museum, 200, Bay Street Landing, Saint George, Staten Island, Richmond County, New York, 10301, United States",
+      "query": "National Lighthouse Museum, Staten Island, New York"
+    }
+  }
+]
