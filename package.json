@@ -9,6 +9,7 @@
     "geocode": "node scripts/geocode.mjs",
     "check": "node scripts/check-data.mjs",
     "audit": "node scripts/audit-design.mjs",
+    "links": "node scripts/check-links.mjs",
     "fonts": "python3 scripts/build-fonts.py",
     "mark": "python3 scripts/build-mark.py"
   }

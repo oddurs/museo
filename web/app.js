@@ -163,8 +163,10 @@ function renderIndex() {
             <p class="entry__meta t-small">${
               m.neighborhood ? highlight(m.neighborhood) + ' &middot; ' : ''
             }${highlight(street(m.address))}</p>
-            <a class="entry__link t-fine" href="${escapeHtml(m.url)}" tabindex="-1"
-               target="_blank" rel="noopener noreferrer">${escapeHtml(hostOf(m.url))} &#8599;</a>
+            ${m.url
+              ? `<a class="entry__link t-fine" href="${escapeHtml(m.url)}" tabindex="-1"
+                    target="_blank" rel="noopener noreferrer">${escapeHtml(hostOf(m.url))} &#8599;</a>`
+              : '<span class="entry__link entry__link--none t-fine">No website</span>'}
             ${facts(m)}
           </div>
           <span class="entry__class">
@@ -237,7 +239,7 @@ function syncRoving() {
   entries.forEach((entry, i) => {
     const on = i === state.cursor ? '0' : '-1'
     entry.querySelector('.entry__select')?.setAttribute('tabindex', on)
-    entry.querySelector('.entry__link')?.setAttribute('tabindex', on)
+    entry.querySelector('a.entry__link')?.setAttribute('tabindex', on)
   })
 }
 
@@ -327,8 +329,10 @@ function initMap() {
          <div class="pop__meta">${escapeHtml(m.address)}</div>
          <div class="pop__foot">
            <span class="t-label">${escapeHtml(m.borough)} &middot; ${escapeHtml(m.category)}</span>
-           <a class="link t-small" href="${escapeHtml(m.url)}" target="_blank"
-              rel="noopener noreferrer">${escapeHtml(hostOf(m.url))} &#8599;</a>
+           ${m.url
+             ? `<a class="link t-small" href="${escapeHtml(m.url)}" target="_blank"
+                   rel="noopener noreferrer">${escapeHtml(hostOf(m.url))} &#8599;</a>`
+             : '<span class="t-small u-quiet">No website</span>'}
          </div>
        </div>`,
       { closeButton: false, offset: [0, -10], autoPanPadding: [28, 28] },

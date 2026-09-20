@@ -11,6 +11,7 @@ npm run mark    # cut the mark out of Whitney (web/mark.svg)
 npm start       # http://localhost:5173
 npm run check   # validate data/museums.json, including its typography
 npm run audit   # lint the design system — spacing, borders, tokens
+npm run links   # check every outbound museum link
 npm run geocode # fill in coordinates for any new entries
 ```
 
@@ -28,7 +29,9 @@ npm run geocode # fill in coordinates for any new entries
   ("children brooklyn" works).
 - **On map only** — narrows the index to the current map viewport, so you can pan
   to a neighborhood and see just what's walkable from there.
-- Each entry links out to the museum's own site. No photos, by design.
+- Each entry links out to the museum's own site. No photos, by design. Links
+  are verified with `npm run links`; one museum (Garibaldi-Meucci) has no
+  working website and the entry says so rather than offering a dead link.
 - **Keyboard** — `/` jumps to search, `↓` steps into the index, `↑` `↓` `Home`
   `End` move through results and fly the map along, `Escape` clears.
 - **Shareable** — filters, search and the selected museum live in the URL, so a
@@ -52,6 +55,7 @@ scripts/serve.mjs       zero-dependency static server
 scripts/geocode.mjs     fills missing lat/lng from OpenStreetMap Nominatim
 scripts/check-data.mjs  validates the dataset
 scripts/audit-design.mjs lints spacing, borders and tokens
+scripts/check-links.mjs  checks every outbound museum link
 ```
 
 See **[DESIGN.md](DESIGN.md)** for the system: principles, color, type scale,
@@ -77,6 +81,7 @@ One object per museum:
 ```
 
 `id`, `name`, `borough`, `address`, `url` and `category` are hand-entered.
+`url` is optional — an entry without a link beats an entry with a dead one.
 `lat`, `lng` and `geocode` are written by `npm run geocode`.
 
 Categories in use: Art, Children, Culture, Design, History, Science, Specialty.
@@ -97,6 +102,18 @@ To re-geocode an existing record: `node scripts/geocode.mjs --force=some-id,othe
 
 Coordinates were spot-checked against known positions; the ten landmarks sampled
 were all within 40m.
+
+### Checking the links
+
+```
+npm run links            # all of them, six at a time
+npm run links -- --slow  # one at a time
+```
+
+A 403 or 429 is reported as *unverifiable*, not broken: nine of the larger
+museums sit behind bot protection that refuses any automated request. Those
+still need a human eye — the stale Met Cloisters and NMAI paths were both
+hiding behind a block.
 
 ## Still to come
 

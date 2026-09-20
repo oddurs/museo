@@ -127,7 +127,10 @@
               border-color var(--duration) var(--easing);
 }
 
-.entry:hover .entry__link { border-bottom-color: var(--primary-line); }
+.entry:hover a.entry__link { border-bottom-color: var(--primary-line); }
+
+/* A museum whose website has gone says so, rather than offering a dead link. */
+.entry__link--none { color: var(--ink-tertiary); font-style: italic; }
 .entry__link:hover { color: var(--primary-deep); border-bottom-color: var(--primary); }
 
 /* Classification stack, flush right: borough on the name's baseline,

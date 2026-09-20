@@ -12,7 +12,7 @@ const seenNames = new Set()
 
 for (const m of museums) {
   const where = m.id ?? m.name ?? '(unnamed)'
-  for (const field of ['id', 'name', 'borough', 'address', 'url', 'category']) {
+  for (const field of ['id', 'name', 'borough', 'address', 'category']) {
     if (!m[field]) problems.push(`${where}: missing ${field}`)
   }
   if (seenIds.has(m.id)) problems.push(`${where}: duplicate id`)
@@ -39,11 +39,15 @@ for (const m of museums) {
     }
   }
 
-  try {
-    const u = new URL(m.url)
-    if (u.protocol !== 'https:') problems.push(`${where}: url is not https`)
-  } catch {
-    problems.push(`${where}: invalid url "${m.url}"`)
+  // `url` is optional: a handful of small museums have no working website,
+  // and an entry without a link beats an entry with a dead one.
+  if (m.url) {
+    try {
+      const u = new URL(m.url)
+      if (u.protocol !== 'https:') problems.push(`${where}: url is not https`)
+    } catch {
+      problems.push(`${where}: invalid url "${m.url}"`)
+    }
   }
 }
 
@@ -60,7 +64,11 @@ for (const [key, ids] of byCoord) {
 const byBorough = {}
 for (const m of museums) byBorough[m.borough] = (byBorough[m.borough] ?? 0) + 1
 
+const siteless = museums.filter((m) => !m.url)
 console.log(`${museums.length} museums`, byBorough)
+if (siteless.length) {
+  console.log(`${siteless.length} without a website: ${siteless.map((m) => m.id).join(', ')}`)
+}
 if (problems.length) {
   console.error(`\n${problems.length} problem(s):`)
   for (const p of problems) console.error(' -', p)
