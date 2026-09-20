@@ -401,10 +401,33 @@ and `--primary` on the link itself.
 
 ## The map
 
-The basemap is desaturated *and warmed to the paper's temperature*
-(`grayscale(1) sepia(0.32) saturate(0.55)`), so it reads as part of the system
-rather than a window cut through it. Leaflet's own link color is overridden —
-nothing in the interface carries a stray hue.
+**The basemap keeps a trace of its own colour.** It used to be fully
+desaturated and warmed, which looked disciplined and read badly: the Hudson was
+exactly the same value as the city on either side of it, so the map could not
+tell water from land. Six treatments of the same view were rendered side by
+side; the one in use keeps enough saturation for water to be water and parks to
+be parks, warmed toward the paper and held well below the pins
+(`saturate(0.38) sepia(0.2) brightness(1.07) contrast(0.81)`). Cinnabar still
+owns the page. Leaflet's own link colour and its attribution flag are still
+overridden — nothing else carries a stray hue.
+
+**One movement, landing correctly.** Choosing a museum used to centre its pin
+and then let the popup auto-pan the map a second time. The view is now placed
+deliberately: the centre is offset by half the room a popup needs, so the pin
+sits below the middle with its label above it, and the popup no longer pans
+itself at all.
+
+**Animated zoom is capped at 1.5 steps.** A canvas renderer scales its whole
+surface during a zoom animation and only redraws when it ends, so every pin
+swells by the zoom factor and snaps back — measured at **16.8×** across a
+city-wide fly. Under a step and a half that is imperceptible and the movement
+is worth having; beyond it the view is placed outright, which looks deliberate
+where a swelling, popping zoom looks broken. Panning between museums once
+zoomed in is a pure pan, and stays smooth.
+
+Other smoothness settings: continuous zoom (`zoomSnap: 0`) rather than quarter
+steps, a slower wheel, a canvas margin of 0.6 so pins do not pop in at the edge
+of the frame while panning, and `keepBuffer: 4` so panning has no white edge.
 
 Pins are the primary: 107 cinnabar dots on warm gray. The selected pin takes an
 ink fill with a wide, low-opacity primary halo.
@@ -438,6 +461,12 @@ list.
 the map's contents, so choosing a row pans only as far as `panInside` needs to
 bring the pin into view instead of zooming to it. Selecting a row used to
 collapse the list from 107 rows to 5.
+
+**Grouped by borough, the index grows section rules.** The borough name and
+its count head each run, and the per-row borough label — which would otherwise
+repeat 58 times under a heading that already says it — comes off the screen
+while staying in the document for assistive technology. The column head follows
+the column: it reads *Discipline* while grouped, because that is what is in it.
 
 **Three orders, one of them yours.** A–Z, by borough (in the boroughs' own
 order, matching the filter bar), and by distance. Distance asks the browser

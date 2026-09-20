@@ -41,6 +41,7 @@ const els = {
   list: document.getElementById('list'),
   scroll: document.getElementById('scroll'),
   colophonCount: document.getElementById('colophon-count'),
+  headClass: document.getElementById('head-class'),
   empty: document.getElementById('empty'),
   search: document.getElementById('search'),
   boroughFilters: document.getElementById('borough-filters'),
@@ -201,14 +202,39 @@ function facts(m) {
 }
 
 const showDistance = () => state.sort === 'near' && !!state.origin
+const isGrouped = () => state.sort === 'borough'
+
+/** A section rule announcing each borough. Presentational: every row still
+    carries its borough for assistive technology, just not on screen. */
+function sectionRow(borough, count) {
+  const li = document.createElement('li')
+  li.className = 'index__section'
+  li.setAttribute('aria-hidden', 'true')
+  li.innerHTML =
+    `<span class="index__section-name t-label">${escapeHtml(borough)}</span>` +
+    `<span class="index__section-count t-figure">${count}</span>`
+  return li
+}
 
 function renderIndex() {
   state.rows = visible()
   const active = state.rows.findIndex((m) => m.id === state.activeId)
   state.cursor = active >= 0 ? active : state.rows.length ? 0 : -1
 
+  const grouped = isGrouped()
+  const counts = {}
+  if (grouped) for (const m of state.rows) counts[m.borough] = (counts[m.borough] ?? 0) + 1
+  let section = null
+  const children = []
+
+  els.list.classList.toggle('is-grouped', grouped)
   els.list.replaceChildren(
-    ...state.rows.map((m, i) => {
+    ...state.rows.flatMap((m, i) => {
+      const before = []
+      if (grouped && m.borough !== section) {
+        section = m.borough
+        before.push(sectionRow(m.borough, counts[m.borough]))
+      }
       const li = document.createElement('li')
       li.innerHTML = `
         <article class="entry" data-id="${escapeHtml(m.id)}">
@@ -228,13 +254,16 @@ function renderIndex() {
             ${facts(m)}
           </div>
           <span class="entry__class">
-            <span class="entry__borough t-label">${escapeHtml(m.borough)}</span>
+            <span class="entry__borough t-label${grouped ? ' sr-only' : ''}">${escapeHtml(m.borough)}</span>
             <span class="entry__discipline t-label">${escapeHtml(m.category)}</span>
           </span>
         </article>`
-      return li
+      return [...before, li]
     }),
   )
+
+  // Grouped by borough, that column holds the discipline instead.
+  els.headClass.textContent = grouped ? 'Discipline' : 'Borough'
 
   els.empty.hidden = state.rows.length > 0
   els.count.textContent = state.rows.length
@@ -320,7 +349,33 @@ function setCursorTo(index, { focus = true } = {}) {
 
 /* ---------------------------------------------------------- selection --- */
 
-function select(id, { pan = true, scroll = false, focus = false } = {}) {
+const POPUP_ROOM = 150   // vertical clearance a popup needs above its pin
+
+const targetZoom = () => Math.max(map.getZoom(), 15)
+
+/* A canvas renderer scales its whole surface during a zoom animation and only
+   redraws when the animation ends, so every pin swells by the zoom factor and
+   snaps back — measured at 16.8× across a city-wide fly. Under a step and a
+   half that magnification is imperceptible and the movement is worth having;
+   beyond it, placing the view outright looks deliberate where a swelling,
+   popping zoom looks broken. */
+const ANIMATABLE_ZOOM_STEP = 1.5
+
+function moveTo(centre, zoom, { duration = 0.6 } = {}) {
+  const far = Math.abs(zoom - map.getZoom()) > ANIMATABLE_ZOOM_STEP
+  if (!animate || far) map.setView(centre, zoom, { animate: false })
+  else map.flyTo(centre, zoom, { animate: true, duration, easeLinearity: 0.22 })
+}
+
+/** Where the map should centre so the pin sits below the middle and its popup
+    has room above — one movement that lands correctly, rather than a centre
+    followed by an auto-pan correction. */
+function centreFor(latlng) {
+  const z = targetZoom()
+  return map.unproject(map.project(latlng, z).subtract([0, POPUP_ROOM / 2]), z)
+}
+
+function select(id, { pan = true, scroll = false, focus = false, center = false } = {}) {
   state.activeId = id
   const i = state.rows.findIndex((m) => m.id === id)
   if (i >= 0) { state.cursor = i; syncRoving() }
@@ -332,15 +387,21 @@ function select(id, { pan = true, scroll = false, focus = false } = {}) {
     // zoom would empty it out from under whoever just chose a row. Nudge the
     // view only as far as it takes to bring the pin inside.
     if (state.viewportOnly) {
-      map.panInside(marker.getLatLng(), { padding: [48, 48], animate })
+      map.panInside(marker.getLatLng(), { padding: [48, POPUP_ROOM], animate })
     } else {
-      map.setView(marker.getLatLng(), Math.max(map.getZoom(), 15), { animate })
+      moveTo(centreFor(marker.getLatLng()), targetZoom(), { duration: 0.7 })
     }
   }
-  if (marker) marker.openPopup()
+  if (marker) {
+    marker.openPopup()
+    // The popup opens above the pin; make room for it without a second jump.
+    if (!pan) map.panInside(marker.getLatLng(), { padding: [48, POPUP_ROOM], animate })
+  }
 
   const entry = entryFor(id)
-  if (scroll) entry?.scrollIntoView({ block: 'nearest', behavior: animate ? 'smooth' : 'auto' })
+  if (scroll) {
+    entry?.scrollIntoView({ block: center ? 'center' : 'nearest', behavior: animate ? 'smooth' : 'auto' })
+  }
   if (focus) entry?.querySelector('.entry__select')?.focus({ preventScroll: true })
   writeUrl()
 }
@@ -368,11 +429,28 @@ els.list.addEventListener('keydown', (e) => {
 /* ---------------------------------------------------------------- map --- */
 
 function initMap() {
-  map = L.map('map', { zoomControl: true, preferCanvas: true, zoomSnap: 0.25 })
-    .setView([40.7128, -73.96], 11)
+  map = L.map('map', {
+    zoomControl: true,
+    // Continuous zoom rather than quarter steps, and a slower wheel, so the
+    // map glides instead of clicking between stops.
+    zoomSnap: 0,
+    zoomDelta: 0.6,
+    wheelPxPerZoomLevel: 130,
+    wheelDebounceTime: 20,
+    zoomAnimation: true,
+    fadeAnimation: true,
+    inertia: true,
+    easeLinearity: 0.22,
+    // A generous canvas margin: at the default 10% the pins pop in at the edge
+    // of the frame while panning.
+    preferCanvas: true,
+    renderer: L.canvas({ padding: 0.6 }),
+  }).setView([40.7128, -73.96], 11)
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
+    keepBuffer: 4,            // hold tiles either side, so panning has no white edge
+    updateWhenZooming: false, // one tile update at the end of a zoom, not every frame
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   }).addTo(map)
 
@@ -393,10 +471,10 @@ function initMap() {
              : '<span class="t-small u-quiet">No website</span>'}
          </div>
        </div>`,
-      { closeButton: false, offset: [0, -10], autoPanPadding: [28, 28] },
+      { closeButton: false, offset: [0, -10], autoPan: false },
     )
 
-    marker.on('click', () => select(m.id, { pan: false, scroll: true }))
+    marker.on('click', () => select(m.id, { pan: false, scroll: true, center: true }))
     marker.on('mouseover', () => {
       if (m.id !== state.activeId) marker.setStyle(PIN_HOVER)
       entryFor(m.id)?.classList.add('is-peeked')
@@ -426,11 +504,9 @@ function syncMarkers() {
 function fitToResults() {
   const rows = state.museums.filter((m) => matches(m))
   if (!rows.length) return
-  map.fitBounds(L.latLngBounds(rows.map((m) => [m.lat, m.lng])), {
-    padding: [32, 32],
-    maxZoom: 15,
-    animate,
-  })
+  const bounds = L.latLngBounds(rows.map((m) => [m.lat, m.lng]))
+  const zoom = Math.min(map.getBoundsZoom(bounds, false, L.point(32, 32)), 15)
+  moveTo(bounds.getCenter(), zoom)
 }
 
 /* ------------------------------------------------------------ controls --- */

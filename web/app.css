@@ -162,6 +162,23 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 
 .index__list { flex: 0 0 auto; }
 
+/* Grouped by borough, the section rule says which borough these are, so the
+   per-row label would be 58 repetitions of the same word. It stays in the
+   document for assistive technology and comes off the screen. */
+.index__section {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-6) var(--gutter) var(--space-2);
+  padding-left: calc(var(--gutter) - var(--stroke-marker));
+  border-bottom: var(--hairline-strong);
+  color: var(--ink);
+}
+
+.index__section:first-child { padding-top: var(--space-3); }
+.index__section-count { color: var(--ink-tertiary); }
+
 .index__empty {
   flex: 1 0 auto;
   display: flex;
@@ -235,9 +252,14 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 /* Leaflet colors its own links (#0078A8). Nothing here carries a stray hue. */
 .leaflet-container a { color: inherit; }
 
+/* Not desaturated to nothing. Fully grey, the Hudson read exactly like the
+   city either side of it — a map that cannot tell water from land. A trace of
+   the basemap's own colour survives, warmed toward the paper and pulled well
+   below the pins: water is water, parks are parks, and cinnabar still owns the
+   page. Chosen by rendering six treatments of the same view side by side. */
 .leaflet-tile-pane {
-  filter: grayscale(1) sepia(0.32) saturate(0.55) brightness(1.06) contrast(0.82);
-  opacity: 0.9;
+  filter: saturate(0.38) sepia(0.2) brightness(1.07) contrast(0.81);
+  opacity: 0.95;
 }
 
 .leaflet-control-zoom {
