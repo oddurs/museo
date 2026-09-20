@@ -36,29 +36,6 @@ body { display: flex; flex-direction: column; overflow: hidden; }
   flex: none;
 }
 
-/* Light at display size and tracked wide — a wayfinding sign rather than a
-   logo. The weight it gives up is supplied by the keyline above it. */
-.wordmark {
-  font-family: var(--font-display);
-  font-size: 38px;
-  font-weight: 300;
-  line-height: 0.9;
-  letter-spacing: var(--track-wordmark);
-  text-transform: uppercase;
-  margin-right: calc(-1 * var(--track-wordmark)); /* absorb the trailing track */
-}
-
-.deck {
-  margin-top: var(--space-3);
-  color: var(--ink-secondary);
-  max-width: 46ch;
-}
-
-.deck em {
-  font-style: normal;
-  color: var(--primary-deep);
-}
-
 /* --------------------------------------------------------------------------
    SEARCH + FILTERS
    -------------------------------------------------------------------------- */
@@ -154,18 +131,21 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 
 .index__head span:last-child { text-align: right; }
 
-.index__list {
+/* One scroll region holding the rows, the empty message and the imprint, so
+   reaching the end of the index reaches the end of the publication. */
+.index__scroll {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
 }
 
-/* With no rows the list must stop claiming the pane, or the message explaining
-   why there are no rows is pushed to the bottom of it. */
-.index__list:empty { flex: 0 0 auto; }
+.index__list { flex: 0 0 auto; }
 
 .index__empty {
-  flex: 1;
+  flex: 1 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -183,6 +163,43 @@ body { display: flex; flex-direction: column; overflow: hidden; }
    no skeleton pretending to be content. */
 .is-loading .index__list,
 .is-loading .index__head { visibility: hidden; }
+
+/* --------------------------------------------------------------------------
+   COLOPHON
+   The index is a publication, so it ends the way one does: the mark, the name,
+   what it is set in, and where. Pushed to the foot of the scroll region, so a
+   short result list does not leave it floating mid-pane.
+   -------------------------------------------------------------------------- */
+
+.colophon {
+  margin-top: auto;
+  padding: var(--space-8) var(--gutter) var(--space-7);
+  padding-left: calc(var(--gutter) - var(--stroke-marker));
+  border-top: var(--edge);
+  color: var(--ink-tertiary);
+}
+
+.colophon__mark { opacity: 0.9; }
+
+.colophon .wordmark {
+  margin-top: var(--space-4);
+  color: var(--ink);
+}
+
+.colophon__imprint {
+  margin-top: var(--space-3);
+  max-width: 54ch;
+}
+
+.colophon__foot {
+  margin-top: var(--space-5);
+  padding-top: var(--space-3);
+  border-top: var(--hairline-light);
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  max-width: 54ch;
+}
 
 /* --------------------------------------------------------------------------
    MAP

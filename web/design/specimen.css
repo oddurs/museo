@@ -18,17 +18,6 @@ main,
   border-bottom: var(--edge);
 }
 
-.wordmark {
-  font-family: var(--font-display);
-  font-size: 38px;
-  font-weight: 300;
-  line-height: 0.9;
-  letter-spacing: var(--track-wordmark);
-  text-transform: uppercase;
-  margin-right: calc(-1 * var(--track-wordmark));
-}
-
-.deck { margin-top: var(--space-3); color: var(--ink-secondary); max-width: 46ch; }
 .spec-head__note { max-width: 44ch; color: var(--ink-secondary); }
 
 code {
@@ -160,6 +149,29 @@ code {
 .demo__stage { padding: var(--space-5); border: var(--hairline); background: var(--paper); }
 
 .filter-strip { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--space-4); }
+
+/* 01 identity */
+.marks { display: flex; align-items: flex-end; flex-wrap: wrap; gap: var(--space-5); }
+.marks figure { margin: 0; text-align: center; }
+.marks figcaption { margin-top: var(--space-2); color: var(--ink-tertiary); }
+.marks img { border: var(--hairline-light); }
+
+.lockups { display: flex; flex-direction: column; gap: var(--space-6); }
+.lockups > div > p:last-child { margin-top: var(--space-3); }
+
+/* the clearance is the wordmark's own cap height on every side */
+.clearspace {
+  display: inline-block;
+  padding: 0.72em;
+  outline: var(--hairline);
+  outline-offset: 0;
+  background:
+    linear-gradient(var(--primary-wash), var(--primary-wash)) padding-box;
+}
+.clearspace .wordmark { background: var(--paper); }
+
+.nots { display: grid; gap: var(--space-3); max-width: 62ch; color: var(--ink-secondary); }
+.nots li { padding-left: var(--space-4); border-left: var(--stroke-marker) solid var(--primary-line); }
 
 /* 09 entry */
 .entry-demo { border-top: var(--hairline-strong); border-bottom: var(--hairline-strong); }

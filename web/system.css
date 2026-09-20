@@ -107,7 +107,8 @@
   --track-heading: -0.018em;
   --track-normal:  0;
   --track-smallcap: 0.09em;
-  --track-wordmark: 0.17em;
+  --track-wordmark: 0.17em;  /* the wordmark at masthead size */
+  --track-imprint:  0.22em;  /* and at imprint size — small caps open up */
 
   /* 1.9 Space — 4px base. Only these steps. */
   --space-1: 4px;

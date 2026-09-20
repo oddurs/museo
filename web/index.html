@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="light" />
     <title>Museo — New York City Museums</title>
+    <meta name="description" content="An index of every museum in the five boroughs of New York City — art, history, science and the specific." />
+    <meta name="theme-color" content="#c0361b" />
+    <link rel="icon" href="mark.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="mark.svg" />
 
     <link rel="preload" as="font" type="font/woff2" href="fonts/whitney-light.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="fonts/whitney-book.woff2" crossorigin />
@@ -83,10 +87,27 @@
           <span class="t-label">Museum</span>
           <span class="t-label">Borough</span>
         </div>
-        <ol class="index__list" id="list"></ol>
-        <div class="index__empty" id="empty" hidden>
-          <span class="t-label">Nothing matches</span>
-          <button type="button" class="empty__reset toggle toggle--plain">Clear the filters</button>
+        <div class="index__scroll" id="scroll">
+          <ol class="index__list" id="list"></ol>
+
+          <div class="index__empty" id="empty" hidden>
+            <span class="t-label">Nothing matches</span>
+            <button type="button" class="empty__reset toggle toggle--plain">Clear the filters</button>
+          </div>
+
+          <footer class="colophon">
+            <img class="colophon__mark" src="mark.svg" width="28" height="28" alt="" />
+            <p class="wordmark wordmark--imprint">Museo</p>
+            <p class="colophon__imprint t-small">
+              An index of the museums of New York City, all five boroughs.
+              Compiled from public sources; coordinates from OpenStreetMap.
+              Set in Whitney, Whitney ScreenSmart and Whitney Condensed.
+            </p>
+            <p class="colophon__foot">
+              <span class="t-label">N&#186; <span id="colophon-count">107</span></span>
+              <span class="t-label">New York</span>
+            </p>
+          </footer>
         </div>
       </section>
 

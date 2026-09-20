@@ -164,6 +164,37 @@ for (const media of breakpoints) {
 
 console.log(`columns      checked at ${breakpoints.length} breakpoint(s)`)
 
+/* ---------- one home per component ---------- */
+
+/* A component defined in two layers has two homes, and they drift: .wordmark
+   was styled in app.css AND specimen.css while the imprint lived only in
+   app.css — so the specimen, which does not load app.css, rendered it
+   unstyled. Only a BARE single-class selector at base level counts as
+   defining a component; `.colophon .wordmark {}` is contextual, and a rule
+   inside @media is a responsive adjustment. Both are fine. */
+
+const homes = new Map()
+for (const file of LAYERS) {
+  const css = (await read(file)).replace(/\/\*[\s\S]*?\*\//g, '')
+
+  // drop @media bodies so responsive adjustments do not count as definitions
+  const base = css.replace(/@media[^{]+\{(?:[^{}]*\{[^{}]*\})*[^{}]*\}/g, '')
+
+  for (const m of base.matchAll(/(^|\})\s*([^{}@]+?)\s*\{/g)) {
+    for (const sel of m[2].split(',')) {
+      const bare = sel.trim().match(/^\.([\w-]+)$/)   // exactly one class, nothing else
+      if (!bare) continue
+      if (!homes.has(bare[1])) homes.set(bare[1], new Set())
+      homes.get(bare[1]).add(file)
+    }
+  }
+}
+for (const [cls, files] of homes) {
+  if (files.size > 1) {
+    problems.push(`.${cls} is defined in ${[...files].join(' and ')} — give it one home`)
+  }
+}
+
 /* ---------- report ---------- */
 
 console.log(`space scale  ${spaceScale.join(' ')}`)

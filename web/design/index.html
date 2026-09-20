@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="light" />
     <title>Museo — Design System</title>
+    <link rel="icon" href="../mark.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="../fonts.css" />
     <link rel="stylesheet" href="../system.css" />
     <link rel="stylesheet" href="../components.css" />
@@ -29,7 +30,88 @@
 
     <main>
       <section class="spec">
-        <h2 class="spec__title t-title"><span class="spec__num">01</span> Principles</h2>
+        <h2 class="spec__title t-title"><span class="spec__num">01</span> Identity</h2>
+        <p class="spec__lede t-body">
+          The identity is typographic, so the mark is not drawn — it is Whitney's own
+          <b>M</b>, lifted out of the font file by <code>scripts/build-mark.py</code> and
+          written as an SVG path. Change the weight or the letter there and the mark
+          follows the type, because it is the same outline the wordmark is set in.
+        </p>
+
+        <div class="demo">
+          <div class="demo__label">
+            <span class="t-label">Mark</span>
+            <p class="t-small u-quiet">
+              Whitney Semibold, which holds its counters where Light would close up. The
+              cap sits on an optical centre, not a mathematical one. Reverse it on a dark
+              or busy ground; never on another color.
+            </p>
+          </div>
+          <div class="demo__stage">
+            <div class="marks">
+              <figure><img src="../mark.svg" width="96" height="96" alt="" /><figcaption class="t-label">96</figcaption></figure>
+              <figure><img src="../mark.svg" width="48" height="48" alt="" /><figcaption class="t-label">48</figcaption></figure>
+              <figure><img src="../mark.svg" width="24" height="24" alt="" /><figcaption class="t-label">24</figcaption></figure>
+              <figure><img src="../mark.svg" width="16" height="16" alt="" /><figcaption class="t-label">16 min</figcaption></figure>
+              <figure><img src="../mark-reverse.svg" width="48" height="48" alt="" /><figcaption class="t-label">Reverse</figcaption></figure>
+            </div>
+          </div>
+        </div>
+
+        <div class="demo">
+          <div class="demo__label">
+            <span class="t-label">Wordmark</span>
+            <p class="t-small u-quiet">
+              Whitney Light, uppercase, and tracked wider as it gets smaller — the setting
+              opens up rather than holding one value. The weight it gives up is supplied
+              by the keyline above it.
+            </p>
+          </div>
+          <div class="demo__stage">
+            <div class="lockups">
+              <div>
+                <p class="wordmark">Museo</p>
+                <p class="t-label u-quiet">Masthead &middot; 38px &middot; tracking 0.17em</p>
+              </div>
+              <div>
+                <p class="wordmark wordmark--imprint">Museo</p>
+                <p class="t-label u-quiet">Imprint &middot; 15px &middot; tracking 0.22em</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="demo">
+          <div class="demo__label">
+            <span class="t-label">Clear space</span>
+            <p class="t-small u-quiet">
+              The cap height of the wordmark on every side, and nothing set inside it. At
+              the masthead that clearance is what the keyline and the tally measure from.
+            </p>
+          </div>
+          <div class="demo__stage">
+            <div class="clearspace"><p class="wordmark">Museo</p></div>
+          </div>
+        </div>
+
+        <div class="demo">
+          <div class="demo__label">
+            <span class="t-label">Not this</span>
+            <p class="t-small u-quiet">Four ways the identity stops being itself.</p>
+          </div>
+          <div class="demo__stage">
+            <ul class="nots t-small">
+              <li>Do not set the wordmark in another face, or in another weight of Whitney.</li>
+              <li>Do not letterspace it by eye — the two values are tokens.</li>
+              <li>Do not put the mark and the wordmark in a lockup. They do separate jobs: the mark is for a tab or an app icon, the wordmark for a page.</li>
+              <li>Do not add a second color. Cinnabar is the identity; anything else is decoration.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="spec">
+        <h2 class="spec__title t-title"><span class="spec__num">02</span> Principles</h2>
         <ol class="principles">
           <li>
             <span class="t-label">One</span>
@@ -75,7 +157,7 @@
       </section>
 
       <section class="spec">
-        <h2 class="spec__title t-title"><span class="spec__num">02</span> The neutral ramp</h2>
+        <h2 class="spec__title t-title"><span class="spec__num">03</span> The neutral ramp</h2>
         <p class="spec__lede t-body">
           Warm, not gray — every step carries the same red-over-blue bias as the paper, so
           nothing reads as cold against it. Ratios are measured against
@@ -86,7 +168,7 @@
       </section>
 
       <section class="spec">
-        <h2 class="spec__title t-title"><span class="spec__num">03</span> The primary</h2>
+        <h2 class="spec__title t-title"><span class="spec__num">04</span> The primary</h2>
         <p class="spec__lede t-body">
           Cinnabar. One hue, four values, used only where something is live: the bar, the
           selection, the pins, focus, and the underline beneath a link you are about to
@@ -96,7 +178,7 @@
       </section>
 
       <section class="spec">
-        <h2 class="spec__title t-title"><span class="spec__num">04</span> Families</h2>
+        <h2 class="spec__title t-title"><span class="spec__num">05</span> Families</h2>
         <p class="spec__lede t-body">
           Three cuts of one typeface. The choice between them is a size threshold, not a
           preference.
@@ -137,7 +219,7 @@
       </section>
 
       <section class="spec">
-        <h2 class="spec__title t-title"><span class="spec__num">05</span> Setting the type</h2>
+        <h2 class="spec__title t-title"><span class="spec__num">06</span> Setting the type</h2>
         <p class="spec__lede t-body">
           Whitney carries the features that separate set type from typed text. Each pair
           below is the same string — the left one as the browser would render it by
@@ -147,7 +229,7 @@
       </section>
 
       <section class="spec">
-        <h2 class="spec__title t-title"><span class="spec__num">06</span> Scale</h2>
+        <h2 class="spec__title t-title"><span class="spec__num">07</span> Scale</h2>
         <p class="spec__lede t-body">
           Eight sizes, spaced by eye rather than by ratio. A strict modular scale put a
           museum's name and its address too close together; the interval from
@@ -167,7 +249,7 @@
       </section>
 
       <section class="spec">
-        <h2 class="spec__title t-title"><span class="spec__num">07</span> Space &amp; rules</h2>
+        <h2 class="spec__title t-title"><span class="spec__num">08</span> Space &amp; rules</h2>
         <p class="spec__lede t-body">
           A 4px base — these nine steps are the only spacing values in the system. Five
           rule weights, so separation can be graded rather than uniform.
@@ -177,7 +259,7 @@
       </section>
 
       <section class="spec">
-        <h2 class="spec__title t-title"><span class="spec__num">08</span> Elements</h2>
+        <h2 class="spec__title t-title"><span class="spec__num">09</span> Elements</h2>
 
         <div class="demo">
           <div class="demo__label">
@@ -242,7 +324,7 @@
       </section>
 
       <section class="spec">
-        <h2 class="spec__title t-title"><span class="spec__num">09</span> The index entry</h2>
+        <h2 class="spec__title t-title"><span class="spec__num">10</span> The index entry</h2>
         <p class="spec__lede t-body">
           The application's one composite component: a catalogue row, not a card. Three
           columns on a shared first baseline, so the figure and the borough sit on the

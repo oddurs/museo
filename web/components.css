@@ -5,6 +5,45 @@
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
+   WORDMARK
+   Whitney Light, uppercase, tracked wider as it gets smaller — the setting
+   opens up rather than holding one value. The weight it gives up is supplied
+   by the keyline above it. The negative margin absorbs the trailing track so
+   the mark still aligns on the gutter.
+   -------------------------------------------------------------------------- */
+
+.wordmark {
+  font-family: var(--font-display);
+  font-size: 38px;
+  font-weight: 300;
+  line-height: 0.9;
+  letter-spacing: var(--track-wordmark);
+  text-transform: uppercase;
+  margin-right: calc(-1 * var(--track-wordmark));
+}
+
+.wordmark--imprint {
+  font-size: var(--size-body);
+  line-height: 1;
+  letter-spacing: var(--track-imprint);
+  margin-right: calc(-1 * var(--track-imprint));
+}
+
+/* The deck is the identity's voice — the one line of writing that says what
+   this is. It sits under the wordmark at the masthead and under it again on
+   the specimen, so it belongs here rather than in either page. */
+.deck {
+  margin-top: var(--space-3);
+  color: var(--ink-secondary);
+  max-width: 46ch;
+}
+
+.deck em {
+  font-style: normal;
+  color: var(--primary-deep);
+}
+
+/* --------------------------------------------------------------------------
    INDEX ENTRY
 
    A catalogue row, not a card. Three columns — figure, subject, classification

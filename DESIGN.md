@@ -20,6 +20,48 @@ are computed, not transcribed — so it cannot drift out of sync with the tokens
 
 ---
 
+## Identity
+
+The identity is typographic, so the mark is not drawn — it is Whitney's own
+**M**, lifted out of the font file by `scripts/build-mark.py` and written as an
+SVG path. Change the weight or the letter there and the mark follows the type,
+because it is the same outline the wordmark is set in.
+
+| Piece | What it is | Where it goes |
+| --- | --- | --- |
+| **Mark** | Whitney Semibold `M`, paper on cinnabar, cap on an optical centre | Browser tab, app icon, the colophon. 16px minimum |
+| **Wordmark** | Whitney Light, uppercase, `--track-wordmark` (0.17em) | The masthead |
+| **Wordmark, imprint** | The same, at body size and `--track-imprint` (0.22em) | The colophon |
+| **Keyline** | 3px cinnabar across the full width | The top of every page |
+| **Deck** | One line saying what this is | Under the wordmark |
+
+The wordmark is tracked **wider as it gets smaller** — the setting opens up
+rather than holding one value, which is why there are two tokens rather than
+one. Both are `text-transform: uppercase` on mixed-case source, so the word
+stays "Museo" to a screen reader and to anyone copying it.
+
+Clear space is the wordmark's own cap height on every side. Minimum mark size
+is 16px, which is where Semibold's counters still hold.
+
+**Not this:** the wordmark in another face or another weight; tracking set by
+eye instead of from the tokens; the mark and wordmark locked up together (they
+do separate jobs — the mark is for a tab, the wordmark for a page); a second
+color, since cinnabar *is* the identity and anything else is decoration.
+
+### The colophon
+
+The index is a publication, so it ends the way one does — mark, wordmark, what
+it is set in, and where. It lives at the foot of the scroll region, so reaching
+the end of the index reaches the end of the publication.
+
+### The tab
+
+`document.title` carries the current view: `Queens — Museo`, `“noguchi” ·
+Queens — Museo`. With state in the URL, a filtered view is a different page and
+its tab says so.
+
+---
+
 ## Principles
 
 **1. Systems before screens.** The ramp, the scale and the figure sets were
@@ -368,6 +410,14 @@ instant, as well as the CSS transitions.
 4. Add it to `/web/design/` in the same commit. A component that isn't in the
    specimen will drift.
 
+**One home per component.** A class defined in two layers drifts. The wordmark
+was styled in both `app.css` and `specimen.css` while the imprint lived only in
+`app.css` — so the specimen, which does not load `app.css`, rendered it
+unstyled. Anything shared belongs in `components.css`. The audit enforces this:
+a bare single-class selector at base level may define a component in only one
+layer, while `.colophon .wordmark {}` and rules inside `@media` stay free,
+being contextual and responsive rather than second definitions.
+
 **The audit.** `npm run audit` is a static linter over the composition layers.
 It fails on a raw color, a spacing value off the 4px scale, a border width off
 the stroke scale, an unknown token, or any divergence between `.entry` and
@@ -380,6 +430,16 @@ never by interpolating into a `style="..."` attribute. A value like `"smcp" 1`
 contains double quotes that terminate the attribute and silently drop the
 declaration — which is exactly how four of the five specimens in §05 shipped
 broken before they were measured.
+
+## Rebuilding the mark
+
+```
+npm run mark    # reads ~/Fonts/Master Library, writes web/mark.svg
+```
+
+Emits `mark.svg` and `mark-reverse.svg` — 319 bytes each, one `rect` and one
+`path`. The letter, the weight and the two colors are constants at the top of
+the script.
 
 ## Rebuilding the fonts
 

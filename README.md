@@ -7,6 +7,7 @@ Static HTML/CSS/JS, no build step, no dependencies to install.
 
 ```
 npm run fonts   # build the Whitney webfonts — do this first
+npm run mark    # cut the mark out of Whitney (web/mark.svg)
 npm start       # http://localhost:5173
 npm run check   # validate data/museums.json, including its typography
 npm run audit   # lint the design system — spacing, borders, tokens
@@ -46,6 +47,7 @@ web/fonts.css           generated @font-face rules
 web/fonts/              generated .woff2 (gitignored)
 web/design/             living specimen of the design system
 scripts/build-fonts.py  subsets Whitney OTFs into web fonts
+scripts/build-mark.py   lifts the M out of Whitney as an SVG mark
 scripts/serve.mjs       zero-dependency static server
 scripts/geocode.mjs     fills missing lat/lng from OpenStreetMap Nominatim
 scripts/check-data.mjs  validates the dataset

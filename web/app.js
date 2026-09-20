@@ -22,6 +22,8 @@ const state = {
 
 const els = {
   list: document.getElementById('list'),
+  scroll: document.getElementById('scroll'),
+  colophonCount: document.getElementById('colophon-count'),
   empty: document.getElementById('empty'),
   search: document.getElementById('search'),
   boroughFilters: document.getElementById('borough-filters'),
@@ -171,8 +173,18 @@ function renderIndex() {
       : `of ${state.museums.length}`
 
   announce()
+  title()
   syncActive()
   syncRoving()
+}
+
+/** The tab says what is on screen — a filtered view is a different page. */
+function title() {
+  const parts = []
+  if (state.query) parts.push(`“${state.query}”`)
+  if (state.boroughs.size) parts.push([...state.boroughs].join(' + '))
+  if (state.categories.size) parts.push([...state.categories].join(' + '))
+  document.title = parts.length ? `${parts.join(' · ')} — Museo` : 'Museo — New York City Museums'
 }
 
 function announce() {
@@ -401,7 +413,7 @@ function update({ refit = false, keepScroll = false } = {}) {
   syncMarkers()
   if (refit) fitToResults()
   renderIndex()
-  if (!keepScroll) els.list.scrollTo({ top: 0 })
+  if (!keepScroll) els.scroll.scrollTo({ top: 0 })
 
   if (hadFocus && state.cursor >= 0) {
     const row = els.list.querySelectorAll('.entry')[state.cursor]
@@ -490,6 +502,7 @@ try {
     .filter((m) => typeof m.lat === 'number' && typeof m.lng === 'number')
     .sort((a, b) => a.name.localeCompare(b.name, 'en'))
   if (!state.museums.length) throw new Error('no records')
+  els.colophonCount.textContent = state.museums.length
 
   document.body.classList.remove('is-loading')
   readUrl()
