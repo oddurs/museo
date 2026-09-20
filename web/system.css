@@ -1,0 +1,296 @@
+/* ==========================================================================
+   MUSEO DESIGN SYSTEM
+   Achromatic, typographic, Whitney-set. See DESIGN.md for the reasoning and
+   web/design/ for a living specimen of everything defined here.
+
+   Load order:  fonts.css  →  system.css  →  app.css
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. TOKENS
+   The only values the application layer is allowed to reference. If a number
+   or color appears in app.css that isn't one of these, it's a bug in the
+   system, not a shortcut.
+   -------------------------------------------------------------------------- */
+
+:root {
+  /* 1.1 Color — achromatic by rule. No hue anywhere, including the map.
+     Percentages are the token's contrast ratio against --paper. */
+  --paper:        #ffffff;
+  --paper-sunk:   #f7f7f7;  /* hover beds, insets */
+  --ink:          #000000;  /* 21.0:1 — primary text, rules of emphasis */
+  --ink-secondary:#4d4d4d;  /*  8.6:1 — supporting text */
+  --ink-tertiary: #767676;  /*  4.5:1 — metadata; the lightest text allowed */
+  --ink-quiet:    #b4b4b4;  /*  2.1:1 — marks and borders only, never text */
+  --rule:         #e4e4e4;  /* hairline separators */
+
+  /* 1.2 Type families
+     Whitney Pro for anything 16px and up; ScreenSmart below that (its wider
+     apertures and looser spacing survive small sizes); Condensed only for
+     uppercase labels, never for running text. */
+  --font-display: "Whitney", -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-text:    "Whitney SSm", "Whitney", -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --font-label:   "Whitney Cond", "Whitney SSm", -apple-system, Arial, sans-serif;
+
+  /* 1.3 Type scale
+     Seven sizes, spaced by eye rather than by ratio. The jump from --size-heading to
+     --size-small is deliberate and large: an entry's name and its metadata
+     should never be mistaken for one another at a glance. */
+  --size-display: 56px;   /* the tally figure, specimen headings */
+  --size-title:   32px;   /* section titles */
+  --size-heading: 21px;   /* museum names — the interface's reading size */
+  --size-body:    15px;
+  --size-small:   13px;   /* addresses, secondary lines */
+  --size-fine:    12px;   /* outbound links */
+  --size-label:   10.5px; /* uppercase wall labels */
+
+  /* 1.4 Line heights — tight for display, generous for reading. */
+  --leading-tight: 1.0;
+  --leading-snug:  1.2;
+  --leading-body:  1.5;
+
+  /* 1.5 Tracking
+     Whitney is a signage face: it tightens well at display sizes and needs the
+     opposite treatment in small caps, where counters must stay open. */
+  --track-display: -0.03em;
+  --track-title:   -0.022em;
+  --track-heading: -0.018em;
+  --track-normal:  0;
+  --track-wide:    0.16em;  /* the wordmark */
+  --track-label:   0.14em;  /* wall labels */
+
+  /* 1.6 Space — 4px base. Only these steps. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* 1.7 Structure
+     Everything is square. No border radius, no shadow, no gradient — depth is
+     expressed by rules and whitespace alone. */
+  --hairline: 1px solid var(--rule);
+  --edge:     1px solid var(--ink);
+  --radius:   0;
+
+  /* 1.8 Motion — short and linear. Nothing bounces. */
+  --duration: 120ms;
+  --easing:   linear;
+
+  /* 1.9 Layout */
+  --gutter:      var(--space-5);
+  --index-width: 46%;
+  --index-min:   380px;
+  --number-col:  40px;  /* catalogue number column in the index */
+}
+
+/* --------------------------------------------------------------------------
+   2. RESET
+   -------------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-text);
+  font-size: var(--size-body);
+  line-height: var(--leading-body);
+  font-feature-settings: "kern" 1, "liga" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, p, figure, ol, ul { margin: 0; padding: 0; }
+ol, ul { list-style: none; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; }
+a { color: inherit; }
+img, svg { display: block; max-width: 100%; }
+
+/* --------------------------------------------------------------------------
+   3. TYPE PRIMITIVES
+   Each is a complete voice: family, size, weight, leading and tracking
+   together. Compose with these rather than setting font properties ad hoc.
+   -------------------------------------------------------------------------- */
+
+.t-display {
+  font-family: var(--font-display);
+  font-size: var(--size-display);
+  font-weight: 300;            /* Whitney Light — the showpiece weight */
+  line-height: var(--leading-tight);
+  letter-spacing: var(--track-display);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.t-title {
+  font-family: var(--font-display);
+  font-size: var(--size-title);
+  font-weight: 300;
+  line-height: var(--leading-snug);
+  letter-spacing: var(--track-title);
+}
+
+/* The reading size. Book, not Light: at 21px Light starts to break up against
+   white, and this is the one thing in the interface people actually read. */
+.t-heading {
+  font-family: var(--font-display);
+  font-size: var(--size-heading);
+  font-weight: 400;
+  line-height: var(--leading-snug);
+  letter-spacing: var(--track-heading);
+}
+
+.t-body {
+  font-family: var(--font-text);
+  font-size: var(--size-body);
+  font-weight: 400;
+  line-height: var(--leading-body);
+}
+
+.t-small {
+  font-family: var(--font-text);
+  font-size: var(--size-small);
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.t-fine {
+  font-family: var(--font-text);
+  font-size: var(--size-fine);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* The wall label: Whitney Condensed, uppercase, widely tracked. Every piece of
+   categorical metadata — borough, discipline, column heads. Never more than
+   three words, never lowercase. */
+.t-label {
+  font-family: var(--font-label);
+  font-size: var(--size-label);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+
+/* Catalogue numerals — tabular, so the index column stays plumb. */
+.t-numeral {
+  font-family: var(--font-label);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Modifiers */
+.u-quiet     { color: var(--ink-tertiary); }
+.u-secondary { color: var(--ink-secondary); }
+.u-tabular   { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+
+/* --------------------------------------------------------------------------
+   4. ELEMENTS
+   -------------------------------------------------------------------------- */
+
+/* 4.1 Rule — the system's only divider. */
+.rule { border: 0; border-top: var(--hairline); height: 0; }
+.rule--strong { border-top: var(--edge); }
+
+/* 4.2 Link — underlined on hover only, so dense lists stay calm. */
+.link {
+  text-decoration: none;
+  border-bottom: 1px solid var(--ink-quiet);
+  transition: border-color var(--duration) var(--easing);
+}
+.link:hover { border-bottom-color: var(--ink); }
+
+/* 4.3 Toggle — the one interactive control. A text button that states its
+   selection with a solid rule beneath it, never with a fill or a pill. */
+.toggle {
+  font-family: var(--font-label);
+  font-size: var(--size-label);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-tertiary);
+  cursor: pointer;
+  padding: var(--space-1) 0;
+  border-bottom: 2px solid transparent;
+  transition: color var(--duration) var(--easing),
+              border-color var(--duration) var(--easing);
+  white-space: nowrap;
+}
+
+.toggle:hover { color: var(--ink); }
+
+.toggle[aria-pressed="true"] {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+
+/* Counts ride alongside a toggle, always lighter than the label. */
+.toggle .tally {
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--ink-tertiary);
+  margin-left: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.toggle:hover .tally,
+.toggle[aria-pressed="true"] .tally { color: var(--ink-secondary); }
+
+/* 4.4 Field — an input reduced to a baseline. */
+.field {
+  width: 100%;
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 300;
+  letter-spacing: var(--track-heading);
+  color: var(--ink);
+  background: none;
+  border: 0;
+  border-bottom: var(--hairline);
+  padding: var(--space-2) 0;
+  transition: border-color var(--duration) var(--easing);
+}
+.field::placeholder { color: var(--ink-tertiary); letter-spacing: var(--track-heading); }
+.field:focus { outline: none; border-bottom: 1px solid var(--ink); }
+.field::-webkit-search-cancel-button { filter: grayscale(1); }
+
+/* 4.5 Mark — search hits. An underline, not a highlighter. */
+mark {
+  background: none;
+  color: inherit;
+  box-shadow: inset 0 -0.08em 0 0 var(--ink);
+}
+
+/* 4.6 Focus — square, black, always visible. */
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+/* 4.7 Screen-reader only */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

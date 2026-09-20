@@ -1,0 +1,294 @@
+/* ==========================================================================
+   MUSEO — application layer
+   Composition only. Every value here resolves to a token from system.css.
+   ========================================================================== */
+
+html, body { height: 100%; }
+
+body { display: flex; flex-direction: column; overflow: hidden; }
+
+/* --------------------------------------------------------------------------
+   MASTHEAD
+   -------------------------------------------------------------------------- */
+
+.masthead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-5);
+  padding: var(--space-6) var(--gutter) var(--space-5);
+  padding-top: calc(var(--space-6) + env(safe-area-inset-top, 0px));
+  border-bottom: var(--edge);
+  flex: none;
+}
+
+/* Set in Light at display size and tracked wide — a wayfinding sign, not a
+   logo. The weight it lacks is supplied by the black rule beneath it. */
+.wordmark {
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 300;
+  line-height: 0.9;
+  letter-spacing: var(--track-wide);
+  text-transform: uppercase;
+  margin-right: calc(-1 * var(--track-wide)); /* absorb the trailing track */
+}
+
+.masthead__brand p { margin-top: var(--space-3); color: var(--ink-tertiary); }
+
+.masthead__tally {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  flex: none;
+}
+
+.tally-figure {
+  font-family: var(--font-display);
+  font-size: var(--size-display);
+  font-weight: 300;
+  line-height: 0.78;
+  letter-spacing: var(--track-display);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.masthead__tally .t-label { color: var(--ink-tertiary); }
+
+/* --------------------------------------------------------------------------
+   SEARCH + FILTERS
+   -------------------------------------------------------------------------- */
+
+.search-bar {
+  padding: var(--space-5) var(--gutter) 0;
+  flex: none;
+}
+
+.filters {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-7);
+  padding: var(--space-5) var(--gutter) var(--space-4);
+  border-bottom: var(--hairline);
+  flex: none;
+}
+
+.filter-set {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.filter-set__name {
+  color: var(--ink-tertiary);
+  flex: none;
+  min-width: 56px;
+}
+
+.filter-set__items {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+}
+
+.filter-set--end {
+  margin-left: auto;
+  gap: var(--space-4);
+}
+
+/* Reset reads as an action, not a selection, so it never takes the rule. */
+.toggle--plain { border-bottom-color: transparent !important; }
+.toggle--plain:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* --------------------------------------------------------------------------
+   LAYOUT
+   -------------------------------------------------------------------------- */
+
+.layout {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(var(--index-min), var(--index-width)) 1fr;
+}
+
+/* --------------------------------------------------------------------------
+   INDEX
+   The scroll container and column heads. The entry itself is in components.css.
+   -------------------------------------------------------------------------- */
+
+.index {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-right: var(--edge);
+}
+
+.index__head {
+  display: grid;
+  grid-template-columns: var(--number-col) 1fr auto;
+  column-gap: var(--space-4);
+  padding: var(--space-3) var(--gutter);
+  border-bottom: var(--hairline);
+  color: var(--ink-tertiary);
+  flex: none;
+}
+
+.index__list {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.index__empty {
+  padding: var(--space-8) var(--gutter);
+  text-align: center;
+  color: var(--ink-tertiary);
+}
+
+/* --------------------------------------------------------------------------
+   MAP
+   The basemap is desaturated so the map joins the achromatic system instead
+   of fighting it. Pins are plain black dots; the borough a pin belongs to is
+   already stated by the filters and the index.
+   -------------------------------------------------------------------------- */
+
+.map-pane { position: relative; min-height: 0; }
+
+#map {
+  position: absolute;
+  inset: 0;
+  background: var(--paper-sunk);
+}
+
+.leaflet-container { font-family: var(--font-text); background: var(--paper-sunk); }
+
+/* Leaflet colors its own links (#0078A8). Nothing in this system has a hue. */
+.leaflet-container a { color: inherit; }
+
+/* Strip the basemap to grays and flatten it, so the black pins stay dominant. */
+.leaflet-tile-pane {
+  filter: grayscale(1) brightness(1.08) contrast(0.78);
+  opacity: 0.92;
+}
+
+.leaflet-control-zoom {
+  border: var(--edge) !important;
+  border-radius: var(--radius) !important;
+}
+
+.leaflet-control-zoom a {
+  width: 28px; height: 28px;
+  line-height: 28px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  color: var(--ink) !important;
+  background: var(--paper) !important;
+  border-radius: var(--radius) !important;
+  border-bottom: var(--hairline) !important;
+}
+.leaflet-control-zoom a:last-child { border-bottom: 0 !important; }
+.leaflet-control-zoom a:hover { background: var(--paper-sunk) !important; }
+
+.leaflet-popup-content-wrapper {
+  background: var(--paper);
+  border: var(--edge);
+  border-radius: var(--radius);
+  box-shadow: none;
+}
+
+.leaflet-popup-content { margin: var(--space-3); width: auto !important; min-width: 190px; }
+.leaflet-popup-tip { display: none; }
+.leaflet-popup-close-button { display: none; }
+
+.leaflet-control-attribution {
+  font-family: var(--font-text) !important;
+  font-size: 10px !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  border-top: var(--hairline);
+  border-left: var(--hairline);
+  color: var(--ink-tertiary) !important;
+}
+.leaflet-control-attribution a { color: var(--ink-secondary) !important; }
+
+/* --------------------------------------------------------------------------
+   NARROW
+   The map moves above the index and pins itself there, so panning and reading
+   stay in view together. The masthead keeps its two-part structure but drops a
+   step down the type scale — at 390px the display sizes would otherwise take
+   half the viewport before a single museum appeared.
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  :root {
+    --gutter: var(--space-4);
+    --index-min: 0;
+    --map-height: 44vh;
+  }
+
+  body { overflow: auto; }
+
+  .masthead {
+    padding: var(--space-4) var(--gutter);
+    padding-top: calc(var(--space-4) + env(safe-area-inset-top, 0px));
+    align-items: flex-end;
+  }
+
+  .wordmark { font-size: 24px; }
+  .masthead__brand p { margin-top: var(--space-2); }
+  .tally-figure { font-size: 34px; }
+
+  .search-bar { padding-top: var(--space-4); }
+  .field { font-size: 19px; }
+
+  .filters {
+    gap: var(--space-3) var(--space-5);
+    padding: var(--space-4) var(--gutter) var(--space-3);
+  }
+  .filter-set { gap: var(--space-2); }
+  .filter-set__name { min-width: 0; }
+  .filter-set--end { margin-left: 0; }
+
+  .layout { display: flex; flex-direction: column; }
+
+  .map-pane {
+    order: -1;
+    flex: 0 0 var(--map-height);   /* flex items shrink by default; this must not */
+    height: var(--map-height);
+    position: sticky;
+    top: 0;
+    z-index: 400;
+    border-bottom: var(--edge);
+  }
+
+  .index { border-right: 0; }
+
+  .index__head {
+    position: sticky;
+    top: var(--map-height);
+    background: var(--paper);
+    z-index: 300;
+  }
+
+  .index__list { overflow: visible; }
+}
+
+@media (max-width: 560px) {
+  /* Two columns only. The classification stack unwraps into a row beneath the
+     entry body rather than being squeezed off the edge. */
+  .entry { grid-template-columns: var(--number-col) 1fr; }
+
+  .entry__class {
+    grid-column: 2;
+    flex-direction: row;
+    align-items: baseline;
+    gap: var(--space-3);
+    text-align: left;
+    margin-top: var(--space-3);
+  }
+
+  .index__head { grid-template-columns: var(--number-col) 1fr; }
+  .index__head span:last-child { display: none; }
+}

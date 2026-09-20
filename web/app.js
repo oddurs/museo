@@ -1,13 +1,5 @@
 const BOROUGHS = ['Manhattan', 'Brooklyn', 'Queens', 'Bronx', 'Staten Island']
 
-const BOROUGH_COLOR = {
-  Manhattan: 'var(--manhattan)',
-  Brooklyn: 'var(--brooklyn)',
-  Queens: 'var(--queens)',
-  Bronx: 'var(--bronx)',
-  'Staten Island': 'var(--statenisland)',
-}
-
 const state = {
   museums: [],
   query: '',
@@ -25,12 +17,15 @@ const els = {
   categoryFilters: document.getElementById('category-filters'),
   viewportOnly: document.getElementById('viewport-only'),
   count: document.getElementById('count'),
+  countLabel: document.getElementById('count-label'),
   reset: document.getElementById('reset'),
 }
 
+const PIN = { radius: 3.5, weight: 1.5 }
+const PIN_ACTIVE = { radius: 6.5, weight: 2 }
+
 const markers = new Map()
 let map
-let cssColor // resolves CSS custom properties to real colors for canvas markers
 
 // ---------- data ----------
 
@@ -38,61 +33,18 @@ const res = await fetch('../data/museums.json')
 if (!res.ok) throw new Error(`could not load museums.json (${res.status})`)
 state.museums = (await res.json())
   .filter((m) => typeof m.lat === 'number' && typeof m.lng === 'number')
-  .sort((a, b) => a.name.localeCompare(b.name))
+  .sort((a, b) => a.name.localeCompare(b.name, 'en'))
 
-// ---------- helpers ----------
+// ---------- text ----------
 
 const norm = (s) => s.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
-
-function haystack(m) {
-  return norm([m.name, m.borough, m.neighborhood, m.address, m.category].join(' '))
-}
-
-function matchesText(m) {
-  if (!state.query) return true
-  // every whitespace-separated term must appear somewhere in the record
-  return norm(state.query)
-    .split(/\s+/)
-    .filter(Boolean)
-    .every((term) => haystack(m).includes(term))
-}
-
-function matchesFilters(m) {
-  if (state.boroughs.size && !state.boroughs.has(m.borough)) return false
-  if (state.categories.size && !state.categories.has(m.category)) return false
-  return matchesText(m)
-}
-
-function visible() {
-  let out = state.museums.filter(matchesFilters)
-  if (state.viewportOnly && map) {
-    const b = map.getBounds()
-    out = out.filter((m) => b.contains([m.lat, m.lng]))
-  }
-  return out
-}
-
-function highlight(text) {
-  const terms = norm(state.query).split(/\s+/).filter(Boolean)
-  if (!terms.length) return escapeHtml(text)
-  const re = new RegExp(`(${terms.map(escapeRe).join('|')})`, 'gi')
-  // match against the normalized string but slice from the original so
-  // accented characters survive
-  const flat = norm(text)
-  let html = ''
-  let last = 0
-  for (const hit of flat.matchAll(re)) {
-    html += escapeHtml(text.slice(last, hit.index))
-    html += `<mark>${escapeHtml(text.slice(hit.index, hit.index + hit[0].length))}</mark>`
-    last = hit.index + hit[0].length
-  }
-  return html + escapeHtml(text.slice(last))
-}
 
 const escapeHtml = (s) =>
   s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
 
 const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+const terms = () => norm(state.query).split(/\s+/).filter(Boolean)
 
 const hostOf = (url) => {
   try {
@@ -102,54 +54,105 @@ const hostOf = (url) => {
   }
 }
 
-// Pricing and hours land here later; render whatever exists today.
-function facts(m) {
-  const bits = []
-  if (m.admission) bits.push(m.admission)
-  if (m.hoursSummary) bits.push(m.hoursSummary)
-  return bits.length ? `<span class="facts">${escapeHtml(bits.join(' · '))}</span>` : ''
+const ordinal = (n) => String(n).padStart(3, '0')
+
+/** The city/state/zip tail is the same on every record; the index drops it. */
+const street = (address) =>
+  address.replace(/,\s*(New York|Brooklyn|Queens|Bronx|Staten Island),\s*NY.*$/i, '')
+
+/** Marks search hits by slicing the original string, so accents survive. */
+function highlight(text) {
+  const t = terms()
+  if (!t.length) return escapeHtml(text)
+  const re = new RegExp(`(${t.map(escapeRe).join('|')})`, 'gi')
+  let html = ''
+  let last = 0
+  for (const hit of norm(text).matchAll(re)) {
+    html += escapeHtml(text.slice(last, hit.index))
+    html += `<mark>${escapeHtml(text.slice(hit.index, hit.index + hit[0].length))}</mark>`
+    last = hit.index + hit[0].length
+  }
+  return html + escapeHtml(text.slice(last))
 }
 
-// ---------- list ----------
+// ---------- filtering ----------
 
-function renderList() {
+const haystack = (m) => norm([m.name, m.borough, m.neighborhood, m.address, m.category].join(' '))
+
+function matchesFilters(m) {
+  if (state.boroughs.size && !state.boroughs.has(m.borough)) return false
+  if (state.categories.size && !state.categories.has(m.category)) return false
+  return terms().every((term) => haystack(m).includes(term))
+}
+
+function visible() {
+  const out = state.museums.filter(matchesFilters)
+  if (!state.viewportOnly || !map) return out
+  const bounds = map.getBounds()
+  return out.filter((m) => bounds.contains([m.lat, m.lng]))
+}
+
+// Pricing and opening hours land here later; render whatever exists today.
+function facts(m) {
+  const bits = [m.admission, m.hoursSummary].filter(Boolean)
+  return bits.length
+    ? `<p class="entry__meta t-small">${escapeHtml(bits.join(' · '))}</p>`
+    : ''
+}
+
+// ---------- index ----------
+
+function renderIndex() {
   const rows = visible()
+
   els.list.replaceChildren(
-    ...rows.map((m) => {
+    ...rows.map((m, i) => {
       const li = document.createElement('li')
       li.innerHTML = `
-        <article class="card" tabindex="0" role="button" data-id="${m.id}"
-                 style="--swatch:${BOROUGH_COLOR[m.borough] ?? 'var(--line)'}"
+        <article class="entry" data-id="${escapeHtml(m.id)}" tabindex="0" role="button"
                  aria-label="${escapeHtml(m.name)} — show on map">
-          <h2>${highlight(m.name)}</h2>
-          <p class="where">${highlight(m.borough)}${m.neighborhood ? ' · ' + highlight(m.neighborhood) : ''}</p>
-          <p class="addr">${highlight(m.address)}</p>
-          <p class="row">
-            <span class="tag">${escapeHtml(m.category)}</span>
-            <a href="${escapeHtml(m.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(hostOf(m.url))} ↗</a>
+          <span class="entry__no t-numeral">${ordinal(i + 1)}</span>
+          <div class="entry__body">
+            <h2 class="entry__name t-heading">${highlight(m.name)}</h2>
+            <p class="entry__meta t-small">${
+              m.neighborhood ? highlight(m.neighborhood) + ' &middot; ' : ''
+            }${highlight(street(m.address))}</p>
+            <a class="entry__link t-fine" href="${escapeHtml(m.url)}"
+               target="_blank" rel="noopener noreferrer">${escapeHtml(hostOf(m.url))} &#8599;</a>
             ${facts(m)}
-          </p>
+          </div>
+          <span class="entry__class">
+            <span class="entry__borough t-label">${escapeHtml(m.borough)}</span>
+            <span class="entry__discipline t-label">${escapeHtml(m.category)}</span>
+          </span>
         </article>`
       return li
     }),
   )
+
   els.empty.hidden = rows.length > 0
-  els.count.textContent = `${rows.length} of ${state.museums.length}`
+  els.count.textContent = rows.length
+  els.countLabel.textContent =
+    rows.length === state.museums.length
+      ? rows.length === 1 ? 'Museum' : 'Museums'
+      : `of ${state.museums.length}`
+
   syncActive()
-  return rows
 }
 
-function cardFor(id) {
-  return els.list.querySelector(`.card[data-id="${CSS.escape(id)}"]`)
-}
+const entryFor = (id) => els.list.querySelector(`.entry[data-id="${CSS.escape(id)}"]`)
 
 function syncActive() {
-  for (const card of els.list.querySelectorAll('.card')) {
-    card.classList.toggle('is-active', card.dataset.id === state.activeId)
+  for (const entry of els.list.querySelectorAll('.entry')) {
+    entry.classList.toggle('is-active', entry.dataset.id === state.activeId)
+  }
+  for (const [id, marker] of markers) {
+    marker.setStyle(id === state.activeId ? PIN_ACTIVE : PIN)
+    if (id === state.activeId) marker.bringToFront()
   }
 }
 
-function select(id, { pan = true, scroll = true } = {}) {
+function select(id, { pan = true, scroll = false } = {}) {
   state.activeId = id
   syncActive()
   const marker = markers.get(id)
@@ -157,67 +160,65 @@ function select(id, { pan = true, scroll = true } = {}) {
     if (pan) map.setView(marker.getLatLng(), Math.max(map.getZoom(), 15), { animate: true })
     marker.openPopup()
   }
-  if (scroll) cardFor(id)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+  if (scroll) entryFor(id)?.scrollIntoView({ block: 'center', behavior: 'smooth' })
 }
 
 els.list.addEventListener('click', (e) => {
   if (e.target.closest('a')) return // let the outbound link through
-  const card = e.target.closest('.card')
-  if (card) select(card.dataset.id, { scroll: false })
+  const entry = e.target.closest('.entry')
+  if (entry) select(entry.dataset.id)
 })
 
 els.list.addEventListener('keydown', (e) => {
   if (e.key !== 'Enter' && e.key !== ' ') return
-  const card = e.target.closest('.card')
-  if (!card || e.target.tagName === 'A') return
+  const entry = e.target.closest('.entry')
+  if (!entry || e.target.tagName === 'A') return
   e.preventDefault()
-  select(card.dataset.id, { scroll: false })
+  select(entry.dataset.id)
 })
 
 // ---------- map ----------
 
 function initMap() {
-  map = L.map('map', { zoomControl: true, preferCanvas: true, zoomSnap: 0.25 }).setView(
-    [40.7128, -73.96],
-    11,
-  )
+  map = L.map('map', { zoomControl: true, preferCanvas: true, zoomSnap: 0.25 })
+    .setView([40.7128, -73.96], 11)
 
+  // OpenStreetMap, stripped of color and flattened by CSS so the map reads as
+  // part of the achromatic system. (Keyless tile hosts that ship a quiet
+  // basemap no longer exist — CARTO and Stadia both watermark now.)
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   }).addTo(map)
 
-  const probe = document.createElement('div')
-  document.body.appendChild(probe)
-  cssColor = (varRef) => {
-    probe.style.color = varRef
-    return getComputedStyle(probe).color
-  }
-
   for (const m of state.museums) {
-    const color = cssColor(BOROUGH_COLOR[m.borough] ?? 'var(--ink-3)')
     const marker = L.circleMarker([m.lat, m.lng], {
-      radius: 6,
-      weight: 2,
-      color,
-      fillColor: color,
-      fillOpacity: 0.55,
+      ...PIN,
+      color: '#000000',
+      fillColor: '#000000',
+      fillOpacity: 1,
+      opacity: 1,
     })
+
     marker.bindPopup(
-      `<b>${escapeHtml(m.name)}</b><br>
-       <span class="pop-where">${escapeHtml(m.address)}</span><br>
-       <a href="${escapeHtml(m.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(hostOf(m.url))} ↗</a>`,
+      `<div class="pop">
+         <div class="pop__name">${escapeHtml(m.name)}</div>
+         <div class="pop__meta">${escapeHtml(m.address)}</div>
+         <div class="pop__foot">
+           <span class="t-label">${escapeHtml(m.borough)} &middot; ${escapeHtml(m.category)}</span>
+           <a class="link t-small" href="${escapeHtml(m.url)}" target="_blank"
+              rel="noopener noreferrer">${escapeHtml(hostOf(m.url))} &#8599;</a>
+         </div>
+       </div>`,
+      { closeButton: false, offset: [0, -4], autoPanPadding: [24, 24] },
     )
-    marker.on('click', () => {
-      state.activeId = m.id
-      syncActive()
-      cardFor(m.id)?.scrollIntoView({ block: 'center', behavior: 'smooth' })
-    })
+
+    marker.on('click', () => select(m.id, { pan: false, scroll: true }))
     markers.set(m.id, marker)
   }
 
   map.on('moveend', () => {
-    if (state.viewportOnly) renderList()
+    if (state.viewportOnly) renderIndex()
   })
 
   syncMarkers()
@@ -236,53 +237,65 @@ function syncMarkers() {
 function fitToResults() {
   const rows = state.museums.filter(matchesFilters)
   if (!rows.length) return
-  const bounds = L.latLngBounds(rows.map((m) => [m.lat, m.lng]))
-  map.fitBounds(bounds, { padding: [28, 28], maxZoom: 15 })
+  map.fitBounds(L.latLngBounds(rows.map((m) => [m.lat, m.lng])), {
+    padding: [32, 32],
+    maxZoom: 15,
+  })
 }
 
-// ---------- filters ----------
+// ---------- controls ----------
 
 function buildFilters() {
-  const counts = (key) =>
+  const tally = (key) =>
     state.museums.reduce((acc, m) => ((acc[m[key]] = (acc[m[key]] || 0) + 1), acc), {})
 
-  const boroughCounts = counts('borough')
+  const boroughTally = tally('borough')
   for (const b of BOROUGHS) {
-    const btn = document.createElement('button')
-    btn.type = 'button'
-    btn.className = 'chip'
-    btn.setAttribute('aria-pressed', 'false')
-    btn.dataset.borough = b
-    btn.style.setProperty('--swatch', BOROUGH_COLOR[b])
-    btn.innerHTML = `<span class="dot"></span>${b} <span class="n">${boroughCounts[b] ?? 0}</span>`
-    btn.addEventListener('click', () => toggle(state.boroughs, b, btn, { refit: true }))
-    els.boroughFilters.append(btn)
+    els.boroughFilters.append(
+      makeToggle(b, boroughTally[b] ?? 0, () => toggleValue(state.boroughs, b, { refit: true })),
+    )
   }
 
-  const categoryCounts = counts('category')
-  for (const c of Object.keys(categoryCounts).sort()) {
-    const btn = document.createElement('button')
-    btn.type = 'button'
-    btn.className = 'chip'
-    btn.setAttribute('aria-pressed', 'false')
-    btn.innerHTML = `${c} <span class="n">${categoryCounts[c]}</span>`
-    btn.addEventListener('click', () => toggle(state.categories, c, btn, { refit: false }))
-    els.categoryFilters.append(btn)
+  const categoryTally = tally('category')
+  for (const c of Object.keys(categoryTally).sort()) {
+    els.categoryFilters.append(
+      makeToggle(c, categoryTally[c], () => toggleValue(state.categories, c, { refit: false })),
+    )
   }
 }
 
-function toggle(set, value, btn, { refit }) {
-  if (set.has(value)) set.delete(value)
-  else set.add(value)
-  btn.setAttribute('aria-pressed', String(set.has(value)))
+function makeToggle(label, count, onClick) {
+  const btn = document.createElement('button')
+  btn.type = 'button'
+  btn.className = 'toggle'
+  btn.dataset.value = label
+  btn.setAttribute('aria-pressed', 'false')
+  btn.innerHTML = `${escapeHtml(label)}<span class="tally">${count}</span>`
+  btn.addEventListener('click', () => onClick(btn))
+  return btn
+}
+
+function toggleValue(set, value, { refit }) {
+  set.has(value) ? set.delete(value) : set.add(value)
+  syncToggles()
   update({ refit })
+}
+
+function syncToggles() {
+  for (const btn of els.boroughFilters.children) {
+    btn.setAttribute('aria-pressed', String(state.boroughs.has(btn.dataset.value)))
+  }
+  for (const btn of els.categoryFilters.children) {
+    btn.setAttribute('aria-pressed', String(state.categories.has(btn.dataset.value)))
+  }
+  els.viewportOnly.setAttribute('aria-pressed', String(state.viewportOnly))
 }
 
 function update({ refit = false } = {}) {
   syncMarkers()
   if (refit) fitToResults()
-  renderList()
-  document.querySelector('.list-pane')?.scrollTo({ top: 0 })
+  renderIndex()
+  els.list.scrollTo({ top: 0 })
 }
 
 els.search.addEventListener('input', () => {
@@ -290,9 +303,11 @@ els.search.addEventListener('input', () => {
   update()
 })
 
-els.viewportOnly.addEventListener('change', () => {
-  state.viewportOnly = els.viewportOnly.checked
-  renderList()
+els.viewportOnly.addEventListener('click', () => {
+  state.viewportOnly = !state.viewportOnly
+  syncToggles()
+  renderIndex()
+  els.list.scrollTo({ top: 0 })
 })
 
 els.reset.addEventListener('click', () => {
@@ -301,10 +316,9 @@ els.reset.addEventListener('click', () => {
   state.categories.clear()
   state.viewportOnly = false
   state.activeId = null
-  map?.closePopup()
   els.search.value = ''
-  els.viewportOnly.checked = false
-  for (const chip of document.querySelectorAll('.chip')) chip.setAttribute('aria-pressed', 'false')
+  map?.closePopup()
+  syncToggles()
   update({ refit: true })
 })
 
@@ -312,4 +326,4 @@ els.reset.addEventListener('click', () => {
 
 buildFilters()
 initMap()
-renderList()
+renderIndex()

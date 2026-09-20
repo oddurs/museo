@@ -1,35 +1,52 @@
 # Museo
 
 A browsable directory of museums across all five boroughs of New York City.
+Black and white, set in Whitney, built on a documented design system.
 Static HTML/CSS/JS, no build step, no dependencies to install.
 
 ```
-npm start      # http://localhost:5173
-npm run check  # validate data/museums.json
+npm run fonts   # build the Whitney webfonts — do this first
+npm start       # http://localhost:5173
+npm run check   # validate data/museums.json
 npm run geocode # fill in coordinates for any new entries
 ```
+
+- The app: <http://localhost:5173>
+- The design system specimen: <http://localhost:5173/web/design/>
 
 ## What's here
 
 - **107 museums** — Manhattan 58, Brooklyn 16, Queens 15, Bronx 8, Staten Island 10.
-- **Map** (Leaflet + OpenStreetMap), pins colored by borough. Clicking a pin scrolls
-  the list to that museum; clicking a card flies the map to the pin.
+- **Map** (Leaflet + OpenStreetMap), desaturated to grays so it joins the
+  achromatic system. Clicking a pin scrolls the index to that museum; clicking an
+  entry flies the map to the pin.
 - **Filters** — borough, category, and full-text search over name, neighborhood and
   address. Filters combine, and search terms are matched independently
   ("children brooklyn" works).
-- **Only what's on the map** — narrows the list to the current map viewport, so you
-  can pan to a neighborhood and see just what's walkable from there.
+- **On map only** — narrows the index to the current map viewport, so you can pan
+  to a neighborhood and see just what's walkable from there.
 - Each entry links out to the museum's own site. No photos, by design.
 
 ## Layout
 
 ```
-data/museums.json     the dataset (hand-curated, machine-geocoded)
-web/                  the interface — index.html, styles.css, app.js
-scripts/serve.mjs     zero-dependency static server
-scripts/geocode.mjs   fills missing lat/lng from OpenStreetMap Nominatim
-scripts/check-data.mjs validates the dataset
+data/museums.json       the dataset (hand-curated, machine-geocoded)
+web/index.html          the app
+web/app.js              behaviour
+web/system.css          design system — tokens, primitives, elements
+web/components.css      shared composite pieces (index entry, map popup)
+web/app.css             composition only; tokens, never raw values
+web/fonts.css           generated @font-face rules
+web/fonts/              generated .woff2 (gitignored)
+web/design/             living specimen of the design system
+scripts/build-fonts.py  subsets Whitney OTFs into web fonts
+scripts/serve.mjs       zero-dependency static server
+scripts/geocode.mjs     fills missing lat/lng from OpenStreetMap Nominatim
+scripts/check-data.mjs  validates the dataset
 ```
+
+See **[DESIGN.md](DESIGN.md)** for the system: principles, color, type scale,
+space, elements, and how to extend it.
 
 ## Data
 
@@ -74,8 +91,8 @@ were all within 40m.
 
 ## Still to come
 
-Pricing and opening hours. The card renderer already displays two optional fields
-if they're present on a record, so the first step is populating them:
+Pricing and opening hours. The index entry already renders two optional fields if
+they're present on a record, so the first step is populating them:
 
 ```json
 { "admission": "$30 suggested", "hoursSummary": "Wed–Mon 10–5, closed Tue" }

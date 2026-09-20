@@ -3,62 +3,81 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Museo — NYC Museums</title>
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-      crossorigin=""
-    />
-    <link rel="stylesheet" href="styles.css" />
+    <meta name="color-scheme" content="light" />
+    <title>Museo — New York City Museums</title>
+
+    <link rel="preload" as="font" type="font/woff2" href="fonts/whitney-light.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="fonts/whitney-book.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="fonts/whitney-ssm-book.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="fonts/whitney-cond-semibold.woff2" crossorigin />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <link rel="stylesheet" href="fonts.css" />
+    <link rel="stylesheet" href="system.css" />
+    <link rel="stylesheet" href="components.css" />
+    <link rel="stylesheet" href="app.css" />
   </head>
+
   <body>
-    <header class="topbar">
-      <div class="brand">
-        <h1>Museo</h1>
-        <p class="tagline">Every museum in the five boroughs.</p>
+    <header class="masthead">
+      <div class="masthead__brand">
+        <h1 class="wordmark">Museo</h1>
+        <p class="t-label">New York City · All Five Boroughs</p>
       </div>
-
-      <div class="controls">
-        <label class="search">
-          <span class="sr-only">Search museums</span>
-          <input
-            id="search"
-            type="search"
-            placeholder="Search name, neighborhood, address…"
-            autocomplete="off"
-          />
-        </label>
-
-        <div class="filter-row" id="borough-filters" role="group" aria-label="Filter by borough"></div>
-        <div class="filter-row subtle" id="category-filters" role="group" aria-label="Filter by category"></div>
-
-        <div class="filter-row meta">
-          <label class="toggle">
-            <input type="checkbox" id="viewport-only" />
-            <span>Only what's on the map</span>
-          </label>
-          <span class="count" id="count" aria-live="polite"></span>
-          <button type="button" class="linky" id="reset">Reset</button>
-        </div>
-      </div>
+      <p class="masthead__tally">
+        <span class="tally-figure" id="count">—</span>
+        <span class="t-label" id="count-label">Museums</span>
+      </p>
     </header>
 
+    <div class="search-bar">
+      <label class="sr-only" for="search">Search museums</label>
+      <input
+        id="search"
+        class="field"
+        type="search"
+        placeholder="Search a museum, a neighborhood, an address"
+        autocomplete="off"
+        spellcheck="false"
+      />
+    </div>
+
+    <nav class="filters">
+      <div class="filter-set">
+        <span class="t-label filter-set__name">Borough</span>
+        <div class="filter-set__items" id="borough-filters" role="group" aria-label="Filter by borough"></div>
+      </div>
+
+      <div class="filter-set">
+        <span class="t-label filter-set__name">Discipline</span>
+        <div class="filter-set__items" id="category-filters" role="group" aria-label="Filter by discipline"></div>
+      </div>
+
+      <div class="filter-set filter-set--end">
+        <button type="button" class="toggle" id="viewport-only" aria-pressed="false">
+          On map only
+        </button>
+        <button type="button" class="toggle toggle--plain" id="reset">Reset</button>
+      </div>
+    </nav>
+
     <main class="layout">
-      <section class="list-pane" aria-label="Museum list">
-        <ol id="list" class="list"></ol>
-        <p id="empty" class="empty" hidden>No museums match those filters.</p>
+      <section class="index" aria-label="Museum index">
+        <div class="index__head" aria-hidden="true">
+          <span class="t-label">Nº</span>
+          <span class="t-label">Museum</span>
+          <span class="t-label">Borough</span>
+        </div>
+        <ol class="index__list" id="list"></ol>
+        <p class="index__empty t-label" id="empty" hidden>Nothing matches</p>
       </section>
+
       <section class="map-pane" aria-label="Map">
         <div id="map"></div>
       </section>
     </main>
 
-    <script
-      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-      crossorigin=""
-    ></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     <script src="app.js" type="module"></script>
   </body>
 </html>

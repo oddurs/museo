@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light" />
+    <title>Museo — Design System</title>
+    <link rel="stylesheet" href="../fonts.css" />
+    <link rel="stylesheet" href="../system.css" />
+    <link rel="stylesheet" href="../components.css" />
+    <link rel="stylesheet" href="specimen.css" />
+  </head>
+
+  <body>
+    <header class="spec-head">
+      <div>
+        <h1 class="wordmark">Museo</h1>
+        <p class="t-label u-quiet">Design System · Specimen</p>
+      </div>
+      <p class="t-small u-secondary spec-head__note">
+        Everything below is rendered by <code>system.css</code>. If a specimen looks wrong,
+        the system is wrong — not the page. <a class="link" href="../index.html">Back to the app</a>
+      </p>
+    </header>
+
+    <main>
+      <!-- ================================================================ -->
+      <section class="spec">
+        <h2 class="spec__title t-title">01 — Principles</h2>
+        <ol class="principles">
+          <li>
+            <span class="t-label u-quiet">One</span>
+            <p class="t-body">
+              <b>Achromatic without exception.</b> Black, white, and four grays. Color is
+              never used to encode meaning, so nothing in the interface depends on it —
+              including the map, whose tiles are desaturated to join the system.
+            </p>
+          </li>
+          <li>
+            <span class="t-label u-quiet">Two</span>
+            <p class="t-body">
+              <b>Type carries the hierarchy.</b> Size, weight and case do the work that
+              color, fills and shadows do elsewhere. Whitney was drawn for the Whitney
+              Museum's wayfinding; it is used here the way signage uses it.
+            </p>
+          </li>
+          <li>
+            <span class="t-label u-quiet">Three</span>
+            <p class="t-body">
+              <b>Rules and whitespace instead of boxes.</b> No border radius, no shadow, no
+              gradient. Structure is drawn with hairlines and the space between things.
+            </p>
+          </li>
+          <li>
+            <span class="t-label u-quiet">Four</span>
+            <p class="t-body">
+              <b>Nothing moves that doesn't have to.</b> Transitions are 120ms and linear,
+              limited to color and background. Selection changes weight, never position.
+            </p>
+          </li>
+        </ol>
+      </section>
+
+      <!-- ================================================================ -->
+      <section class="spec">
+        <h2 class="spec__title t-title">02 — Color</h2>
+        <p class="spec__lede t-body u-secondary">
+          Seven values, no hue. The ratio given is contrast against paper; anything below
+          4.5:1 is barred from carrying text, which leaves <code>--ink-quiet</code> for
+          borders and marks alone.
+        </p>
+        <ul class="swatches" id="swatches"></ul>
+      </section>
+
+      <!-- ================================================================ -->
+      <section class="spec">
+        <h2 class="spec__title t-title">03 — Families</h2>
+        <p class="spec__lede t-body u-secondary">
+          Three cuts of one typeface. The rule for choosing between them is a size
+          threshold, not a preference.
+        </p>
+
+        <div class="family">
+          <div class="family__head">
+            <h3 class="t-heading">Whitney</h3>
+            <span class="t-label u-quiet">Display · 16px and up</span>
+          </div>
+          <p class="family__sample" style="font-family: var(--font-display); font-weight: 300">
+            The Metropolitan Museum of Art
+          </p>
+          <div class="weights" id="weights-display"></div>
+        </div>
+
+        <div class="family">
+          <div class="family__head">
+            <h3 class="t-heading">Whitney ScreenSmart</h3>
+            <span class="t-label u-quiet">Text · below 16px</span>
+          </div>
+          <p class="family__sample family__sample--small" style="font-family: var(--font-text)">
+            Wider apertures and looser spacing hold up where the display cut would close in
+            on itself. All running text, metadata and addresses are set in this.
+          </p>
+          <div class="weights" id="weights-text"></div>
+        </div>
+
+        <div class="family">
+          <div class="family__head">
+            <h3 class="t-heading">Whitney Condensed</h3>
+            <span class="t-label u-quiet">Label · uppercase only</span>
+          </div>
+          <p class="family__sample" style="font-family: var(--font-label); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600">
+            Manhattan · Brooklyn · Queens · Bronx · Staten Island
+          </p>
+          <p class="t-small u-quiet">
+            Never set lowercase, never used for more than three words.
+          </p>
+        </div>
+      </section>
+
+      <!-- ================================================================ -->
+      <section class="spec">
+        <h2 class="spec__title t-title">04 — Type scale</h2>
+        <p class="spec__lede t-body u-secondary">
+          Seven sizes, spaced by eye rather than by ratio — a strict modular scale put
+          the name and its address too close together. The gap from 21px to 13px is the
+          important one, and it is deliberately larger than a ratio would give. Each
+          primitive sets family, size, weight, leading and tracking together; compose
+          with these rather than setting font properties by hand.
+        </p>
+        <table class="scale">
+          <thead>
+            <tr>
+              <th class="t-label u-quiet">Class</th>
+              <th class="t-label u-quiet">Token</th>
+              <th class="t-label u-quiet">Specimen</th>
+            </tr>
+          </thead>
+          <tbody id="scale"></tbody>
+        </table>
+      </section>
+
+      <!-- ================================================================ -->
+      <section class="spec">
+        <h2 class="spec__title t-title">05 — Space</h2>
+        <p class="spec__lede t-body u-secondary">
+          A 4px base. These eight steps are the only spacing values in the system.
+        </p>
+        <ul class="spaces" id="spaces"></ul>
+      </section>
+
+      <!-- ================================================================ -->
+      <section class="spec">
+        <h2 class="spec__title t-title">06 — Elements</h2>
+
+        <div class="demo">
+          <div class="demo__label">
+            <span class="t-label u-quiet">Toggle</span>
+            <p class="t-small u-secondary">
+              The only interactive control. States selection with a rule beneath it —
+              never a fill, never a pill. Counts ride alongside, always lighter.
+            </p>
+          </div>
+          <div class="demo__stage">
+            <div class="filter-strip">
+              <span class="t-label u-quiet filter-strip__name">Borough</span>
+              <button class="toggle" aria-pressed="true">Manhattan<span class="tally">58</span></button>
+              <button class="toggle" aria-pressed="false">Brooklyn<span class="tally">16</span></button>
+              <button class="toggle" aria-pressed="false">Queens<span class="tally">15</span></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="demo">
+          <div class="demo__label">
+            <span class="t-label u-quiet">Field</span>
+            <p class="t-small u-secondary">
+              An input reduced to a baseline. The rule goes black on focus.
+            </p>
+          </div>
+          <div class="demo__stage">
+            <input class="field" type="search" placeholder="Search a museum, a neighborhood, an address" />
+          </div>
+        </div>
+
+        <div class="demo">
+          <div class="demo__label">
+            <span class="t-label u-quiet">Link &amp; mark</span>
+            <p class="t-small u-secondary">
+              Links underline on hover only, so dense lists stay calm. Search hits take an
+              underline rather than a highlighter.
+            </p>
+          </div>
+          <div class="demo__stage">
+            <p class="t-body">
+              <a class="link" href="https://whitney.org" target="_blank" rel="noopener">whitney.org &#8599;</a>
+              &nbsp;&nbsp;·&nbsp;&nbsp;
+              The <mark>Noguchi</mark> Museum, Long Island City
+            </p>
+          </div>
+        </div>
+
+        <div class="demo">
+          <div class="demo__label">
+            <span class="t-label u-quiet">Rule</span>
+            <p class="t-small u-secondary">
+              Hairline for separation, black for structural edges.
+            </p>
+          </div>
+          <div class="demo__stage">
+            <hr class="rule" />
+            <div style="height: var(--space-4)"></div>
+            <hr class="rule rule--strong" />
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================ -->
+      <section class="spec">
+        <h2 class="spec__title t-title">07 — Index entry</h2>
+        <p class="spec__lede t-body u-secondary">
+          The application's one composite component: a catalogue row, not a card.
+          Numbered in the margin, divided by a hairline, marked at the left edge when
+          selected. Shown below in its resting and selected states.
+        </p>
+        <div class="entry-demo" id="entry-demo"></div>
+      </section>
+    </main>
+
+    <footer class="spec-foot">
+      <span class="t-label u-quiet">Museo Design System</span>
+      <span class="t-small u-quiet">Whitney © Hoefler &amp; Co. Set in Whitney, ScreenSmart and Condensed.</span>
+    </footer>
+
+    <script src="specimen.js" type="module"></script>
+  </body>
+</html>
