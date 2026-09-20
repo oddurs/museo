@@ -2,9 +2,18 @@ const BOROUGHS = ['Manhattan', 'Brooklyn', 'Queens', 'Bronx', 'Staten Island']
 
 const PRIMARY = '#c0361b'
 const INK = '#1c1810'
-const PIN = { radius: 3.6, weight: 1, color: PRIMARY, fillColor: PRIMARY, fillOpacity: 1, opacity: 0.85 }
-const PIN_HOVER = { radius: 5, weight: 1, color: PRIMARY, fillColor: PRIMARY, fillOpacity: 1, opacity: 1 }
-const PIN_ACTIVE = { radius: 5.5, weight: 6, color: PRIMARY, fillColor: INK, fillOpacity: 1, opacity: 0.22 }
+const PAPER = '#fbf9f5'
+
+// Every pin carries a paper ring. Without it, museums a block apart fuse into
+// one lump — in midtown that was most of them — and the map stopped reporting
+// how many things are actually there.
+const PIN = { radius: 3.6, weight: 1.4, color: PAPER, fillColor: PRIMARY, fillOpacity: 1, opacity: 1 }
+const PIN_HOVER = { radius: 5, weight: 1.6, color: PAPER, fillColor: PRIMARY, fillOpacity: 1, opacity: 1 }
+const PIN_ACTIVE = { radius: 5, weight: 1.6, color: PAPER, fillColor: INK, fillOpacity: 1, opacity: 1 }
+
+// The selection reads as a ring around the pin rather than a change of size,
+// so choosing a museum does not make it look like a different kind of place.
+const HALO = { radius: 10, weight: 1.5, color: PRIMARY, opacity: 0.65, fill: false, interactive: false }
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 const animate = !reduceMotion
@@ -32,12 +41,14 @@ const els = {
   count: document.getElementById('count'),
   countLabel: document.getElementById('count-label'),
   reset: document.getElementById('reset'),
+  searchClear: document.getElementById('search-clear'),
   status: document.getElementById('status'),
 }
 
 const toggles = { borough: new Map(), category: new Map() }
 const markers = new Map()
 let map
+let halo
 
 /* ---------------------------------------------------------------- text --- */
 
@@ -205,7 +216,18 @@ function syncActive() {
   }
   for (const [id, marker] of markers) {
     marker.setStyle(id === state.activeId ? PIN_ACTIVE : PIN)
-    if (id === state.activeId) marker.bringToFront()
+  }
+
+  // A pin the filters have removed cannot be the selection: its halo would sit
+  // on empty map and the URL would still name it.
+  const marker = state.activeId ? markers.get(state.activeId) : null
+  const active = marker && map && map.hasLayer(marker) ? marker : null
+  if (active && map) {
+    halo.setLatLng(active.getLatLng())
+    if (!map.hasLayer(halo)) halo.addTo(map)
+    active.bringToFront()
+  } else if (halo && map && map.hasLayer(halo)) {
+    map.removeLayer(halo)
   }
 }
 
@@ -294,6 +316,8 @@ function initMap() {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   }).addTo(map)
 
+  halo = L.circleMarker([0, 0], { ...HALO })
+
   for (const m of state.museums) {
     const marker = L.circleMarker([m.lat, m.lng], { ...PIN })
 
@@ -307,7 +331,7 @@ function initMap() {
               rel="noopener noreferrer">${escapeHtml(hostOf(m.url))} &#8599;</a>
          </div>
        </div>`,
-      { closeButton: false, offset: [0, -4], autoPanPadding: [24, 24] },
+      { closeButton: false, offset: [0, -10], autoPanPadding: [28, 28] },
     )
 
     marker.on('click', () => select(m.id, { pan: false, scroll: true }))
@@ -397,6 +421,7 @@ function syncToggles() {
   const dirty = !!(state.query || state.boroughs.size || state.categories.size || state.viewportOnly)
   els.reset.disabled = !dirty
   els.reset.hidden = !dirty
+  els.searchClear.hidden = !state.query
 }
 
 function toggleValue(set, value, { refit }) {
@@ -408,6 +433,15 @@ function update({ refit = false, keepScroll = false } = {}) {
   // renderIndex replaces every row, so anyone reading the index by keyboard
   // would be dropped back to the top of the document. Put them back.
   const hadFocus = els.list.contains(document.activeElement)
+
+  // A selection the filters have excluded is no longer a selection.
+  if (state.activeId) {
+    const chosen = state.museums.find((m) => m.id === state.activeId)
+    if (!chosen || !matches(chosen)) {
+      state.activeId = null
+      map?.closePopup()
+    }
+  }
 
   syncToggles()
   syncMarkers()
@@ -438,6 +472,13 @@ els.search.addEventListener('keydown', (e) => {
   }
   if (e.key === 'ArrowDown' && state.rows.length) { e.preventDefault(); setCursorTo(0) }
   if (e.key === 'Enter' && state.rows.length) { e.preventDefault(); setCursorTo(0) }
+})
+
+els.searchClear.addEventListener('click', () => {
+  els.search.value = ''
+  state.query = ''
+  update()
+  els.search.focus()
 })
 
 els.viewportOnly.addEventListener('click', () => {

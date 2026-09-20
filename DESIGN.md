@@ -362,6 +362,41 @@ letters, or on a stray quotation mark, in any name, address or neighborhood.
 
 ---
 
+## Components
+
+**The pin carries a paper ring.** Without one, museums a block apart fused into
+a single lump — in midtown that was most of them — and the map stopped
+reporting how many things are actually there. A 1.4px ring in `--paper`
+separates them at every zoom.
+
+**Selection is a ring, not a size.** The chosen pin takes an ink fill and a
+separate halo layer draws a cinnabar circle around it, so choosing a museum
+does not make it look like a different *kind* of place. A selection the filters
+have since excluded is cleared rather than left as a halo on empty map with the
+URL still naming it.
+
+**The popup points at its pin.** Leaflet's tip is a rotated square clipped by
+its container, which leaves exactly the two bordered edges the callout needs.
+Its address takes `text-wrap: pretty`, so a zip code never lands alone on a
+line.
+
+**Small caps take old-style figures.** A count beside a small-cap label is the
+one place lining figures look wrong — they stand a head taller than the letters
+next to them. `.toggle .tally` therefore overrides to `--figures-text`, which
+is the classic pairing and the reason both figure sets are in the system.
+
+**The field clears itself.** The native `-webkit-search-cancel-button` is a
+heavy black glyph at the far end of a very wide rule, so it is hidden and
+replaced by a small-cap `Clear` that only exists while there is something to
+clear. It clears the *search*; `Reset` clears every filter, which is not what
+someone retyping a query wants.
+
+**Hovering a row reveals its link.** The outbound underline is transparent at
+rest so a list of 107 stays calm, `--primary-line` while the row is hovered,
+and `--primary` on the link itself.
+
+---
+
 ## The map
 
 The basemap is desaturated *and warmed to the paper's temperature*

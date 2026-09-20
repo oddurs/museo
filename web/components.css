@@ -127,6 +127,7 @@
               border-color var(--duration) var(--easing);
 }
 
+.entry:hover .entry__link { border-bottom-color: var(--primary-line); }
 .entry__link:hover { color: var(--primary-deep); border-bottom-color: var(--primary); }
 
 /* Classification stack, flush right: borough on the name's baseline,
@@ -176,6 +177,7 @@
   color: var(--ink-tertiary);
   margin-top: var(--space-2);
   font-feature-settings: var(--figures-text);
+  text-wrap: pretty;   /* never leave the zip alone on its own line */
 }
 
 .pop__foot {
