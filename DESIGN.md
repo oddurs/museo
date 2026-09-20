@@ -146,12 +146,69 @@ together. Compose with them; don't set font properties by hand.
 
 ---
 
-## Space & rules
+## Space
 
-A 4px base: `4 · 8 · 12 · 16 · 24 · 32 · 48 · 64 · 96`.
+A 4px base: `4 · 8 · 12 · 16 · 24 · 32 · 48 · 64 · 96`. These are the only
+spacing values in the system, and `npm run audit` fails the build if a raw one
+appears in a composition layer.
 
-Five rule weights, so separation can be graded rather than uniform:
-`--hairline-light` · `--hairline` · `--hairline-strong` · `--edge` · `--keyline`.
+### One gutter
+
+Every region shares a single left edge — `--gutter`. The index's rows carry a
+2px selection marker on their left border, so they and their column heads
+**absorb it into their padding**:
+
+```css
+padding-left: calc(var(--gutter) - var(--stroke-marker));
+```
+
+Without that, the marker pushes the whole column 2px right and every row sits
+off the header it belongs to. That was the defect this rule exists to prevent,
+and the audit now asserts the two stay in step at every breakpoint.
+
+### Region padding
+
+Vertical padding descends with the weight of the region:
+
+| Region | Padding | Why |
+| --- | --- | --- |
+| `.masthead` | 32 / 24 | Top is heavier to clear the exhibition bar above it |
+| `.search-bar` | 24 / 0 | The field supplies its own 8px baseline padding |
+| `.filters` | 24 / 24 | Symmetric — the toggles carry their own 4px and 2px marker |
+| `.index__head` | 12 | A label strip, not a region |
+| `.entry` | 16 | Optical gaps land at 21.7px above the name, 20.1px below the link |
+
+The entry's figures come from Whitney's own metrics rather than from eyeballing:
+at 21px on a 1.2 line the name's box-top sits 5.67px above its cap, and the
+link's baseline sits 4.08px above its box-bottom. Equal 16px padding therefore
+reads as balanced even though the numbers differ.
+
+---
+
+## Strokes & the border ladder
+
+Borders run on their own scale, not the spacing scale:
+
+| Token | Width | Use |
+| --- | --- | --- |
+| `--stroke-hairline` | 1px | Every rule and edge |
+| `--stroke-marker` | 2px | Selection markers, toggle underlines |
+| `--stroke-keyline` | 3px | The exhibition bar |
+
+Weight tracks **structural significance**, so the hierarchy of the page can be
+read from the rules alone. Pick by what the rule separates, never by how it
+looks in isolation:
+
+| Token | Value | Separates |
+| --- | --- | --- |
+| `--edge` | gray-900 | Outermost structural divisions — masthead from body, index from map. The only rule set in ink. |
+| `--hairline-strong` | gray-300 | Regions inside a pane — the filter bar, the index's column heads, a field's baseline |
+| `--hairline` | gray-200 | Boundaries inside a single component — a popup's foot, a specimen frame |
+| `--hairline-light` | gray-150 | Repeating separators in a list — one per entry, where a heavier value would stripe the column |
+
+The filter bar was originally `--hairline`, making it *lighter* than the column
+heads inside the pane below it and inverting the hierarchy. It is
+`--hairline-strong` now.
 
 ---
 
@@ -221,6 +278,13 @@ what a map is for.
    render it.
 4. Add it to `/web/design/` in the same commit. A component that isn't in the
    specimen will drift.
+
+**The audit.** `npm run audit` is a static linter over the composition layers.
+It fails on a raw color, a spacing value off the 4px scale, a border width off
+the stroke scale, an unknown token, or any divergence between `.entry` and
+`.index__head` — comparing their *effective* column shape at every breakpoint,
+with the cascade applied in load order. A line may opt out with a trailing
+`/* system-exempt: reason */`, and the report lists every exemption.
 
 **Setting OpenType features from JavaScript:** assign them as style *properties*,
 never by interpolating into a `style="..."` attribute. A value like `"smcp" 1`

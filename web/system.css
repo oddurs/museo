@@ -117,14 +117,34 @@
   --space-8: 64px;
   --space-9: 96px;
 
-  /* 1.10 Structure
+  /* 1.10 Stroke widths
+     Borders run on their own scale, not the 4px spacing scale. Three widths,
+     each with one meaning. */
+  --stroke-hairline: 1px;  /* every rule and edge */
+  --stroke-marker:   2px;  /* selection markers and toggle underlines */
+  --stroke-keyline:  3px;  /* the exhibition bar */
+
+  /* 1.11 The border ladder
+     Weight tracks structural significance, so the eye can read the hierarchy of
+     the page from the rules alone. Pick by what the rule separates, never by
+     how it looks in isolation:
+
+       --edge            outermost structural divisions — masthead from body,
+                         index from map. The only rule set in ink.
+       --hairline-strong boundaries between regions inside a pane — the filter
+                         bar, the index's column heads, a field's baseline.
+       --hairline        boundaries inside a single component — the rule across
+                         a popup's foot, a specimen frame.
+       --hairline-light  repeating separators in a list — one per index entry,
+                         where a heavier value would stripe the column.
+
      Everything is square. Depth is drawn with rules and whitespace — there is
      no shadow and no gradient anywhere in the system. */
-  --hairline:        1px solid var(--rule);
-  --hairline-light:  1px solid var(--rule-light);
-  --hairline-strong: 1px solid var(--rule-strong);
-  --edge:            1px solid var(--ink);
-  --keyline:         3px solid var(--primary);
+  --hairline-light:  var(--stroke-hairline) solid var(--rule-light);
+  --hairline:        var(--stroke-hairline) solid var(--rule);
+  --hairline-strong: var(--stroke-hairline) solid var(--rule-strong);
+  --edge:            var(--stroke-hairline) solid var(--ink);
+  --keyline:         var(--stroke-keyline) solid var(--primary);
   --radius:          0;
 
   /* 1.11 Motion — short and linear. Nothing bounces, nothing moves on select. */
@@ -135,7 +155,7 @@
   --gutter:      var(--space-6);
   --index-width: 46%;
   --index-min:   400px;
-  --number-col:  38px;
+  --number-col:  40px;  /* 4px scale, like everything else */
 }
 
 /* --------------------------------------------------------------------------
@@ -300,7 +320,7 @@ img, svg { display: block; max-width: 100%; }
   color: var(--ink-tertiary);
   cursor: pointer;
   padding: var(--space-1) 0;
-  border-bottom: 2px solid transparent;
+  border-bottom: var(--stroke-marker) solid transparent;
   transition: color var(--duration) var(--easing),
               border-color var(--duration) var(--easing);
   white-space: nowrap;

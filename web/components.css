@@ -25,8 +25,9 @@
   width: 100%;
   text-align: left;
   padding: var(--space-4) var(--gutter);
+  padding-left: calc(var(--gutter) - var(--stroke-marker));
   border-bottom: var(--hairline-light);
-  border-left: 2px solid transparent;
+  border-left: var(--stroke-marker) solid transparent;
   cursor: pointer;
   scroll-margin: var(--space-4);
   transition: background-color var(--duration) var(--easing),
@@ -101,7 +102,7 @@
    Square, hairline-edged, no shadow — a label pinned to the map.
    -------------------------------------------------------------------------- */
 
-.pop { min-width: 200px; max-width: 250px; }
+.pop { min-width: 200px; max-width: 248px; }
 
 .pop__name {
   font-family: var(--font-display);

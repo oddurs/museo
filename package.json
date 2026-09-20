@@ -8,6 +8,7 @@
     "start": "node scripts/serve.mjs",
     "geocode": "node scripts/geocode.mjs",
     "check": "node scripts/check-data.mjs",
+    "audit": "node scripts/audit-design.mjs",
     "fonts": "python3 scripts/build-fonts.py"
   }
 }

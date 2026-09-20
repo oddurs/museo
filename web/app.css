@@ -14,7 +14,7 @@ body { display: flex; flex-direction: column; overflow: hidden; }
    -------------------------------------------------------------------------- */
 
 .bar {
-  height: 3px;
+  height: var(--stroke-keyline);
   background: var(--primary);
   flex: none;
 }
@@ -72,9 +72,11 @@ body { display: flex; flex-direction: column; overflow: hidden; }
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
+  /* Symmetric: the toggles carry their own 4px padding and a 2px marker rule,
+     so equal token padding lands within 2px optically above and below. */
   gap: var(--space-3) var(--space-7);
-  padding: var(--space-5) var(--gutter) var(--space-4);
-  border-bottom: var(--hairline);
+  padding: var(--space-5) var(--gutter);
+  border-bottom: var(--hairline-strong);
   flex: none;
 }
 
@@ -126,12 +128,16 @@ body { display: flex; flex-direction: column; overflow: hidden; }
   border-right: var(--edge);
 }
 
+/* The same three columns as .entry, and the same transparent selection marker:
+   without it every row in the index sits 2px right of its own column head. */
 .index__head {
   display: grid;
   grid-template-columns: var(--number-col) 1fr auto;
   column-gap: var(--space-5);
   padding: var(--space-3) var(--gutter);
+  padding-left: calc(var(--gutter) - var(--stroke-marker));
   border-bottom: var(--hairline-strong);
+  border-left: var(--stroke-marker) solid transparent;
   color: var(--ink-tertiary);
   flex: none;
 }
