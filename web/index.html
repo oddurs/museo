@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="app.css" />
   </head>
 
-  <body>
+  <body class="is-loading">
     <div class="bar" role="presentation"></div>
 
     <header class="masthead">
@@ -41,11 +41,15 @@
 
     <div class="search-bar">
       <label class="sr-only" for="search">Search museums</label>
+      <span class="sr-only" id="search-hint">
+        Press slash to return here. Arrow down moves into the index.
+      </span>
       <input
         id="search"
         class="field"
         type="search"
         placeholder="Search a museum, a neighborhood, an address"
+        aria-describedby="search-hint"
         autocomplete="off"
         spellcheck="false"
       />
@@ -66,11 +70,13 @@
         <button type="button" class="toggle" id="viewport-only" aria-pressed="false">
           On map only
         </button>
-        <button type="button" class="toggle toggle--plain" id="reset">Reset</button>
+        <button type="button" class="toggle toggle--plain" id="reset" hidden>Reset</button>
       </div>
     </nav>
 
     <main class="layout">
+      <p class="sr-only" id="status" role="status" aria-live="polite"></p>
+
       <section class="index" aria-label="Museum index">
         <div class="index__head" aria-hidden="true">
           <span class="t-label">N&#186;</span>
@@ -78,7 +84,10 @@
           <span class="t-label">Borough</span>
         </div>
         <ol class="index__list" id="list"></ol>
-        <p class="index__empty t-label" id="empty" hidden>Nothing matches</p>
+        <div class="index__empty" id="empty" hidden>
+          <span class="t-label">Nothing matches</span>
+          <button type="button" class="empty__reset toggle toggle--plain">Clear the filters</button>
+        </div>
       </section>
 
       <section class="map-pane" aria-label="Map">

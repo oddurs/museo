@@ -182,6 +182,10 @@ body {
 }
 
 h1, h2, h3, p, figure, ol, ul { margin: 0; padding: 0; }
+
+/* Any component that sets its own display would otherwise out-rank the user
+   agent's [hidden] rule and stay on screen while marked hidden. */
+[hidden] { display: none !important; }
 ol, ul { list-style: none; }
 button { font: inherit; color: inherit; background: none; border: 0; padding: 0; }
 a { color: inherit; }

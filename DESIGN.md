@@ -286,8 +286,17 @@ Case does the sorting: everything categorical is small caps, everything read is
 mixed case. That split is what lets the eye skip the labels when scanning names
 and find them instantly when scanning for a borough.
 
-Selected: a primary rule at the left edge, a warm bed, the figure going to the
-primary, and the name stepping from Book to Medium. Nothing moves.
+The **name is a button** — selecting a museum puts it on the map — and the
+outbound link is a second, separate action beside it. The row is deliberately
+not a button that contains a link, which is what it was until the interaction
+layer was rebuilt: nested interactive elements announce as one control and hide
+the link from assistive technology.
+
+Four states: resting, hovered, **peeked** (its pin is under the cursor on the
+map, shown with a `--primary-line` inset rule, which never steals the current
+selection), and selected — a primary rule at the left edge, a warm bed, the
+figure going to the primary, and the name stepping from Book to Medium. Nothing
+moves.
 
 ---
 
@@ -313,6 +322,38 @@ ink fill with a wide, low-opacity primary halo.
 The cost is worth naming: **boroughs are not color-coded.** One primary means
 one hue, so the filters and the index carry that distinction instead — which is
 what a map is for.
+
+---
+
+## Interaction
+
+**The index is two tab stops, not two hundred.** A roving tabindex keeps only
+the cursor row's button and link reachable; `↑` `↓` `Home` `End` `PageUp`
+`PageDown` move through the results and fly the map along, so the whole index
+can be read from the keyboard. `/` returns to the search field from anywhere
+that isn't already a text field, `↓` from the field steps into the index, and
+`Escape` clears the field, then the selection.
+
+Re-rendering the index replaces every row, which drops keyboard focus back to
+the top of the document. `update()` therefore restores focus to the cursor row
+whenever focus was inside the list before the render.
+
+**Facets count what choosing them would yield.** Each facet is tallied against
+every *other* filter, so with Brooklyn selected the disciplines read `Art 4`,
+`History 8`, `Design 0` — and a zero is disabled rather than left looking
+available. Before this, the counts stayed global and `Design 7` led to an empty
+list.
+
+**"On map only" never empties the list under you.** With it on, the list *is*
+the map's contents, so choosing a row pans only as far as `panInside` needs to
+bring the pin into view instead of zooming to it. Selecting a row used to
+collapse the list from 107 rows to 5.
+
+**State lives in the URL** — `?q=`, `&borough=`, `&type=`, `&onmap=1`, `&at=`.
+A view can be reloaded or shared, and the selected museum comes back with it.
+
+Motion respects `prefers-reduced-motion`: map movement and scrolling both go
+instant, as well as the CSS transitions.
 
 ---
 

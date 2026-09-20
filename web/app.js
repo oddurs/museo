@@ -1,5 +1,14 @@
 const BOROUGHS = ['Manhattan', 'Brooklyn', 'Queens', 'Bronx', 'Staten Island']
 
+const PRIMARY = '#c0361b'
+const INK = '#1c1810'
+const PIN = { radius: 3.6, weight: 1, color: PRIMARY, fillColor: PRIMARY, fillOpacity: 1, opacity: 0.85 }
+const PIN_HOVER = { radius: 5, weight: 1, color: PRIMARY, fillColor: PRIMARY, fillOpacity: 1, opacity: 1 }
+const PIN_ACTIVE = { radius: 5.5, weight: 6, color: PRIMARY, fillColor: INK, fillOpacity: 1, opacity: 0.22 }
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+const animate = !reduceMotion
+
 const state = {
   museums: [],
   query: '',
@@ -7,6 +16,8 @@ const state = {
   categories: new Set(),
   viewportOnly: false,
   activeId: null,
+  rows: [],        // what the index is currently showing, in order
+  cursor: -1,      // index into rows for roving focus
 }
 
 const els = {
@@ -19,26 +30,14 @@ const els = {
   count: document.getElementById('count'),
   countLabel: document.getElementById('count-label'),
   reset: document.getElementById('reset'),
+  status: document.getElementById('status'),
 }
 
-const INK = '#1c1810'
-const PRIMARY = '#c0361b'
-
-const PIN = { radius: 3.6, weight: 1, color: PRIMARY, fillColor: PRIMARY, fillOpacity: 1, opacity: 0.85 }
-const PIN_ACTIVE = { radius: 5.5, weight: 6, color: PRIMARY, fillColor: INK, fillOpacity: 1, opacity: 0.22 }
-
+const toggles = { borough: new Map(), category: new Map() }
 const markers = new Map()
 let map
 
-// ---------- data ----------
-
-const res = await fetch('../data/museums.json')
-if (!res.ok) throw new Error(`could not load museums.json (${res.status})`)
-state.museums = (await res.json())
-  .filter((m) => typeof m.lat === 'number' && typeof m.lng === 'number')
-  .sort((a, b) => a.name.localeCompare(b.name, 'en'))
-
-// ---------- text ----------
+/* ---------------------------------------------------------------- text --- */
 
 const norm = (s) => s.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
 
@@ -78,49 +77,80 @@ function highlight(text) {
   return html + escapeHtml(text.slice(last))
 }
 
-// ---------- filtering ----------
+/* ----------------------------------------------------------- filtering --- */
 
 const haystack = (m) => norm([m.name, m.borough, m.neighborhood, m.address, m.category].join(' '))
 
-function matchesFilters(m) {
-  if (state.boroughs.size && !state.boroughs.has(m.borough)) return false
-  if (state.categories.size && !state.categories.has(m.category)) return false
-  return terms().every((term) => haystack(m).includes(term))
+const matchesText = (m) => terms().every((t) => haystack(m).includes(t))
+
+/**
+ * A museum passes when every filter agrees. `except` skips one facet, which is
+ * how each facet counts what selecting it would actually yield.
+ */
+function matches(m, except) {
+  if (except !== 'borough' && state.boroughs.size && !state.boroughs.has(m.borough)) return false
+  if (except !== 'category' && state.categories.size && !state.categories.has(m.category)) return false
+  return matchesText(m)
 }
 
-function visible() {
-  const out = state.museums.filter(matchesFilters)
-  if (!state.viewportOnly || !map) return out
-  const bounds = map.getBounds()
-  return out.filter((m) => bounds.contains([m.lat, m.lng]))
+function inViewport(m) {
+  if (!state.viewportOnly || !map) return true
+  return map.getBounds().contains([m.lat, m.lng])
 }
+
+const visible = () => state.museums.filter((m) => matches(m) && inViewport(m))
+
+/* ----------------------------------------------------------- url state --- */
+
+function writeUrl() {
+  const p = new URLSearchParams()
+  if (state.query) p.set('q', state.query)
+  if (state.boroughs.size) p.set('borough', [...state.boroughs].join(','))
+  if (state.categories.size) p.set('type', [...state.categories].join(','))
+  if (state.viewportOnly) p.set('onmap', '1')
+  if (state.activeId) p.set('at', state.activeId)
+  const url = p.toString() ? `?${p}` : location.pathname
+  history.replaceState(null, '', url)
+}
+
+function readUrl() {
+  const p = new URLSearchParams(location.search)
+  state.query = p.get('q') ?? ''
+  const known = (set, values) => values.filter(Boolean).forEach((v) => set.add(v))
+  known(state.boroughs, (p.get('borough') ?? '').split(',').filter((b) => BOROUGHS.includes(b)))
+  known(state.categories, (p.get('type') ?? '').split(',').filter(Boolean))
+  state.viewportOnly = p.get('onmap') === '1'
+  state.activeId = p.get('at')
+  els.search.value = state.query
+}
+
+/* -------------------------------------------------------------- index --- */
 
 // Pricing and opening hours land here later; render whatever exists today.
 function facts(m) {
   const bits = [m.admission, m.hoursSummary].filter(Boolean)
-  return bits.length
-    ? `<p class="entry__meta t-small">${escapeHtml(bits.join(' · '))}</p>`
-    : ''
+  return bits.length ? `<p class="entry__meta t-small">${escapeHtml(bits.join(' · '))}</p>` : ''
 }
 
-// ---------- index ----------
-
 function renderIndex() {
-  const rows = visible()
+  state.rows = visible()
+  const active = state.rows.findIndex((m) => m.id === state.activeId)
+  state.cursor = active >= 0 ? active : state.rows.length ? 0 : -1
 
   els.list.replaceChildren(
-    ...rows.map((m, i) => {
+    ...state.rows.map((m, i) => {
       const li = document.createElement('li')
       li.innerHTML = `
-        <article class="entry" data-id="${escapeHtml(m.id)}" tabindex="0" role="button"
-                 aria-label="${escapeHtml(m.name)} — show on map">
-          <span class="entry__no t-figure">${ordinal(i + 1)}</span>
+        <article class="entry" data-id="${escapeHtml(m.id)}">
+          <span class="entry__no t-figure" aria-hidden="true">${ordinal(i + 1)}</span>
           <div class="entry__body">
-            <h2 class="entry__name t-heading">${highlight(m.name)}</h2>
+            <h2 class="entry__name t-heading">
+              <button type="button" class="entry__select" tabindex="-1">${highlight(m.name)}</button>
+            </h2>
             <p class="entry__meta t-small">${
               m.neighborhood ? highlight(m.neighborhood) + ' &middot; ' : ''
             }${highlight(street(m.address))}</p>
-            <a class="entry__link t-fine" href="${escapeHtml(m.url)}"
+            <a class="entry__link t-fine" href="${escapeHtml(m.url)}" tabindex="-1"
                target="_blank" rel="noopener noreferrer">${escapeHtml(hostOf(m.url))} &#8599;</a>
             ${facts(m)}
           </div>
@@ -133,14 +163,26 @@ function renderIndex() {
     }),
   )
 
-  els.empty.hidden = rows.length > 0
-  els.count.textContent = rows.length
+  els.empty.hidden = state.rows.length > 0
+  els.count.textContent = state.rows.length
   els.countLabel.textContent =
-    rows.length === state.museums.length
-      ? rows.length === 1 ? 'Museum' : 'Museums'
+    state.rows.length === state.museums.length
+      ? state.rows.length === 1 ? 'Museum' : 'Museums'
       : `of ${state.museums.length}`
 
+  announce()
   syncActive()
+  syncRoving()
+}
+
+function announce() {
+  const bits = []
+  if (state.query) bits.push(`matching “${state.query}”`)
+  if (state.boroughs.size) bits.push(`in ${[...state.boroughs].join(', ')}`)
+  if (state.categories.size) bits.push(`${[...state.categories].join(', ')}`)
+  if (state.viewportOnly) bits.push('within the map view')
+  els.status.textContent =
+    `${state.rows.length} ${state.rows.length === 1 ? 'museum' : 'museums'}${bits.length ? ' ' + bits.join(', ') : ''}.`
 }
 
 const entryFor = (id) => els.list.querySelector(`.entry[data-id="${CSS.escape(id)}"]`)
@@ -155,15 +197,58 @@ function syncActive() {
   }
 }
 
-function select(id, { pan = true, scroll = false } = {}) {
+/** Roving tabindex: the list is two tab stops, not two hundred. */
+function syncRoving() {
+  const entries = [...els.list.querySelectorAll('.entry')]
+  entries.forEach((entry, i) => {
+    const on = i === state.cursor ? '0' : '-1'
+    entry.querySelector('.entry__select')?.setAttribute('tabindex', on)
+    entry.querySelector('.entry__link')?.setAttribute('tabindex', on)
+  })
+}
+
+function moveCursor(delta, { focus = true } = {}) {
+  if (!state.rows.length) return
+  const next = Math.min(Math.max(state.cursor + delta, 0), state.rows.length - 1)
+  if (next === state.cursor) return
+  state.cursor = next
+  syncRoving()
+  const m = state.rows[next]
+  select(m.id, { scroll: true, focus })
+}
+
+function setCursorTo(index, { focus = true } = {}) {
+  if (!state.rows.length) return
+  state.cursor = Math.min(Math.max(index, 0), state.rows.length - 1)
+  syncRoving()
+  select(state.rows[state.cursor].id, { scroll: true, focus })
+}
+
+/* ---------------------------------------------------------- selection --- */
+
+function select(id, { pan = true, scroll = false, focus = false } = {}) {
   state.activeId = id
+  const i = state.rows.findIndex((m) => m.id === id)
+  if (i >= 0) { state.cursor = i; syncRoving() }
   syncActive()
+
   const marker = markers.get(id)
-  if (marker) {
-    if (pan) map.setView(marker.getLatLng(), Math.max(map.getZoom(), 15), { animate: true })
-    marker.openPopup()
+  if (marker && pan) {
+    // With "on map only" on, the list is the map's contents — changing the
+    // zoom would empty it out from under whoever just chose a row. Nudge the
+    // view only as far as it takes to bring the pin inside.
+    if (state.viewportOnly) {
+      map.panInside(marker.getLatLng(), { padding: [48, 48], animate })
+    } else {
+      map.setView(marker.getLatLng(), Math.max(map.getZoom(), 15), { animate })
+    }
   }
-  if (scroll) entryFor(id)?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+  if (marker) marker.openPopup()
+
+  const entry = entryFor(id)
+  if (scroll) entry?.scrollIntoView({ block: 'nearest', behavior: animate ? 'smooth' : 'auto' })
+  if (focus) entry?.querySelector('.entry__select')?.focus({ preventScroll: true })
+  writeUrl()
 }
 
 els.list.addEventListener('click', (e) => {
@@ -173,22 +258,25 @@ els.list.addEventListener('click', (e) => {
 })
 
 els.list.addEventListener('keydown', (e) => {
-  if (e.key !== 'Enter' && e.key !== ' ') return
   const entry = e.target.closest('.entry')
-  if (!entry || e.target.tagName === 'A') return
-  e.preventDefault()
-  select(entry.dataset.id)
+  if (!entry) return
+  const at = state.rows.findIndex((m) => m.id === entry.dataset.id)
+  switch (e.key) {
+    case 'ArrowDown': e.preventDefault(); state.cursor = at; moveCursor(1); break
+    case 'ArrowUp':   e.preventDefault(); state.cursor = at; moveCursor(-1); break
+    case 'Home':      e.preventDefault(); setCursorTo(0); break
+    case 'End':       e.preventDefault(); setCursorTo(state.rows.length - 1); break
+    case 'PageDown':  e.preventDefault(); state.cursor = at; moveCursor(10); break
+    case 'PageUp':    e.preventDefault(); state.cursor = at; moveCursor(-10); break
+  }
 })
 
-// ---------- map ----------
+/* ---------------------------------------------------------------- map --- */
 
 function initMap() {
   map = L.map('map', { zoomControl: true, preferCanvas: true, zoomSnap: 0.25 })
     .setView([40.7128, -73.96], 11)
 
-  // OpenStreetMap, stripped of color and flattened by CSS so the map reads as
-  // part of the achromatic system. (Keyless tile hosts that ship a quiet
-  // basemap no longer exist — CARTO and Stadia both watermark now.)
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -211,19 +299,25 @@ function initMap() {
     )
 
     marker.on('click', () => select(m.id, { pan: false, scroll: true }))
+    marker.on('mouseover', () => {
+      if (m.id !== state.activeId) marker.setStyle(PIN_HOVER)
+      entryFor(m.id)?.classList.add('is-peeked')
+    })
+    marker.on('mouseout', () => {
+      if (m.id !== state.activeId) marker.setStyle(PIN)
+      entryFor(m.id)?.classList.remove('is-peeked')
+    })
+
     markers.set(m.id, marker)
   }
 
   map.on('moveend', () => {
-    if (state.viewportOnly) renderIndex()
+    if (state.viewportOnly) { renderIndex(); writeUrl() }
   })
-
-  syncMarkers()
-  fitToResults()
 }
 
 function syncMarkers() {
-  const shown = new Set(state.museums.filter(matchesFilters).map((m) => m.id))
+  const shown = new Set(state.museums.filter((m) => matches(m)).map((m) => m.id))
   for (const [id, marker] of markers) {
     const on = shown.has(id)
     if (on && !map.hasLayer(marker)) marker.addTo(map)
@@ -232,82 +326,119 @@ function syncMarkers() {
 }
 
 function fitToResults() {
-  const rows = state.museums.filter(matchesFilters)
+  const rows = state.museums.filter((m) => matches(m))
   if (!rows.length) return
   map.fitBounds(L.latLngBounds(rows.map((m) => [m.lat, m.lng])), {
     padding: [32, 32],
     maxZoom: 15,
+    animate,
   })
 }
 
-// ---------- controls ----------
+/* ------------------------------------------------------------ controls --- */
 
 function buildFilters() {
-  const tally = (key) =>
-    state.museums.reduce((acc, m) => ((acc[m[key]] = (acc[m[key]] || 0) + 1), acc), {})
-
-  const boroughTally = tally('borough')
   for (const b of BOROUGHS) {
-    els.boroughFilters.append(
-      makeToggle(b, boroughTally[b] ?? 0, () => toggleValue(state.boroughs, b, { refit: true })),
-    )
+    els.boroughFilters.append(makeToggle('borough', b, () => toggleValue(state.boroughs, b, { refit: true })))
   }
-
-  const categoryTally = tally('category')
-  for (const c of Object.keys(categoryTally).sort()) {
-    els.categoryFilters.append(
-      makeToggle(c, categoryTally[c], () => toggleValue(state.categories, c, { refit: false })),
-    )
+  const cats = [...new Set(state.museums.map((m) => m.category))].sort()
+  for (const c of cats) {
+    els.categoryFilters.append(makeToggle('category', c, () => toggleValue(state.categories, c, { refit: false })))
   }
 }
 
-function makeToggle(label, count, onClick) {
+function makeToggle(facet, label, onClick) {
   const btn = document.createElement('button')
   btn.type = 'button'
   btn.className = 'toggle'
   btn.dataset.value = label
   btn.setAttribute('aria-pressed', 'false')
-  btn.innerHTML = `${escapeHtml(label)}<span class="tally">${count}</span>`
-  btn.addEventListener('click', () => onClick(btn))
+  btn.innerHTML = `${escapeHtml(label)}<span class="tally" aria-hidden="true"></span>`
+  btn.addEventListener('click', () => onClick())
+  toggles[facet].set(label, btn)
   return btn
+}
+
+/**
+ * Each facet counts what choosing it would actually yield, given every OTHER
+ * filter. A count of zero means the option is a dead end, so it is disabled
+ * rather than left to look available.
+ */
+function syncToggles() {
+  for (const [facet, key, set] of [
+    ['borough', 'borough', state.boroughs],
+    ['category', 'category', state.categories],
+  ]) {
+    const pool = state.museums.filter((m) => matches(m, facet))
+    for (const [value, btn] of toggles[facet]) {
+      const n = pool.filter((m) => m[key] === value).length
+      const on = set.has(value)
+      btn.setAttribute('aria-pressed', String(on))
+      btn.querySelector('.tally').textContent = n
+      const dead = n === 0 && !on
+      btn.disabled = dead
+      btn.classList.toggle('is-empty', dead)
+      btn.setAttribute('aria-label', `${value}, ${n} ${n === 1 ? 'museum' : 'museums'}`)
+    }
+  }
+  els.viewportOnly.setAttribute('aria-pressed', String(state.viewportOnly))
+  const dirty = !!(state.query || state.boroughs.size || state.categories.size || state.viewportOnly)
+  els.reset.disabled = !dirty
+  els.reset.hidden = !dirty
 }
 
 function toggleValue(set, value, { refit }) {
   set.has(value) ? set.delete(value) : set.add(value)
-  syncToggles()
   update({ refit })
 }
 
-function syncToggles() {
-  for (const btn of els.boroughFilters.children) {
-    btn.setAttribute('aria-pressed', String(state.boroughs.has(btn.dataset.value)))
-  }
-  for (const btn of els.categoryFilters.children) {
-    btn.setAttribute('aria-pressed', String(state.categories.has(btn.dataset.value)))
-  }
-  els.viewportOnly.setAttribute('aria-pressed', String(state.viewportOnly))
-}
+function update({ refit = false, keepScroll = false } = {}) {
+  // renderIndex replaces every row, so anyone reading the index by keyboard
+  // would be dropped back to the top of the document. Put them back.
+  const hadFocus = els.list.contains(document.activeElement)
 
-function update({ refit = false } = {}) {
+  syncToggles()
   syncMarkers()
   if (refit) fitToResults()
   renderIndex()
-  els.list.scrollTo({ top: 0 })
+  if (!keepScroll) els.list.scrollTo({ top: 0 })
+
+  if (hadFocus && state.cursor >= 0) {
+    const row = els.list.querySelectorAll('.entry')[state.cursor]
+    row?.querySelector('.entry__select')?.focus({ preventScroll: true })
+  }
+  writeUrl()
 }
 
+let searchTimer
 els.search.addEventListener('input', () => {
-  state.query = els.search.value.trim()
-  update()
+  clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => {
+    state.query = els.search.value.trim()
+    update()
+  }, 90)
+})
+
+els.search.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (els.search.value) { els.search.value = ''; state.query = ''; update() }
+    else els.search.blur()
+  }
+  if (e.key === 'ArrowDown' && state.rows.length) { e.preventDefault(); setCursorTo(0) }
+  if (e.key === 'Enter' && state.rows.length) { e.preventDefault(); setCursorTo(0) }
 })
 
 els.viewportOnly.addEventListener('click', () => {
   state.viewportOnly = !state.viewportOnly
-  syncToggles()
-  renderIndex()
-  els.list.scrollTo({ top: 0 })
+  update()
 })
 
 els.reset.addEventListener('click', () => {
+  reset()
+  els.search.focus()
+})
+
+function reset() {
   state.query = ''
   state.boroughs.clear()
   state.categories.clear()
@@ -315,12 +446,68 @@ els.reset.addEventListener('click', () => {
   state.activeId = null
   els.search.value = ''
   map?.closePopup()
-  syncToggles()
   update({ refit: true })
+}
+
+els.empty.querySelector('.empty__reset')?.addEventListener('click', () => {
+  reset()
+  els.search.focus()
 })
 
-// ---------- go ----------
+/* Type-anywhere: "/" jumps to the field the way a reader reaches for an index. */
+document.addEventListener('keydown', (e) => {
+  const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName)
+  if (e.key === '/' && !typing && !e.metaKey && !e.ctrlKey) {
+    e.preventDefault()
+    els.search.focus()
+    els.search.select()
+  }
+  if (e.key === 'Escape' && !typing && state.activeId) {
+    state.activeId = null
+    map?.closePopup()
+    syncActive()
+    writeUrl()
+  }
+})
 
-buildFilters()
-initMap()
-renderIndex()
+/* --------------------------------------------------------------- boot --- */
+
+function fail(message) {
+  els.list.replaceChildren()
+  els.empty.hidden = false
+  els.empty.innerHTML =
+    `<span class="t-label">${escapeHtml(message)}</span>` +
+    '<button type="button" class="empty__reset toggle toggle--plain">Try again</button>'
+  els.empty.querySelector('.empty__reset').addEventListener('click', () => location.reload())
+  els.count.textContent = '—'
+  els.countLabel.textContent = 'Unavailable'
+}
+
+try {
+  const res = await fetch('../data/museums.json')
+  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
+  state.museums = (await res.json())
+    .filter((m) => typeof m.lat === 'number' && typeof m.lng === 'number')
+    .sort((a, b) => a.name.localeCompare(b.name, 'en'))
+  if (!state.museums.length) throw new Error('no records')
+
+  document.body.classList.remove('is-loading')
+  readUrl()
+  buildFilters()
+  initMap()
+  syncToggles()
+  syncMarkers()
+  renderIndex()
+
+  if (state.activeId && markers.has(state.activeId)) {
+    select(state.activeId, { scroll: true })
+  } else {
+    state.activeId = null
+    fitToResults()
+  }
+  writeUrl()
+} catch (err) {
+  console.error('museo:', err)
+  document.body.classList.remove('is-loading')
+  fail('The index could not be loaded')
+}

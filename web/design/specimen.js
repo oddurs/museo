@@ -253,9 +253,11 @@ document.getElementById('rules').append(
 
 const entry = (n, name, meta, discipline, host, borough, cls = '') => `
   <article class="entry ${cls}">
-    <span class="entry__no t-figure">${n}</span>
+    <span class="entry__no t-figure" aria-hidden="true">${n}</span>
     <div class="entry__body">
-      <h3 class="entry__name t-heading">${name}</h3>
+      <h3 class="entry__name t-heading">
+        <button type="button" class="entry__select" tabindex="-1">${name}</button>
+      </h3>
       <p class="entry__meta t-small">${meta}</p>
       <a class="entry__link t-fine" href="#" onclick="return false">${host} &#8599;</a>
     </div>
@@ -268,4 +270,5 @@ const entry = (n, name, meta, discipline, host, borough, cls = '') => `
 document.getElementById('entry-demo').innerHTML =
   entry('047', 'The Noguchi Museum', 'Long Island City · 9-01 33rd Road', 'Art', 'noguchi.org', 'Queens') +
   entry('048', 'The Studio Museum in Harlem', 'Harlem · 144 West 125th Street', 'Art', 'studiomuseum.org', 'Manhattan', 'is-hovered') +
-  entry('049', 'Wave Hill', 'Riverdale · 4900 Independence Avenue', 'Culture', 'wavehill.org', 'Bronx', 'is-active')
+  entry('049', 'Wave Hill', 'Riverdale · 4900 Independence Avenue', 'Culture', 'wavehill.org', 'Bronx', 'is-peeked') +
+  entry('050', 'Museum of the Moving Image', 'Astoria · 36-01 35th Avenue', 'Culture', 'movingimage.org', 'Queens', 'is-active')

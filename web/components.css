@@ -34,7 +34,12 @@
               border-color var(--duration) var(--easing);
 }
 
-.entry:hover { background: var(--paper-sunk); }
+.entry:hover,
+.entry.is-peeked { background: var(--paper-sunk); }
+
+/* Hovering a pin peeks its row without taking the selection from the one
+   already chosen. */
+.entry.is-peeked { box-shadow: inset var(--stroke-marker) 0 0 0 var(--primary-line); }
 
 /* Right-aligned so the column rules itself straight against the names. */
 .entry__no {
@@ -43,12 +48,25 @@
   transition: color var(--duration) var(--easing);
 }
 
-.entry:hover .entry__no { color: var(--ink-secondary); }
+.entry:hover .entry__no,
+.entry.is-peeked .entry__no { color: var(--ink-secondary); }
 
 .entry__name {
   font-weight: 400;
   text-wrap: balance;
   transition: color var(--duration) var(--easing);
+}
+
+/* The name is the row's control: selecting a museum puts it on the map. The
+   outbound link is a second, separate action, so the row is not a button that
+   contains a link — which is what it used to be. */
+.entry__select {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+  cursor: pointer;
+  padding: 0;
 }
 
 /* Old-style figures put the street number into the line rather than standing

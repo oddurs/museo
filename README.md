@@ -28,6 +28,10 @@ npm run geocode # fill in coordinates for any new entries
 - **On map only** — narrows the index to the current map viewport, so you can pan
   to a neighborhood and see just what's walkable from there.
 - Each entry links out to the museum's own site. No photos, by design.
+- **Keyboard** — `/` jumps to search, `↓` steps into the index, `↑` `↓` `Home`
+  `End` move through results and fly the map along, `Escape` clears.
+- **Shareable** — filters, search and the selected museum live in the URL, so a
+  view survives a reload and can be sent to someone.
 
 ## Layout
 

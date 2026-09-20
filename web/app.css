@@ -105,6 +105,14 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 .toggle--plain { border-bottom-color: transparent !important; }
 .toggle--plain:hover { color: var(--primary-deep); }
 
+/* A facet that would return nothing says so instead of looking available. */
+.toggle.is-empty {
+  color: var(--rule-strong);
+  cursor: default;
+}
+.toggle.is-empty .tally { color: var(--rule-strong); }
+.toggle.is-empty:hover { color: var(--rule-strong); }
+
 /* --------------------------------------------------------------------------
    LAYOUT
    -------------------------------------------------------------------------- */
@@ -152,11 +160,29 @@ body { display: flex; flex-direction: column; overflow: hidden; }
   overscroll-behavior: contain;
 }
 
+/* With no rows the list must stop claiming the pane, or the message explaining
+   why there are no rows is pushed to the bottom of it. */
+.index__list:empty { flex: 0 0 auto; }
+
 .index__empty {
-  padding: var(--space-9) var(--gutter);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-8) var(--gutter);
   text-align: center;
   color: var(--ink-tertiary);
 }
+
+/* A dead end always offers the way out of it. */
+.empty__reset { color: var(--primary-deep); }
+
+/* Until the index arrives there is nothing to read, so nothing is shown —
+   no skeleton pretending to be content. */
+.is-loading .index__list,
+.is-loading .index__head { visibility: hidden; }
 
 /* --------------------------------------------------------------------------
    MAP
