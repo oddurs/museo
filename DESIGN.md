@@ -1,6 +1,7 @@
 # Museo — Design System
 
-Light mode only. Black, white and four grays. Set entirely in Whitney.
+A typographic exhibition set in Whitney. Warm paper, a twelve-step neutral ramp,
+and one primary color. Light mode only.
 
 The system lives in three files, loaded in this order:
 
@@ -10,55 +11,81 @@ The system lives in three files, loaded in this order:
 | `web/system.css` | Tokens, reset, type primitives, elements |
 | `web/components.css` | Composite pieces shared by the app and the specimen |
 
-`web/app.css` sits on top and does composition only. **If a raw number or color
-appears in `app.css`, that's a bug in the system, not a shortcut.**
+`web/app.css` sits on top and does composition only. **A raw number or color in
+`app.css` is a bug in the system, not a shortcut in the page.**
 
-A living specimen of everything below renders at **`/web/design/`**. It is built
-from the system's own custom properties — contrast ratios are computed at runtime,
-not typed in — so it cannot drift out of sync with `system.css`.
+The living specimen is at **`/web/design/`**. It is rendered from the system's
+own custom properties and measured in the browser — the contrast ratios there
+are computed, not transcribed — so it cannot drift out of sync with the tokens.
 
 ---
 
 ## Principles
 
-**1. Achromatic without exception.** Color is never used to encode meaning, so
-nothing in the interface depends on it. This extends to the map: OpenStreetMap
-tiles are desaturated and flattened in CSS so the basemap joins the system rather
-than fighting it, and Leaflet's own link color is overridden.
+**1. Systems before screens.** The ramp, the scale and the figure sets were
+settled and measured before any component was composed.
 
-The cost is real and worth naming: boroughs can't be color-coded on the map. They
-are distinguished instead by the filters, by the index, and by position — which is
-what a map is for. All 107 pins are identical black dots.
+**2. One color, and it must earn its place.** Cinnabar marks the exhibition bar,
+the current selection, the pins and focus — the things you act on. It is never
+decoration, and there is never a second accent.
 
-**2. Type carries the hierarchy.** Size, weight and case do the work that color,
-fills and shadows do elsewhere. Whitney was drawn by Tobias Frere-Jones for the
-Whitney Museum's wayfinding; it is used here the way signage uses it.
+**3. Twelve grays, because detail needs range.** Hairlines, marks and text each
+get their own steps. Borrowing one value for two jobs is what makes an interface
+look approximate.
 
-**3. Rules and whitespace instead of boxes.** No border radius, no shadow, no
-gradient. Structure is drawn with hairlines and the space between things.
+**4. Set the type, don't just style it.** True small caps, old-style figures in
+prose, lining tabular figures in columns, the real ordinal glyph.
 
-**4. Nothing moves that doesn't have to.** Transitions are 120ms and linear,
-limited to color and background. Selection adds weight; it never shifts position.
+**5. Rules and whitespace instead of boxes.** No radius, no shadow, no gradient.
+Nothing moves on selection — weight and color carry it.
 
 ---
 
-## Color
+## The neutral ramp
 
-Seven values. The ratio is against `--paper`.
+Warm, not gray: every step holds the same red-over-blue bias as the paper, so
+nothing reads as cold against it. Ratios are against `--paper`.
+
+| Token | Value | Ratio | Role |
+| --- | --- | --- | --- |
+| `--gray-000` | `#fbf9f5` | 1.00 | Paper |
+| `--gray-050` | `#f5f2eb` | 1.06 | Sunk — hover beds |
+| `--gray-100` | `#ede8df` | 1.16 | Wash — inset panels |
+| `--gray-150` | `#e3dcd0` | 1.30 | Hairline, light |
+| `--gray-200` | `#d6cebf` | 1.49 | Hairline, standard |
+| `--gray-300` | `#bcb2a0` | 1.99 | Hairline, strong |
+| `--gray-400` | `#9e9482` | 2.85 | Boundary — draw only |
+| `--gray-500` | `#7b7260` | 4.52 | Metadata — **lightest text allowed** |
+| `--gray-600` | `#645c4c` | 6.29 | Supporting text |
+| `--gray-700` | `#4a4335` | 9.31 | Secondary text |
+| `--gray-800` | `#312c22` | 13.19 | Strong text |
+| `--gray-900` | `#1c1810` | 16.82 | Ink — primary text, edges |
+
+The 4.5:1 line falls between 400 and 500, and it is a hard floor. `--gray-500`
+was originally `#7e7563` at 4.33:1 — close enough to look fine and not close
+enough to pass, so it was darkened by three values until it did.
+
+`--gray-400` has no semantic alias. It is the last step before text becomes
+legal, kept in the ramp as the boundary marker; an alias naming a role that no
+component plays is noise.
+
+Components reference the **semantic aliases** (`--ink`, `--ink-secondary`,
+`--rule`, `--paper-sunk` …), never the ramp directly, so the ramp can be retuned
+in one place.
+
+---
+
+## The primary — cinnabar
 
 | Token | Value | Ratio | Use |
 | --- | --- | --- | --- |
-| `--paper` | `#ffffff` | — | Every background |
-| `--paper-sunk` | `#f7f7f7` | 1.0 | Hover beds, insets |
-| `--ink` | `#000000` | 21.0 | Primary text, structural edges |
-| `--ink-secondary` | `#4d4d4d` | 8.6 | Supporting text |
-| `--ink-tertiary` | `#767676` | 4.5 | Metadata, labels — the lightest text allowed |
-| `--ink-quiet` | `#b4b4b4` | 2.1 | Borders and marks — **never text** |
-| `--rule` | `#e4e4e4` | — | Hairline separators |
+| `--primary` | `#c0361b` | 5.28 | The bar, selection, pins, focus |
+| `--primary-deep` | `#8e2812` | 8.11 | Hover, and the primary as small text |
+| `--primary-line` | `#e7c6b9` | 1.52 | Keylines, link underlines |
+| `--primary-wash` | `#f7eae4` | 1.12 | The selected row's bed |
 
-The 4.5:1 floor is a hard rule. It cost a revision: numerals, disciplines, filter
-tallies and group names were all originally set in `--ink-quiet`, which reads as
-elegant restraint and fails WCAG AA. They are `--ink-tertiary` now.
+Chosen from twelve candidates by contrast: it is the warmest red that still
+clears 4.5:1 on this paper and so may carry text, not only marks.
 
 ---
 
@@ -69,66 +96,78 @@ preference**.
 
 | Token | Family | Used for |
 | --- | --- | --- |
-| `--font-display` | Whitney | Anything 16px and up |
-| `--font-text` | Whitney ScreenSmart | Anything below 16px |
-| `--font-label` | Whitney Condensed | Uppercase labels only |
+| `--font-display` | Whitney | 16px and up |
+| `--font-text` | Whitney ScreenSmart | Below 16px, and all small caps |
+| `--font-figure` | Whitney Condensed | Numeric columns |
 
-ScreenSmart's wider apertures and looser spacing hold up at small sizes where the
-display cut closes in on itself. Condensed is never set lowercase and never runs
-longer than three words.
+### Figure sets
+
+Whitney carries four, and using the right one is most of what separates set type
+from typed text.
+
+| Token | Features | Where |
+| --- | --- | --- |
+| `--figures-text` | `onum`, `pnum` | Running text and addresses — figures sit *in* the line |
+| `--figures-tabular` | `lnum`, `tnum` | Columns and counts — equal width, so nothing shifts |
+| `--figures-superior` | `sups` | Ordinals and footnote marks |
+
+`sups` in Whitney maps **the ten digits and nothing else** — it does not
+substitute letters. The numero sign is therefore the real `ordmasculine` glyph
+(`º`, U+00BA), typed as a character rather than faked by raising an `o`. An
+earlier version raised an `o` and rendered a plain "No".
+
+Small caps are **true small caps** (`smcp` / `c2sc`), not uppercase at a smaller
+size — which would be heavier than the text beside it and sit wrong on the line.
 
 ### Scale
 
-Seven sizes, spaced by eye rather than by ratio. A strict modular scale put a
-museum's name and its address too close together to tell apart at a glance; the
-gap from `--size-heading` (21px) to `--size-small` (13px) is deliberately wider
-than a ratio would give, and it is the most important interval in the system.
+Eight sizes, spaced by eye rather than by ratio.
 
 | Primitive | Size | Weight | Family |
 | --- | --- | --- | --- |
-| `.t-display` | 56px | 300 Light | Whitney |
-| `.t-title` | 32px | 300 Light | Whitney |
-| `.t-heading` | 21px | 400 Book | Whitney |
+| `.t-banner` | 72px | 300 | Whitney |
+| `.t-display` | 48px | 300 | Whitney |
+| `.t-title` | 30px | 300 | Whitney |
+| `.t-heading` | 21px | 400 | Whitney |
 | `.t-body` | 15px | 400 | ScreenSmart |
 | `.t-small` | 13px | 400 | ScreenSmart |
 | `.t-fine` | 12px | 500 | ScreenSmart |
-| `.t-label` | 10.5px | 600 | Condensed, uppercase, `0.14em` |
+| `.t-label` | 11px | 600 | ScreenSmart, true small caps |
+
+A strict modular scale put a museum's name and its address too close together.
+The interval from `--size-heading` to `--size-small` is deliberately wider than
+a ratio would give, and it is the most important one in the system.
 
 `.t-heading` is Book rather than Light on purpose: at 21px Light begins to break
-up against white, and museum names are the one thing here people actually read.
+up against paper, and museum names are the one thing here people actually read.
 
-Each primitive sets family, size, weight, leading **and** tracking together.
-Compose with them; don't set font properties by hand.
-
-### Tracking
-
-Whitney is a signage face — it tightens well at display sizes and needs the
-opposite treatment in small caps, where counters must stay open.
-Display `-0.03em` · heading `-0.018em` · labels `0.14em` · wordmark `0.16em`.
+Each primitive sets family, size, weight, leading, tracking **and figure set**
+together. Compose with them; don't set font properties by hand.
 
 ---
 
-## Space
+## Space & rules
 
-A 4px base. These eight steps are the only spacing values in the system:
-`4 · 8 · 12 · 16 · 24 · 32 · 48 · 64`.
+A 4px base: `4 · 8 · 12 · 16 · 24 · 32 · 48 · 64 · 96`.
+
+Five rule weights, so separation can be graded rather than uniform:
+`--hairline-light` · `--hairline` · `--hairline-strong` · `--edge` · `--keyline`.
 
 ---
 
 ## Elements
 
-**Toggle** — the only interactive control. States selection with a 2px rule
-beneath it, never a fill and never a pill. Counts ride alongside in a lighter
-value. `Reset` is an action rather than a selection, so it never takes the rule.
+**Toggle** — the only interactive control. States selection with a 2px rule in
+the primary, never a fill and never a pill. `Reset` is an action rather than a
+selection, so it never takes the rule.
 
-**Field** — an input reduced to a baseline. 24px Whitney Light; the rule goes
-black on focus.
+**Field** — an input reduced to a baseline; the rule goes primary on focus.
 
-**Link** — underlines on hover only, so a list of 107 stays calm.
+**Link** — the underline carries the color, the word stays in ink.
 
-**Mark** — search hits take an underline (`inset` box-shadow), not a highlighter.
+**Mark** — search hits take a primary underline, not a highlighter.
 
-**Focus** — 2px solid black, 3px offset, square. Always visible.
+**Focus** — 2px solid primary, 3px offset, square. Always visible.
 
 ---
 
@@ -143,16 +182,32 @@ not a card.
       metmuseum.org ↗
 ```
 
-Three columns — number, subject, classification — on a shared **first baseline**,
-so the numeral and the borough sit on the name's line. That's CSS
+Three columns — figure, subject, classification — on a shared **first baseline**,
+so the numeral and the borough sit on the museum's own line. That is
 `align-items: baseline` doing the work, not padding nudges.
 
-Everything categorical is uppercase Condensed; everything read is mixed case.
-That split is what lets the eye skip the labels when scanning names, and find
-them instantly when scanning for a borough.
+Case does the sorting: everything categorical is small caps, everything read is
+mixed case. That split is what lets the eye skip the labels when scanning names
+and find them instantly when scanning for a borough.
 
-Selected state: a black bar at the left edge, a sunk background, and the name
-stepping from Book to Medium. Nothing moves.
+Selected: a primary rule at the left edge, a warm bed, the figure going to the
+primary, and the name stepping from Book to Medium. Nothing moves.
+
+---
+
+## The map
+
+The basemap is desaturated *and warmed to the paper's temperature*
+(`grayscale(1) sepia(0.32) saturate(0.55)`), so it reads as part of the system
+rather than a window cut through it. Leaflet's own link color is overridden —
+nothing in the interface carries a stray hue.
+
+Pins are the primary: 107 cinnabar dots on warm gray. The selected pin takes an
+ink fill with a wide, low-opacity primary halo.
+
+The cost is worth naming: **boroughs are not color-coded.** One primary means
+one hue, so the filters and the index carry that distinction instead — which is
+what a map is for.
 
 ---
 
@@ -161,11 +216,17 @@ stepping from Book to Medium. Nothing moves.
 1. Check whether a primitive already covers it. Most things need a `.t-*` class
    and a space token, nothing more.
 2. New values go in `system.css` §1 as tokens, with a comment explaining the
-   constraint they encode — not just what they are.
-3. Anything composite and reusable goes in `components.css` so the specimen can
+   *constraint they encode*, not just what they are.
+3. Anything composite and reusable goes in `components.css`, so the specimen can
    render it.
 4. Add it to `/web/design/` in the same commit. A component that isn't in the
    specimen will drift.
+
+**Setting OpenType features from JavaScript:** assign them as style *properties*,
+never by interpolating into a `style="..."` attribute. A value like `"smcp" 1`
+contains double quotes that terminate the attribute and silently drop the
+declaration — which is exactly how four of the five specimens in §05 shipped
+broken before they were measured.
 
 ## Rebuilding the fonts
 
@@ -177,5 +238,8 @@ npm run fonts                          # reads ~/Fonts/Master Library
 python3 scripts/build-fonts.py --src "/some/other/folder"
 ```
 
-Eleven faces, subset to Latin plus punctuation and arrows — 186 KB total. The
-script regenerates `web/fonts.css`; don't edit that file.
+Eleven faces — 259 KB, subset to Latin plus punctuation and arrows, retaining
+`smcp`, `c2sc`, `onum`, `lnum`, `pnum`, `tnum`, `sups`, `frac` and friends.
+Retaining a feature also retains the glyphs it reaches, which is how the
+small-cap alphabet survives subsetting. The script regenerates `web/fonts.css`;
+don't edit that file.

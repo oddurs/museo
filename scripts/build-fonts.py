@@ -68,7 +68,11 @@ def main():
         subset_main([
             str(source),
             f"--unicodes={UNICODES}",
-            "--layout-features=kern,liga,clig,calt,onum,lnum,tnum,frac,ss01",
+            # Real H&Co devices: true small caps, old-style and tabular figures,
+            # superiors for the Nº, fractions. Retaining a feature also retains
+            # the glyphs it reaches, so the small-cap alphabet survives subsetting.
+            "--layout-features=kern,liga,clig,calt,smcp,c2sc,onum,lnum,pnum,tnum,"
+            "sups,subs,numr,dnom,frac,sinf,ss01,ss02,salt",
             "--flavor=woff2",
             "--no-hinting",
             "--desubroutinize",

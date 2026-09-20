@@ -1,65 +1,112 @@
 /* ==========================================================================
    MUSEO DESIGN SYSTEM
-   Achromatic, typographic, Whitney-set. See DESIGN.md for the reasoning and
-   web/design/ for a living specimen of everything defined here.
+   A typographic exhibition set in Whitney. Warm paper, a twelve-step neutral
+   ramp, and one primary color used sparingly.
 
-   Load order:  fonts.css  →  system.css  →  app.css
+   Load order:  fonts.css → system.css → components.css → app.css
+   Living specimen: /web/design/ — built from these tokens, so it cannot drift.
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
    1. TOKENS
-   The only values the application layer is allowed to reference. If a number
-   or color appears in app.css that isn't one of these, it's a bug in the
-   system, not a shortcut.
+   The only values the application layer may reference. A raw number or color
+   in app.css is a bug in the system, not a shortcut.
    -------------------------------------------------------------------------- */
 
 :root {
-  /* 1.1 Color — achromatic by rule. No hue anywhere, including the map.
-     Percentages are the token's contrast ratio against --paper. */
-  --paper:        #ffffff;
-  --paper-sunk:   #f7f7f7;  /* hover beds, insets */
-  --ink:          #000000;  /* 21.0:1 — primary text, rules of emphasis */
-  --ink-secondary:#4d4d4d;  /*  8.6:1 — supporting text */
-  --ink-tertiary: #767676;  /*  4.5:1 — metadata; the lightest text allowed */
-  --ink-quiet:    #b4b4b4;  /*  2.1:1 — marks and borders only, never text */
-  --rule:         #e4e4e4;  /* hairline separators */
+  /* 1.1 Neutral ramp
+     Warm, not gray — every step holds the same red-over-blue bias as the paper,
+     so nothing in the interface reads as cold against it. Twelve steps because
+     hairlines, marks and text each need their own, and borrowing one step for
+     two jobs is what makes an interface look approximate.
 
-  /* 1.2 Type families
-     Whitney Pro for anything 16px and up; ScreenSmart below that (its wider
-     apertures and looser spacing survive small sizes); Condensed only for
-     uppercase labels, never for running text. */
+     Ratios are measured against --paper. The 4.5:1 line falls between 400 and
+     500, and that is the hard floor for text: --gray-500 is the lightest value
+     allowed to carry a word. Everything above it draws, it does not speak. */
+  --gray-000: #fbf9f5;  /*  1.00:1  paper */
+  --gray-050: #f5f2eb;  /*  1.06:1  sunk — hover beds */
+  --gray-100: #ede8df;  /*  1.16:1  wash — inset panels */
+  --gray-150: #e3dcd0;  /*  1.30:1  hairline, light */
+  --gray-200: #d6cebf;  /*  1.49:1  hairline, standard */
+  --gray-300: #bcb2a0;  /*  1.99:1  hairline, strong */
+  --gray-400: #9e9482;  /*  2.85:1  the boundary step — the last value before
+                             text becomes legal. Draw-only; no alias, because no
+                             component currently plays that role. */
+  --gray-500: #7b7260;  /*  4.52:1  metadata — lightest text allowed */
+  --gray-600: #645c4c;  /*  6.29:1  supporting text */
+  --gray-700: #4a4335;  /*  9.31:1  secondary text */
+  --gray-800: #312c22;  /* 13.19:1  strong text */
+  --gray-900: #1c1810;  /* 16.82:1  ink — primary text, structural edges */
+
+  /* 1.2 Semantic aliases
+     Components reference these, never the ramp directly, so the ramp can be
+     retuned in one place. */
+  --paper:         var(--gray-000);
+  --paper-sunk:    var(--gray-050);
+  --paper-wash:    var(--gray-100);
+  --rule-light:    var(--gray-150);
+  --rule:          var(--gray-200);
+  --rule-strong:   var(--gray-300);
+  --ink-tertiary:  var(--gray-500);
+  --ink-secondary: var(--gray-600);
+  --ink-muted:     var(--gray-700);
+  --ink:           var(--gray-900);
+
+  /* 1.3 Primary — cinnabar
+     One hue, and it earns its place each time: the exhibition bar, the current
+     selection, the pins on the map, and focus. It is never decoration, and a
+     second accent color is never added. At 5.28:1 it may carry text. */
+  --primary:      #c0361b;  /* 5.28:1 on paper */
+  --primary-deep: #8e2812;  /* 8.11:1 — hover, and text at small sizes */
+  --primary-line: #e7c6b9;  /* keylines and rules in the primary hue */
+  --primary-wash: #f7eae4;  /* 1.12:1 — the selected row's bed */
+
+  /* 1.4 Type families
+     Three cuts of one typeface, chosen by role, not by taste. */
   --font-display: "Whitney", -apple-system, "Helvetica Neue", Arial, sans-serif;
   --font-text:    "Whitney SSm", "Whitney", -apple-system, "Helvetica Neue", Arial, sans-serif;
-  --font-label:   "Whitney Cond", "Whitney SSm", -apple-system, Arial, sans-serif;
+  --font-figure:  "Whitney Cond", "Whitney SSm", -apple-system, Arial, sans-serif;
 
-  /* 1.3 Type scale
-     Seven sizes, spaced by eye rather than by ratio. The jump from --size-heading to
-     --size-small is deliberate and large: an entry's name and its metadata
-     should never be mistaken for one another at a glance. */
-  --size-display: 56px;   /* the tally figure, specimen headings */
-  --size-title:   32px;   /* section titles */
-  --size-heading: 21px;   /* museum names — the interface's reading size */
+  /* 1.5 Figure sets
+     Whitney carries four. Using the right one is most of what separates set
+     type from typed text:
+       old-style, proportional — running text, where figures sit in the line
+       lining, tabular        — columns that must align vertically
+       superior               — the o in Nº, ordinals */
+  --figures-text:    "onum" 1, "pnum" 1;
+  --figures-tabular: "lnum" 1, "tnum" 1;
+  --figures-superior: "sups" 1;
+
+  /* 1.6 Type scale
+     Eight sizes, spaced by eye rather than by ratio. The interval from
+     --size-heading to --size-small is deliberately wider than a modular scale
+     would give: a museum's name and its address must never be mistaken for one
+     another at a glance. */
+  --size-banner:  72px;  /* the tally figure */
+  --size-display: 48px;
+  --size-title:   30px;
+  --size-heading: 21px;  /* museum names — the interface's reading size */
   --size-body:    15px;
-  --size-small:   13px;   /* addresses, secondary lines */
-  --size-fine:    12px;   /* outbound links */
-  --size-label:   10.5px; /* uppercase wall labels */
+  --size-small:   13px;  /* addresses, secondary lines */
+  --size-fine:    12px;  /* outbound links */
+  --size-label:   11px;  /* small-cap labels */
 
-  /* 1.4 Line heights — tight for display, generous for reading. */
-  --leading-tight: 1.0;
+  /* 1.7 Leading */
+  --leading-tight: 0.95;
   --leading-snug:  1.2;
-  --leading-body:  1.5;
+  --leading-body:  1.55;
 
-  /* 1.5 Tracking
-     Whitney is a signage face: it tightens well at display sizes and needs the
-     opposite treatment in small caps, where counters must stay open. */
-  --track-display: -0.03em;
-  --track-title:   -0.022em;
+  /* 1.8 Tracking
+     Whitney is a signage face: it tightens well at display sizes, and small
+     caps need the opposite treatment so their counters stay open. */
+  --track-banner:  -0.035em;
+  --track-display: -0.028em;
   --track-heading: -0.018em;
   --track-normal:  0;
-  --track-wide:    0.16em;  /* the wordmark */
-  --track-label:   0.14em;  /* wall labels */
+  --track-smallcap: 0.09em;
+  --track-wordmark: 0.17em;
 
-  /* 1.6 Space — 4px base. Only these steps. */
+  /* 1.9 Space — 4px base. Only these steps. */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -68,32 +115,34 @@
   --space-6: 32px;
   --space-7: 48px;
   --space-8: 64px;
+  --space-9: 96px;
 
-  /* 1.7 Structure
-     Everything is square. No border radius, no shadow, no gradient — depth is
-     expressed by rules and whitespace alone. */
-  --hairline: 1px solid var(--rule);
-  --edge:     1px solid var(--ink);
-  --radius:   0;
+  /* 1.10 Structure
+     Everything is square. Depth is drawn with rules and whitespace — there is
+     no shadow and no gradient anywhere in the system. */
+  --hairline:        1px solid var(--rule);
+  --hairline-light:  1px solid var(--rule-light);
+  --hairline-strong: 1px solid var(--rule-strong);
+  --edge:            1px solid var(--ink);
+  --keyline:         3px solid var(--primary);
+  --radius:          0;
 
-  /* 1.8 Motion — short and linear. Nothing bounces. */
+  /* 1.11 Motion — short and linear. Nothing bounces, nothing moves on select. */
   --duration: 120ms;
   --easing:   linear;
 
-  /* 1.9 Layout */
-  --gutter:      var(--space-5);
+  /* 1.12 Layout */
+  --gutter:      var(--space-6);
   --index-width: 46%;
-  --index-min:   380px;
-  --number-col:  40px;  /* catalogue number column in the index */
+  --index-min:   400px;
+  --number-col:  38px;
 }
 
 /* --------------------------------------------------------------------------
    2. RESET
    -------------------------------------------------------------------------- */
 
-*,
-*::before,
-*::after { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: border-box; }
 
 html { -webkit-text-size-adjust: 100%; }
 
@@ -104,7 +153,7 @@ body {
   font-family: var(--font-text);
   font-size: var(--size-body);
   line-height: var(--leading-body);
-  font-feature-settings: "kern" 1, "liga" 1;
+  font-feature-settings: "kern" 1, "liga" 1, var(--figures-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -117,18 +166,25 @@ img, svg { display: block; max-width: 100%; }
 
 /* --------------------------------------------------------------------------
    3. TYPE PRIMITIVES
-   Each is a complete voice: family, size, weight, leading and tracking
-   together. Compose with these rather than setting font properties ad hoc.
+   Each is a complete voice — family, size, weight, leading, tracking and
+   figure set together. Compose with these; never set font properties ad hoc.
    -------------------------------------------------------------------------- */
+
+.t-banner {
+  font-family: var(--font-display);
+  font-size: var(--size-banner);
+  font-weight: 300;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--track-banner);
+  font-feature-settings: var(--figures-tabular);
+}
 
 .t-display {
   font-family: var(--font-display);
   font-size: var(--size-display);
-  font-weight: 300;            /* Whitney Light — the showpiece weight */
+  font-weight: 300;
   line-height: var(--leading-tight);
   letter-spacing: var(--track-display);
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
 }
 
 .t-title {
@@ -136,11 +192,11 @@ img, svg { display: block; max-width: 100%; }
   font-size: var(--size-title);
   font-weight: 300;
   line-height: var(--leading-snug);
-  letter-spacing: var(--track-title);
+  letter-spacing: var(--track-display);
 }
 
-/* The reading size. Book, not Light: at 21px Light starts to break up against
-   white, and this is the one thing in the interface people actually read. */
+/* The reading size. Book rather than Light: at 21px Light begins to break up
+   against paper, and museum names are the one thing here people actually read. */
 .t-heading {
   font-family: var(--font-display);
   font-size: var(--size-heading);
@@ -154,6 +210,7 @@ img, svg { display: block; max-width: 100%; }
   font-size: var(--size-body);
   font-weight: 400;
   line-height: var(--leading-body);
+  font-feature-settings: var(--figures-text);
 }
 
 .t-small {
@@ -161,6 +218,7 @@ img, svg { display: block; max-width: 100%; }
   font-size: var(--size-small);
   font-weight: 400;
   line-height: 1.45;
+  font-feature-settings: var(--figures-text);
 }
 
 .t-fine {
@@ -170,58 +228,75 @@ img, svg { display: block; max-width: 100%; }
   line-height: 1.4;
 }
 
-/* The wall label: Whitney Condensed, uppercase, widely tracked. Every piece of
-   categorical metadata — borough, discipline, column heads. Never more than
-   three words, never lowercase. */
+/* The wall label. TRUE small caps from Whitney's smcp feature — not uppercase
+   at a smaller size, which leaves capitals too heavy for the text beside them.
+   Every piece of categorical metadata; never more than three words. */
 .t-label {
-  font-family: var(--font-label);
+  font-family: var(--font-text);
   font-size: var(--size-label);
   font-weight: 600;
   line-height: 1;
-  letter-spacing: var(--track-label);
-  text-transform: uppercase;
+  letter-spacing: var(--track-smallcap);
+  font-feature-settings: "smcp" 1, "c2sc" 1, var(--figures-tabular);
+  text-transform: lowercase; /* feeds smcp; capitals are folded by c2sc */
 }
 
-/* Catalogue numerals — tabular, so the index column stays plumb. */
-.t-numeral {
-  font-family: var(--font-label);
-  font-size: 11px;
+/* Catalogue figures — Condensed, lining and tabular, so a column of numbers
+   rules itself straight without a border. */
+.t-figure {
+  font-family: var(--font-figure);
+  font-size: var(--size-label);
   font-weight: 500;
   line-height: 1;
-  letter-spacing: 0.06em;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
+  letter-spacing: 0.05em;
+  font-feature-settings: var(--figures-tabular);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Superior FIGURES. Whitney's sups feature maps the ten digits and nothing
+   else — it does not letter-substitute — so this is for ordinals and footnote
+   marks. The numero sign is the real ordmasculine glyph (º, U+00BA), typed as
+   a character rather than faked by raising an o. */
+.sup {
+  font-feature-settings: var(--figures-superior);
+  text-transform: none;
 }
 
 /* Modifiers */
 .u-quiet     { color: var(--ink-tertiary); }
 .u-secondary { color: var(--ink-secondary); }
-.u-tabular   { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+.u-primary   { color: var(--primary); }
+.u-tabular   { font-feature-settings: var(--figures-tabular); font-variant-numeric: tabular-nums; }
 
 /* --------------------------------------------------------------------------
    4. ELEMENTS
    -------------------------------------------------------------------------- */
 
-/* 4.1 Rule — the system's only divider. */
-.rule { border: 0; border-top: var(--hairline); height: 0; }
-.rule--strong { border-top: var(--edge); }
+/* 4.1 Rules — four values, so separation can be graded rather than uniform. */
+.rule          { border: 0; border-top: var(--hairline); height: 0; }
+.rule--light   { border-top: var(--hairline-light); }
+.rule--strong  { border-top: var(--hairline-strong); }
+.rule--edge    { border-top: var(--edge); }
+.rule--primary { border-top: var(--keyline); }
 
-/* 4.2 Link — underlined on hover only, so dense lists stay calm. */
+/* 4.2 Link — the underline carries the color, the word stays in ink. */
 .link {
   text-decoration: none;
-  border-bottom: 1px solid var(--ink-quiet);
-  transition: border-color var(--duration) var(--easing);
+  border-bottom: 1px solid var(--primary-line);
+  transition: border-color var(--duration) var(--easing),
+              color var(--duration) var(--easing);
 }
-.link:hover { border-bottom-color: var(--ink); }
+.link:hover { color: var(--primary-deep); border-bottom-color: var(--primary); }
 
-/* 4.3 Toggle — the one interactive control. A text button that states its
-   selection with a solid rule beneath it, never with a fill or a pill. */
+/* 4.3 Toggle — the one interactive control. States selection with a rule
+   beneath it in the primary, never a fill and never a pill. */
 .toggle {
-  font-family: var(--font-label);
+  font-family: var(--font-text);
   font-size: var(--size-label);
   font-weight: 600;
-  letter-spacing: var(--track-label);
-  text-transform: uppercase;
+  letter-spacing: var(--track-smallcap);
+  font-feature-settings: "smcp" 1, "c2sc" 1, var(--figures-tabular);
+  text-transform: lowercase;
   color: var(--ink-tertiary);
   cursor: pointer;
   padding: var(--space-1) 0;
@@ -234,20 +309,18 @@ img, svg { display: block; max-width: 100%; }
 .toggle:hover { color: var(--ink); }
 
 .toggle[aria-pressed="true"] {
-  color: var(--ink);
-  border-bottom-color: var(--ink);
+  color: var(--primary-deep);
+  border-bottom-color: var(--primary);
 }
 
-/* Counts ride alongside a toggle, always lighter than the label. */
 .toggle .tally {
   font-weight: 500;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   color: var(--ink-tertiary);
   margin-left: 4px;
-  font-variant-numeric: tabular-nums;
 }
-.toggle:hover .tally,
-.toggle[aria-pressed="true"] .tally { color: var(--ink-secondary); }
+.toggle:hover .tally { color: var(--ink-secondary); }
+.toggle[aria-pressed="true"] .tally { color: var(--primary); }
 
 /* 4.4 Field — an input reduced to a baseline. */
 .field {
@@ -259,23 +332,23 @@ img, svg { display: block; max-width: 100%; }
   color: var(--ink);
   background: none;
   border: 0;
-  border-bottom: var(--hairline);
+  border-bottom: var(--hairline-strong);
   padding: var(--space-2) 0;
   transition: border-color var(--duration) var(--easing);
 }
 .field::placeholder { color: var(--ink-tertiary); letter-spacing: var(--track-heading); }
-.field:focus { outline: none; border-bottom: 1px solid var(--ink); }
+.field:focus { outline: none; border-bottom: 1px solid var(--primary); }
 .field::-webkit-search-cancel-button { filter: grayscale(1); }
 
-/* 4.5 Mark — search hits. An underline, not a highlighter. */
+/* 4.5 Mark — search hits take a primary underline, not a highlighter. */
 mark {
   background: none;
   color: inherit;
-  box-shadow: inset 0 -0.08em 0 0 var(--ink);
+  box-shadow: inset 0 -0.09em 0 0 var(--primary);
 }
 
-/* 4.6 Focus — square, black, always visible. */
-:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+/* 4.6 Focus */
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
 
 /* 4.7 Screen-reader only */
 .sr-only {

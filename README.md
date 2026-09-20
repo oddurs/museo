@@ -1,7 +1,8 @@
 # Museo
 
 A browsable directory of museums across all five boroughs of New York City.
-Black and white, set in Whitney, built on a documented design system.
+A typographic exhibition set in Whitney — warm paper, a twelve-step neutral
+ramp, one primary color — built on a documented design system.
 Static HTML/CSS/JS, no build step, no dependencies to install.
 
 ```
@@ -17,9 +18,9 @@ npm run geocode # fill in coordinates for any new entries
 ## What's here
 
 - **107 museums** — Manhattan 58, Brooklyn 16, Queens 15, Bronx 8, Staten Island 10.
-- **Map** (Leaflet + OpenStreetMap), desaturated to grays so it joins the
-  achromatic system. Clicking a pin scrolls the index to that museum; clicking an
-  entry flies the map to the pin.
+- **Map** (Leaflet + OpenStreetMap), desaturated and warmed to the paper's
+  temperature so it joins the system. Clicking a pin scrolls the index to that
+  museum; clicking an entry flies the map to the pin.
 - **Filters** — borough, category, and full-text search over name, neighborhood and
   address. Filters combine, and search terms are matched independently
   ("children brooklyn" works).

@@ -9,7 +9,8 @@
     <link rel="preload" as="font" type="font/woff2" href="fonts/whitney-light.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="fonts/whitney-book.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="fonts/whitney-ssm-book.woff2" crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href="fonts/whitney-cond-semibold.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="fonts/whitney-cond-medium.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="fonts/whitney-ssm-semibold.woff2" crossorigin />
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
     <link rel="stylesheet" href="fonts.css" />
@@ -19,14 +20,21 @@
   </head>
 
   <body>
+    <div class="bar" role="presentation"></div>
+
     <header class="masthead">
       <div class="masthead__brand">
         <h1 class="wordmark">Museo</h1>
-        <p class="t-label">New York City · All Five Boroughs</p>
+        <p class="deck t-body">
+          An index of every museum in the five boroughs of New York City —
+          <em>art, history, science and the specific</em>.
+        </p>
       </div>
-      <p class="masthead__tally">
-        <span class="tally-figure" id="count">—</span>
-        <span class="t-label" id="count-label">Museums</span>
+
+      <p class="tally-block">
+        <span class="tally-block__no">N&#186;</span>
+        <span class="tally-block__figure" id="count">—</span>
+        <span class="tally-block__unit t-label" id="count-label">Museums</span>
       </p>
     </header>
 
@@ -64,7 +72,7 @@
     <main class="layout">
       <section class="index" aria-label="Museum index">
         <div class="index__head" aria-hidden="true">
-          <span class="t-label">Nº</span>
+          <span class="t-label t-label--numero">N&#186;</span>
           <span class="t-label">Museum</span>
           <span class="t-label">Borough</span>
         </div>

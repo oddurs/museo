@@ -8,52 +8,56 @@ html, body { height: 100%; }
 body { display: flex; flex-direction: column; overflow: hidden; }
 
 /* --------------------------------------------------------------------------
+   EXHIBITION BAR
+   A 3px keyline across the full width. The one piece of pure brand in the
+   interface, and the reason the masthead beneath it can stay quiet.
+   -------------------------------------------------------------------------- */
+
+.bar {
+  height: 3px;
+  background: var(--primary);
+  flex: none;
+}
+
+/* --------------------------------------------------------------------------
    MASTHEAD
+   Set like the head of an exhibition poster: wordmark, deck, and the tally
+   flush right as a catalogue figure.
    -------------------------------------------------------------------------- */
 
 .masthead {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: var(--space-5);
+  gap: var(--space-6);
   padding: var(--space-6) var(--gutter) var(--space-5);
   padding-top: calc(var(--space-6) + env(safe-area-inset-top, 0px));
   border-bottom: var(--edge);
   flex: none;
 }
 
-/* Set in Light at display size and tracked wide — a wayfinding sign, not a
-   logo. The weight it lacks is supplied by the black rule beneath it. */
+/* Light at display size and tracked wide — a wayfinding sign rather than a
+   logo. The weight it gives up is supplied by the keyline above it. */
 .wordmark {
   font-family: var(--font-display);
-  font-size: 34px;
+  font-size: 38px;
   font-weight: 300;
   line-height: 0.9;
-  letter-spacing: var(--track-wide);
+  letter-spacing: var(--track-wordmark);
   text-transform: uppercase;
-  margin-right: calc(-1 * var(--track-wide)); /* absorb the trailing track */
+  margin-right: calc(-1 * var(--track-wordmark)); /* absorb the trailing track */
 }
 
-.masthead__brand p { margin-top: var(--space-3); color: var(--ink-tertiary); }
-
-.masthead__tally {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-3);
-  flex: none;
+.deck {
+  margin-top: var(--space-3);
+  color: var(--ink-secondary);
+  max-width: 46ch;
 }
 
-.tally-figure {
-  font-family: var(--font-display);
-  font-size: var(--size-display);
-  font-weight: 300;
-  line-height: 0.78;
-  letter-spacing: var(--track-display);
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
+.deck em {
+  font-style: normal;
+  color: var(--primary-deep);
 }
-
-.masthead__tally .t-label { color: var(--ink-tertiary); }
 
 /* --------------------------------------------------------------------------
    SEARCH + FILTERS
@@ -84,7 +88,6 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 .filter-set__name {
   color: var(--ink-tertiary);
   flex: none;
-  min-width: 56px;
 }
 
 .filter-set__items {
@@ -94,14 +97,11 @@ body { display: flex; flex-direction: column; overflow: hidden; }
   gap: var(--space-2) var(--space-4);
 }
 
-.filter-set--end {
-  margin-left: auto;
-  gap: var(--space-4);
-}
+.filter-set--end { margin-left: auto; gap: var(--space-4); }
 
-/* Reset reads as an action, not a selection, so it never takes the rule. */
+/* Reset is an action, not a selection, so it never takes the rule. */
 .toggle--plain { border-bottom-color: transparent !important; }
-.toggle--plain:hover { text-decoration: underline; text-underline-offset: 3px; }
+.toggle--plain:hover { color: var(--primary-deep); }
 
 /* --------------------------------------------------------------------------
    LAYOUT
@@ -116,7 +116,7 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 
 /* --------------------------------------------------------------------------
    INDEX
-   The scroll container and column heads. The entry itself is in components.css.
+   The scroll container and column heads. The entry is in components.css.
    -------------------------------------------------------------------------- */
 
 .index {
@@ -129,12 +129,18 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 .index__head {
   display: grid;
   grid-template-columns: var(--number-col) 1fr auto;
-  column-gap: var(--space-4);
+  column-gap: var(--space-5);
   padding: var(--space-3) var(--gutter);
-  border-bottom: var(--hairline);
+  border-bottom: var(--hairline-strong);
   color: var(--ink-tertiary);
   flex: none;
 }
+
+.index__head span:first-child { text-align: right; }
+
+/* The ordinal glyph is already raised; small caps would flatten it. */
+.t-label--numero { font-feature-settings: "lnum" 1, "tnum" 1; text-transform: none; }
+.index__head span:last-child { text-align: right; }
 
 .index__list {
   flex: 1;
@@ -143,39 +149,34 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 }
 
 .index__empty {
-  padding: var(--space-8) var(--gutter);
+  padding: var(--space-9) var(--gutter);
   text-align: center;
   color: var(--ink-tertiary);
 }
 
 /* --------------------------------------------------------------------------
    MAP
-   The basemap is desaturated so the map joins the achromatic system instead
-   of fighting it. Pins are plain black dots; the borough a pin belongs to is
-   already stated by the filters and the index.
+   The basemap is desaturated and warmed to the paper's temperature, so it
+   reads as part of the system rather than a window cut through it. Pins are
+   the primary: 107 cinnabar dots on warm gray is the whole picture.
    -------------------------------------------------------------------------- */
 
 .map-pane { position: relative; min-height: 0; }
 
-#map {
-  position: absolute;
-  inset: 0;
-  background: var(--paper-sunk);
-}
+#map { position: absolute; inset: 0; background: var(--paper-sunk); }
 
 .leaflet-container { font-family: var(--font-text); background: var(--paper-sunk); }
 
-/* Leaflet colors its own links (#0078A8). Nothing in this system has a hue. */
+/* Leaflet colors its own links (#0078A8). Nothing here carries a stray hue. */
 .leaflet-container a { color: inherit; }
 
-/* Strip the basemap to grays and flatten it, so the black pins stay dominant. */
 .leaflet-tile-pane {
-  filter: grayscale(1) brightness(1.08) contrast(0.78);
-  opacity: 0.92;
+  filter: grayscale(1) sepia(0.32) saturate(0.55) brightness(1.06) contrast(0.82);
+  opacity: 0.9;
 }
 
 .leaflet-control-zoom {
-  border: var(--edge) !important;
+  border: var(--hairline-strong) !important;
   border-radius: var(--radius) !important;
 }
 
@@ -190,7 +191,7 @@ body { display: flex; flex-direction: column; overflow: hidden; }
   border-bottom: var(--hairline) !important;
 }
 .leaflet-control-zoom a:last-child { border-bottom: 0 !important; }
-.leaflet-control-zoom a:hover { background: var(--paper-sunk) !important; }
+.leaflet-control-zoom a:hover { background: var(--primary-wash) !important; color: var(--primary-deep) !important; }
 
 .leaflet-popup-content-wrapper {
   background: var(--paper);
@@ -199,14 +200,14 @@ body { display: flex; flex-direction: column; overflow: hidden; }
   box-shadow: none;
 }
 
-.leaflet-popup-content { margin: var(--space-3); width: auto !important; min-width: 190px; }
+.leaflet-popup-content { margin: var(--space-4); width: auto !important; }
 .leaflet-popup-tip { display: none; }
 .leaflet-popup-close-button { display: none; }
 
 .leaflet-control-attribution {
   font-family: var(--font-text) !important;
   font-size: 10px !important;
-  background: rgba(255, 255, 255, 0.85) !important;
+  background: rgba(251, 249, 245, 0.88) !important;
   border-top: var(--hairline);
   border-left: var(--hairline);
   color: var(--ink-tertiary) !important;
@@ -216,10 +217,16 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 /* --------------------------------------------------------------------------
    NARROW
    The map moves above the index and pins itself there, so panning and reading
-   stay in view together. The masthead keeps its two-part structure but drops a
-   step down the type scale — at 390px the display sizes would otherwise take
-   half the viewport before a single museum appeared.
+   stay in view together. The masthead keeps its structure but drops a step
+   down the scale — at 390px the display sizes would otherwise take half the
+   viewport before a single museum appeared.
    -------------------------------------------------------------------------- */
+
+@media (max-width: 1100px) {
+  :root { --gutter: var(--space-5); --index-min: 340px; }
+  .wordmark { font-size: 32px; }
+  .tally-block__figure { font-size: var(--size-display); }
+}
 
 @media (max-width: 900px) {
   :root {
@@ -237,8 +244,9 @@ body { display: flex; flex-direction: column; overflow: hidden; }
   }
 
   .wordmark { font-size: 24px; }
-  .masthead__brand p { margin-top: var(--space-2); }
-  .tally-figure { font-size: 34px; }
+  .deck { margin-top: var(--space-2); }
+  .tally-block__figure { font-size: 34px; }
+  .tally-block__no { padding-top: var(--space-1); }
 
   .search-bar { padding-top: var(--space-4); }
   .field { font-size: 19px; }
@@ -248,14 +256,13 @@ body { display: flex; flex-direction: column; overflow: hidden; }
     padding: var(--space-4) var(--gutter) var(--space-3);
   }
   .filter-set { gap: var(--space-2); }
-  .filter-set__name { min-width: 0; }
   .filter-set--end { margin-left: 0; }
 
   .layout { display: flex; flex-direction: column; }
 
   .map-pane {
     order: -1;
-    flex: 0 0 var(--map-height);   /* flex items shrink by default; this must not */
+    flex: 0 0 var(--map-height);  /* flex items shrink by default; this must not */
     height: var(--map-height);
     position: sticky;
     top: 0;
@@ -275,10 +282,10 @@ body { display: flex; flex-direction: column; overflow: hidden; }
   .index__list { overflow: visible; }
 }
 
-@media (max-width: 560px) {
-  /* Two columns only. The classification stack unwraps into a row beneath the
-     entry body rather than being squeezed off the edge. */
-  .entry { grid-template-columns: var(--number-col) 1fr; }
+@media (max-width: 620px) {
+  /* Two columns. The classification stack unwraps into a row beneath the entry
+     body rather than being squeezed off the edge. */
+  .entry { grid-template-columns: var(--number-col) 1fr; column-gap: var(--space-4); }
 
   .entry__class {
     grid-column: 2;
@@ -289,6 +296,9 @@ body { display: flex; flex-direction: column; overflow: hidden; }
     margin-top: var(--space-3);
   }
 
-  .index__head { grid-template-columns: var(--number-col) 1fr; }
+  .masthead { gap: var(--space-4); }
+  .deck { display: none; }
+
+  .index__head { grid-template-columns: var(--number-col) 1fr; column-gap: var(--space-4); }
   .index__head span:last-child { display: none; }
 }

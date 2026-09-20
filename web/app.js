@@ -21,8 +21,11 @@ const els = {
   reset: document.getElementById('reset'),
 }
 
-const PIN = { radius: 3.5, weight: 1.5 }
-const PIN_ACTIVE = { radius: 6.5, weight: 2 }
+const INK = '#1c1810'
+const PRIMARY = '#c0361b'
+
+const PIN = { radius: 3.6, weight: 1, color: PRIMARY, fillColor: PRIMARY, fillOpacity: 1, opacity: 0.85 }
+const PIN_ACTIVE = { radius: 5.5, weight: 6, color: PRIMARY, fillColor: INK, fillOpacity: 1, opacity: 0.22 }
 
 const markers = new Map()
 let map
@@ -111,7 +114,7 @@ function renderIndex() {
       li.innerHTML = `
         <article class="entry" data-id="${escapeHtml(m.id)}" tabindex="0" role="button"
                  aria-label="${escapeHtml(m.name)} — show on map">
-          <span class="entry__no t-numeral">${ordinal(i + 1)}</span>
+          <span class="entry__no t-figure">${ordinal(i + 1)}</span>
           <div class="entry__body">
             <h2 class="entry__name t-heading">${highlight(m.name)}</h2>
             <p class="entry__meta t-small">${
@@ -192,13 +195,7 @@ function initMap() {
   }).addTo(map)
 
   for (const m of state.museums) {
-    const marker = L.circleMarker([m.lat, m.lng], {
-      ...PIN,
-      color: '#000000',
-      fillColor: '#000000',
-      fillOpacity: 1,
-      opacity: 1,
-    })
+    const marker = L.circleMarker([m.lat, m.lng], { ...PIN })
 
     marker.bindPopup(
       `<div class="pop">

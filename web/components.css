@@ -7,32 +7,38 @@
 /* --------------------------------------------------------------------------
    INDEX ENTRY
 
-   A catalogue row, not a card. Three columns — number, subject, classification
-   — aligned on a shared first baseline so the numeral and the borough label sit
-   on the same line as the museum's name. Hierarchy is carried by the 21px→13px
-   drop from name to address and by case: everything categorical is uppercase
-   Condensed, everything read is mixed-case.
+   A catalogue row, not a card. Three columns — figure, subject, classification
+   — on a shared first baseline, so the numeral and the borough sit on the
+   museum's own line. That alignment is `align-items: baseline` doing the work,
+   not padding nudges.
+
+   Case does the sorting: everything categorical is small caps, everything read
+   is mixed case. The eye skips the labels when scanning names, and finds them
+   instantly when scanning for a borough.
    -------------------------------------------------------------------------- */
 
 .entry {
   display: grid;
   grid-template-columns: var(--number-col) 1fr auto;
-  column-gap: var(--space-4);
+  column-gap: var(--space-5);
   align-items: baseline;
   width: 100%;
   text-align: left;
   padding: var(--space-4) var(--gutter);
-  border-bottom: var(--hairline);
+  border-bottom: var(--hairline-light);
   border-left: 2px solid transparent;
   cursor: pointer;
   scroll-margin: var(--space-4);
-  transition: background-color var(--duration) var(--easing);
+  transition: background-color var(--duration) var(--easing),
+              border-color var(--duration) var(--easing);
 }
 
 .entry:hover { background: var(--paper-sunk); }
 
+/* Right-aligned so the column rules itself straight against the names. */
 .entry__no {
   color: var(--ink-tertiary);
+  text-align: right;
   transition: color var(--duration) var(--easing);
 }
 
@@ -41,14 +47,15 @@
 .entry__name {
   font-weight: 400;
   text-wrap: balance;
+  transition: color var(--duration) var(--easing);
 }
 
-/* Address line: one quiet run of text, well below the name in both size and
-   value, so the two never read as a single block. */
+/* Old-style figures put the street number into the line rather than standing
+   it up like a heading — the detail that makes an address read as prose. */
 .entry__meta {
   margin-top: var(--space-2);
   color: var(--ink-tertiary);
-  max-width: 54ch;
+  max-width: 52ch;
 }
 
 .entry__link {
@@ -61,10 +68,10 @@
               border-color var(--duration) var(--easing);
 }
 
-.entry__link:hover { color: var(--ink); border-bottom-color: var(--ink); }
+.entry__link:hover { color: var(--primary-deep); border-bottom-color: var(--primary); }
 
 /* Classification stack, flush right: borough on the name's baseline,
-   discipline beneath it in the quietest value that still carries text. */
+   discipline beneath it one step quieter. */
 .entry__class {
   display: flex;
   flex-direction: column;
@@ -77,22 +84,24 @@
 .entry__borough { color: var(--ink-secondary); }
 .entry__discipline { color: var(--ink-tertiary); }
 
-/* Selected: marked at the edge, weight added to the name and numeral.
-   Nothing moves, nothing fills with color. */
+/* Selected: a primary rule at the edge, a warm bed, and the numeral going to
+   the primary. The name steps from Book to Medium. Nothing moves. */
 .entry.is-active {
-  border-left-color: var(--ink);
-  background: var(--paper-sunk);
+  border-left-color: var(--primary);
+  border-bottom-color: var(--primary-line);
+  background: var(--primary-wash);
 }
-.entry.is-active .entry__no { color: var(--ink); }
+.entry.is-active .entry__no { color: var(--primary); }
 .entry.is-active .entry__name { font-weight: 500; }
-.entry.is-active .entry__borough,
-.entry.is-active .entry__discipline { color: var(--ink); }
+.entry.is-active .entry__borough { color: var(--ink); }
+.entry.is-active .entry__discipline { color: var(--ink-secondary); }
 
 /* --------------------------------------------------------------------------
    MAP POPUP
+   Square, hairline-edged, no shadow — a label pinned to the map.
    -------------------------------------------------------------------------- */
 
-.pop { min-width: 200px; max-width: 260px; }
+.pop { min-width: 200px; max-width: 250px; }
 
 .pop__name {
   font-family: var(--font-display);
@@ -107,6 +116,7 @@
   line-height: 1.45;
   color: var(--ink-tertiary);
   margin-top: var(--space-2);
+  font-feature-settings: var(--figures-text);
 }
 
 .pop__foot {
@@ -120,3 +130,37 @@
 }
 
 .pop__foot .t-label { color: var(--ink-tertiary); }
+
+/* --------------------------------------------------------------------------
+   TALLY
+   The count, set as a catalogue figure: Nº with a true superior o.
+   -------------------------------------------------------------------------- */
+
+.tally-block {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  flex: none;
+}
+
+.tally-block__no {
+  font-family: var(--font-text);
+  font-size: var(--size-label);
+  font-weight: 600;
+  letter-spacing: var(--track-smallcap);
+  color: var(--primary);
+  align-self: flex-start;
+  padding-top: var(--space-2);
+}
+
+.tally-block__figure {
+  font-family: var(--font-display);
+  font-size: var(--size-banner);
+  font-weight: 300;
+  line-height: 0.78;
+  letter-spacing: var(--track-banner);
+  font-feature-settings: var(--figures-tabular);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.tally-block__unit { color: var(--ink-tertiary); }
