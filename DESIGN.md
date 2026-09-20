@@ -276,20 +276,31 @@ Borders run on their own scale, not the spacing scale:
 | `--stroke-marker` | 2px | Selection markers, toggle underlines |
 | `--stroke-keyline` | 3px | The exhibition bar |
 
-Weight tracks **structural significance**, so the hierarchy of the page can be
-read from the rules alone. Pick by what the rule separates, never by how it
-looks in isolation:
+Weight tracks **structural significance** — but it is scaled by *length*, not
+only by what the rule separates. A 1px rule at 16.8:1 is a slab when it runs
+1600px, whatever it divides. Measured, the page was **33% furniture** above the
+first museum, with three full-width rules stacked inside 150px and the heaviest
+element on the screen being a black line that divided nothing anyone was
+reading.
+
+So the rule is: **nothing full-width is set in ink.** Division at that scale
+comes from space and from the page's own structure. Ink is for short runs.
 
 | Token | Value | Separates |
 | --- | --- | --- |
-| `--edge` | gray-900 | Outermost structural divisions — masthead from body, index from map. The only rule set in ink. |
-| `--hairline-strong` | gray-300 | Regions inside a pane — the filter bar, the index's column heads, a field's baseline |
-| `--hairline` | gray-200 | Boundaries inside a single component — a popup's foot, a specimen frame |
+| `--edge` | gray-900 | Short runs that need a hard boundary — a popup, a framed specimen. Never across a pane. |
+| `--hairline-strong` | gray-300 | The page's real divisions — the filter bar, the index-to-map seam, the colophon |
+| `--hairline` | gray-200 | A control's own affordance, or a boundary inside one component — the field's baseline, a popup's foot |
 | `--hairline-light` | gray-150 | Repeating separators in a list — one per entry, where a heavier value would stripe the column |
+
+After the pass: **25% chrome, two full-width rules, none in ink.** The masthead
+lost its closing rule entirely — it and the controls are one header, divided
+from the index by a single line — and the index's column heads float on space
+instead of sitting in a ruled band.
 
 The filter bar was originally `--hairline`, making it *lighter* than the column
 heads inside the pane below it and inverting the hierarchy. It is
-`--hairline-strong` now.
+`--hairline-strong` now, and the column heads carry no rule at all.
 
 ---
 

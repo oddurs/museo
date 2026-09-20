@@ -35,7 +35,8 @@
 .deck {
   margin-top: var(--space-3);
   color: var(--ink-secondary);
-  max-width: 46ch;
+  max-width: 76ch;   /* one line where there is room; it is a display line, not body copy */
+  text-wrap: pretty;
 }
 
 .deck em {

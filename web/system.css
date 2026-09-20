@@ -129,16 +129,20 @@
   --stroke-keyline:  3px;  /* the exhibition bar */
 
   /* 1.11 The border ladder
-     Weight tracks structural significance, so the eye can read the hierarchy of
-     the page from the rules alone. Pick by what the rule separates, never by
-     how it looks in isolation:
+     Weight tracks structural significance — but it is scaled by LENGTH, not
+     just by what the rule separates. A 1px rule at 16.8:1 is a slab when it
+     runs 1600px, whatever it is dividing; the page was a third furniture
+     before this was measured. So:
 
-       --edge            outermost structural divisions — masthead from body,
-                         index from map. The only rule set in ink.
-       --hairline-strong boundaries between regions inside a pane — the filter
-                         bar, the index's column heads, a field's baseline.
-       --hairline        boundaries inside a single component — the rule across
-                         a popup's foot, a specimen frame.
+       Nothing full-width is set in ink. Division at that scale comes from
+       space and from the page's own structure. Ink is for short runs only.
+
+       --edge            short runs that need a hard boundary — a popup, a
+                         framed specimen. Never across a pane.
+       --hairline-strong the page's real divisions — the filter bar, the
+                         index-to-map seam, the colophon.
+       --hairline        a control's own affordance, or a boundary inside one
+                         component — the field's baseline, a popup's foot.
        --hairline-light  repeating separators in a list — one per index entry,
                          where a heavier value would stripe the column.
 
@@ -357,7 +361,7 @@ img, svg { display: block; max-width: 100%; }
   color: var(--ink);
   background: none;
   border: 0;
-  border-bottom: var(--hairline-strong);
+  border-bottom: var(--hairline);
   padding: var(--space-2) 0;
   transition: border-color var(--duration) var(--easing);
 }

@@ -15,7 +15,7 @@ main,
   flex-wrap: wrap;
   padding-top: var(--space-8);
   padding-bottom: var(--space-5);
-  border-bottom: var(--edge);
+  border-bottom: var(--hairline-strong);
 }
 
 .spec-head__note { max-width: 44ch; color: var(--ink-secondary); }
