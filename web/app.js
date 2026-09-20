@@ -18,8 +18,16 @@ const HALO = { radius: 10, weight: 1.5, color: PRIMARY, opacity: 0.65, fill: fal
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 const animate = !reduceMotion
 
+const SORTS = {
+  az:      { label: 'A–Z' },
+  borough: { label: 'Borough' },
+  near:    { label: 'Near me' },
+}
+
 const state = {
   museums: [],
+  sort: 'az',
+  origin: null,    // {lat, lng} once the browser has told us where we are
   query: '',
   boroughs: new Set(),
   categories: new Set(),
@@ -43,12 +51,16 @@ const els = {
   reset: document.getElementById('reset'),
   searchClear: document.getElementById('search-clear'),
   status: document.getElementById('status'),
+  notice: document.getElementById('notice'),
+  sortOptions: document.getElementById('sort-options'),
 }
 
 const toggles = { borough: new Map(), category: new Map() }
 const markers = new Map()
+const sortToggles = new Map()
 let map
 let halo
+let hereMarker
 
 /* ---------------------------------------------------------------- text --- */
 
@@ -70,6 +82,27 @@ const hostOf = (url) => {
 }
 
 const ordinal = (n) => String(n).padStart(3, '0')
+
+/** Great-circle distance in miles. The index is walked, so miles read better
+    than kilometres here and a tenth of a mile is as precise as it gets. */
+function milesBetween(a, b) {
+  const R = 3958.8
+  const rad = (x) => (x * Math.PI) / 180
+  const dLat = rad(b.lat - a.lat)
+  const dLng = rad(b.lng - a.lng)
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLng / 2) ** 2
+  return 2 * R * Math.asin(Math.sqrt(h))
+}
+
+/** Under a tenth of a mile, feet are the honest unit — rounded to ten, which
+    is about as much as a street address and a phone's fix can support. */
+function formatMiles(mi) {
+  if (mi < 0.1) return `${Math.max(10, Math.round((mi * 5280) / 10) * 10)} ft`
+  if (mi < 10) return `${mi.toFixed(1)} mi`
+  return `${Math.round(mi)} mi`
+}
 
 /** The city/state/zip tail is the same on every record; the index drops it. */
 const street = (address) =>
@@ -111,7 +144,26 @@ function inViewport(m) {
   return map.getBounds().contains([m.lat, m.lng])
 }
 
-const visible = () => state.museums.filter((m) => matches(m) && inViewport(m))
+const byName = (a, b) => a.name.localeCompare(b.name, 'en')
+
+/** The index's order. Distance falls back to A–Z until the browser has placed
+    us, so choosing "Near me" never empties or scrambles the list while the
+    permission prompt is open. */
+function ordered(rows) {
+  if (state.sort === 'borough') {
+    return [...rows].sort(
+      (a, b) => BOROUGHS.indexOf(a.borough) - BOROUGHS.indexOf(b.borough) || byName(a, b),
+    )
+  }
+  if (state.sort === 'near' && state.origin) {
+    return [...rows].sort(
+      (a, b) => milesBetween(state.origin, a) - milesBetween(state.origin, b) || byName(a, b),
+    )
+  }
+  return [...rows].sort(byName)
+}
+
+const visible = () => ordered(state.museums.filter((m) => matches(m) && inViewport(m)))
 
 /* ----------------------------------------------------------- url state --- */
 
@@ -120,6 +172,7 @@ function writeUrl() {
   if (state.query) p.set('q', state.query)
   if (state.boroughs.size) p.set('borough', [...state.boroughs].join(','))
   if (state.categories.size) p.set('type', [...state.categories].join(','))
+  if (state.sort !== 'az') p.set('sort', state.sort)
   if (state.viewportOnly) p.set('onmap', '1')
   if (state.activeId) p.set('at', state.activeId)
   const url = p.toString() ? `?${p}` : location.pathname
@@ -132,6 +185,8 @@ function readUrl() {
   const known = (set, values) => values.filter(Boolean).forEach((v) => set.add(v))
   known(state.boroughs, (p.get('borough') ?? '').split(',').filter((b) => BOROUGHS.includes(b)))
   known(state.categories, (p.get('type') ?? '').split(',').filter(Boolean))
+  const sort = p.get('sort')
+  if (sort && sort in SORTS) state.sort = sort
   state.viewportOnly = p.get('onmap') === '1'
   state.activeId = p.get('at')
   els.search.value = state.query
@@ -144,6 +199,8 @@ function facts(m) {
   const bits = [m.admission, m.hoursSummary].filter(Boolean)
   return bits.length ? `<p class="entry__meta t-small">${escapeHtml(bits.join(' · '))}</p>` : ''
 }
+
+const showDistance = () => state.sort === 'near' && !!state.origin
 
 function renderIndex() {
   state.rows = visible()
@@ -161,7 +218,8 @@ function renderIndex() {
               <button type="button" class="entry__select" tabindex="-1">${highlight(m.name)}</button>
             </h2>
             <p class="entry__meta t-small">${
-              m.neighborhood ? highlight(m.neighborhood) + ' &middot; ' : ''
+              showDistance() ? `<span class="entry__distance">${formatMiles(milesBetween(state.origin, m))}</span> &middot; ` : ''
+            }${m.neighborhood ? highlight(m.neighborhood) + ' &middot; ' : ''
             }${highlight(street(m.address))}</p>
             ${m.url
               ? `<a class="entry__link t-fine" href="${escapeHtml(m.url)}" tabindex="-1"
@@ -377,6 +435,81 @@ function fitToResults() {
 
 /* ------------------------------------------------------------ controls --- */
 
+function buildSort() {
+  for (const [key, { label }] of Object.entries(SORTS)) {
+    const btn = document.createElement('button')
+    btn.type = 'button'
+    btn.className = 'toggle'
+    btn.dataset.sort = key
+    btn.setAttribute('role', 'radio')
+    btn.setAttribute('aria-checked', String(state.sort === key))
+    btn.textContent = label
+    btn.addEventListener('click', () => chooseSort(key))
+    sortToggles.set(key, btn)
+    els.sortOptions.append(btn)
+  }
+}
+
+function chooseSort(key) {
+  if (key === 'near' && !state.origin) {
+    locate()
+    return
+  }
+  state.sort = key
+  notice('')
+  update()
+}
+
+/** Ask the browser where we are. The order only changes once it answers, so a
+    refused or slow prompt leaves the index exactly as it was. */
+function locate() {
+  if (!navigator.geolocation) {
+    notice('This browser cannot share a location.')
+    return
+  }
+  notice('Finding you…')
+  navigator.geolocation.getCurrentPosition(
+    ({ coords }) => {
+      state.origin = { lat: coords.latitude, lng: coords.longitude }
+      state.sort = 'near'
+      showHere()
+      const nearest = Math.min(...state.museums.map((m) => milesBetween(state.origin, m)))
+      notice(nearest > 50 ? 'You are some way from New York — distances are as the crow flies.' : '')
+      update()
+    },
+    (err) => {
+      notice(
+        err.code === err.PERMISSION_DENIED
+          ? 'Location permission was declined, so the index stays in alphabetical order.'
+          : 'Your location is not available right now.',
+      )
+      syncToggles()
+    },
+    { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 },
+  )
+}
+
+function notice(text) {
+  els.notice.textContent = text
+  els.notice.hidden = !text
+}
+
+/** A hollow marker, so it cannot be mistaken for one of the museums. */
+function showHere() {
+  if (!map || !state.origin) return
+  const at = [state.origin.lat, state.origin.lng]
+  if (hereMarker) hereMarker.setLatLng(at)
+  else {
+    hereMarker = L.circleMarker(at, {
+      radius: 5, weight: 2, color: INK, fillColor: PAPER, fillOpacity: 1, interactive: false,
+    })
+  }
+  if (!map.hasLayer(hereMarker)) hereMarker.addTo(map)
+  // Bring it into view only if it is not already there, and never change the
+  // zoom: the map's framing is the reader's, not ours.
+  map.panInside(at, { padding: [48, 48], animate })
+}
+
 function buildFilters() {
   for (const b of BOROUGHS) {
     els.boroughFilters.append(makeToggle('borough', b, () => toggleValue(state.boroughs, b, { refit: true })))
@@ -422,7 +555,9 @@ function syncToggles() {
     }
   }
   els.viewportOnly.setAttribute('aria-pressed', String(state.viewportOnly))
-  const dirty = !!(state.query || state.boroughs.size || state.categories.size || state.viewportOnly)
+  for (const [key, btn] of sortToggles) btn.setAttribute('aria-checked', String(state.sort === key))
+  const dirty = !!(state.query || state.boroughs.size || state.categories.size ||
+                   state.viewportOnly || state.sort !== 'az')
   els.reset.disabled = !dirty
   els.reset.hidden = !dirty
   els.searchClear.hidden = !state.query
@@ -497,6 +632,9 @@ els.reset.addEventListener('click', () => {
 
 function reset() {
   state.query = ''
+  state.sort = 'az'
+  notice('')
+  if (hereMarker && map?.hasLayer(hereMarker)) map.removeLayer(hereMarker)
   state.boroughs.clear()
   state.categories.clear()
   state.viewportOnly = false
@@ -551,8 +689,10 @@ try {
 
   document.body.classList.remove('is-loading')
   readUrl()
+  buildSort()
   buildFilters()
   initMap()
+  if (state.sort === 'near' && !state.origin) locate()
   syncToggles()
   syncMarkers()
   renderIndex()

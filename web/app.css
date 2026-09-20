@@ -62,7 +62,7 @@ body { display: flex; flex-direction: column; overflow: hidden; }
   flex-wrap: wrap;
   /* Symmetric: the toggles carry their own 4px padding and a 2px marker rule,
      so equal token padding lands within 2px optically above and below. */
-  gap: var(--space-3) var(--space-7);
+  gap: var(--space-3) var(--space-6);
   padding: var(--space-3) var(--gutter);
   border-bottom: var(--hairline-strong);
   flex: none;
@@ -100,6 +100,14 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 }
 .toggle.is-empty .tally { color: var(--rule-strong); }
 .toggle.is-empty:hover { color: var(--rule-strong); }
+
+/* A quiet line under the controls, only while there is something to say —
+   a declined permission, or a location far from the city. */
+.notice {
+  padding: 0 var(--gutter) var(--space-3);
+  color: var(--primary-deep);
+  flex: none;
+}
 
 /* --------------------------------------------------------------------------
    LAYOUT

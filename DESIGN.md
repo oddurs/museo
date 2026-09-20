@@ -307,7 +307,9 @@ heads inside the pane below it and inverting the hierarchy. It is
 ## Elements
 
 **Toggle** — the only interactive control. States selection with a 2px rule in
-the primary, never a fill and never a pill. `Reset` is an action rather than a
+the primary, never a fill and never a pill. Facets are multi-select and use
+`aria-pressed`; the order is single-select and uses radio semantics
+(`role="radio"`, `aria-checked`). Both wear the same rule. `Reset` is an action rather than a
 selection, so it never takes the rule.
 
 **Field** — an input reduced to a baseline; the rule goes primary on focus.
@@ -437,7 +439,19 @@ the map's contents, so choosing a row pans only as far as `panInside` needs to
 bring the pin into view instead of zooming to it. Selecting a row used to
 collapse the list from 107 rows to 5.
 
-**State lives in the URL** — `?q=`, `&borough=`, `&type=`, `&onmap=1`, `&at=`.
+**Three orders, one of them yours.** A–Z, by borough (in the boroughs' own
+order, matching the filter bar), and by distance. Distance asks the browser
+where you are and does nothing until it answers, so a refused or slow
+permission prompt leaves the index exactly as it was — a declined permission
+says so in a line under the controls rather than failing silently. Your
+position draws as a hollow marker that cannot be mistaken for a museum, and the
+map pans only far enough to bring it into view, never changing zoom.
+
+Distances appear on the rows only while distance is the order, and are
+measured, not estimated: great-circle miles from the verified coordinates, in
+feet under a tenth of a mile.
+
+**State lives in the URL** — `?q=`, `&borough=`, `&type=`, `&sort=`, `&onmap=1`, `&at=`.
 A view can be reloaded or shared, and the selected museum comes back with it.
 
 Motion respects `prefers-reduced-motion`: map movement and scrolling both go

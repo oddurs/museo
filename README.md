@@ -29,6 +29,8 @@ npm run geocode # fill in coordinates for any new entries
   ("children brooklyn" works).
 - **On map only** — narrows the index to the current map viewport, so you can pan
   to a neighborhood and see just what's walkable from there.
+- **Order** — A–Z, by borough, or by distance from where you are. Distances are
+  great-circle miles from the verified coordinates, in feet up close.
 - Each entry links out to the museum's own site. No photos, by design. Links
   are verified with `npm run links`; one museum (Garibaldi-Meucci) has no
   working website and the entry says so rather than offering a dead link.

@@ -73,6 +73,11 @@
         <div class="filter-set__items" id="category-filters" role="group" aria-label="Filter by discipline"></div>
       </div>
 
+      <div class="filter-set">
+        <span class="t-label filter-set__name">Order</span>
+        <div class="filter-set__items" id="sort-options" role="radiogroup" aria-label="Order the index"></div>
+      </div>
+
       <div class="filter-set filter-set--end">
         <button type="button" class="toggle" id="viewport-only" aria-pressed="false">
           On map only
@@ -83,6 +88,7 @@
 
     <main class="layout">
       <p class="sr-only" id="status" role="status" aria-live="polite"></p>
+      <p class="notice t-small" id="notice" hidden></p>
 
       <section class="index" aria-label="Museum index">
         <div class="index__head" aria-hidden="true">

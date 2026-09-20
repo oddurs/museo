@@ -144,6 +144,13 @@
   flex: none;
 }
 
+/* The distance leads the address line, and only when distance is the order. */
+.entry__distance {
+  color: var(--ink-secondary);
+  font-weight: 500;
+  font-feature-settings: var(--figures-text);
+}
+
 .entry__borough { color: var(--ink-secondary); }
 .entry__discipline { color: var(--ink-tertiary); }
 
