@@ -25,6 +25,24 @@
   </head>
 
   <body class="is-loading">
+    <!-- The basemap's colour, rebalanced per channel. CSS saturate() treats
+         every hue alike, which left OpenStreetMap's motorway network a dusty
+         pink in the same family as the pins. This matrix keeps most of the
+         blue, a little of the green and almost none of the red, so roads go
+         neutral, water stays water, parks stay parks — and cinnabar is the
+         only warm thing on the page. Values from
+         out = luminance + k·(channel − luminance), k = 0.10 / 0.26 / 0.60. -->
+    <svg class="filters" aria-hidden="true" focusable="false" width="0" height="0">
+      <filter id="basemap" color-interpolation-filters="sRGB">
+        <feColorMatrix
+          type="matrix"
+          values="0.2913 0.6437 0.0650 0 0
+                  0.1573 0.7892 0.0534 0 0
+                  0.0850 0.2861 0.6289 0 0
+                  0      0      0      1 0" />
+      </filter>
+    </svg>
+
     <div class="bar" role="presentation"></div>
 
     <header class="masthead">

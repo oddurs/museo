@@ -401,14 +401,30 @@ and `--primary` on the link itself.
 
 ## The map
 
-**The basemap keeps a trace of its own colour.** It used to be fully
-desaturated and warmed, which looked disciplined and read badly: the Hudson was
-exactly the same value as the city on either side of it, so the map could not
-tell water from land. Six treatments of the same view were rendered side by
-side; the one in use keeps enough saturation for water to be water and parks to
-be parks, warmed toward the paper and held well below the pins
-(`saturate(0.38) sepia(0.2) brightness(1.07) contrast(0.81)`). Cinnabar still
-owns the page. Leaflet's own link colour and its attribution flag are still
+**The basemap's colour is rebalanced per channel, not merely turned down.**
+
+It was fully desaturated once, which looked disciplined and read badly: the
+Hudson was the same value as the city either side of it, so the map could not
+tell water from land. Turning saturation back up fixed that and introduced a
+worse problem — CSS `saturate()` treats every hue alike, so OpenStreetMap's
+motorway network came back as a dusty pink web in the same family as the pins.
+The map went muddy and the cinnabar stopped separating.
+
+A filter cannot desaturate one hue selectively, but a colour matrix can. The
+basemap now runs through `#basemap`, an `feColorMatrix` built from
+
+```
+out = luminance + k · (channel − luminance)      k = 0.10 / 0.26 / 0.60
+```
+
+Almost none of the red survives, a little of the green, most of the blue: roads
+go neutral, water stays water, parks stay parks, and **cinnabar is the only
+warm thing on the page.** Chosen by rendering ten treatments — four `saturate`
+variants, three matrices and two alternative keyless tile styles — of the same
+view side by side.
+
+It costs nothing: 16.7ms median frame interval idle and while panning, which is
+60fps either way. Leaflet's own link colour and its attribution flag are still
 overridden — nothing else carries a stray hue.
 
 **One movement, landing correctly.** Choosing a museum used to centre its pin

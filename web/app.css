@@ -258,9 +258,12 @@ body { display: flex; flex-direction: column; overflow: hidden; }
    below the pins: water is water, parks are parks, and cinnabar still owns the
    page. Chosen by rendering six treatments of the same view side by side. */
 .leaflet-tile-pane {
-  filter: saturate(0.38) sepia(0.2) brightness(1.07) contrast(0.81);
-  opacity: 0.95;
+  filter: url(#basemap) sepia(0.12) brightness(1.06) contrast(0.84);
+  opacity: 0.96;
 }
+
+/* The filter definition itself takes no space. */
+.filters { position: absolute; width: 0; height: 0; overflow: hidden; }
 
 .leaflet-control-zoom {
   border: var(--hairline) !important;
