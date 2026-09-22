@@ -515,6 +515,16 @@ instant, as well as the CSS transitions.
 4. Add it to `/web/design/` in the same commit. A component that isn't in the
    specimen will drift.
 
+**One class, one kind of element.** The colour matrix shipped inside
+`<svg class="filters">` — the same class as `<nav class="filters">`, the
+control bar. The rule meant to hide the filter definition
+(`position: absolute; width: 0; height: 0; overflow: hidden`) collapsed the
+entire bar into a 64px box in the corner of the masthead, with "BOROUGH"
+clipped across the wordmark. The audit now refuses a component class worn by
+two kinds of element. Utilities defined in `system.css` are exempt, because
+they are meant to be worn by anything; a deliberate exception is listed by name
+with its reason, as `.wordmark` is.
+
 **One home per component.** A class defined in two layers drifts. The wordmark
 was styled in both `app.css` and `specimen.css` while the imprint lived only in
 `app.css` — so the specimen, which does not load `app.css`, rendered it

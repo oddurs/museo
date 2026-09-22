@@ -262,8 +262,10 @@ body { display: flex; flex-direction: column; overflow: hidden; }
   opacity: 0.96;
 }
 
-/* The filter definition itself takes no space. */
-.filters { position: absolute; width: 0; height: 0; overflow: hidden; }
+/* The filter definition itself takes no space. Named svg-defs, not filters:
+   `.filters` is the control bar, and giving both the same class collapsed the
+   bar into a 64px box in the corner of the masthead. */
+.svg-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
 
 .leaflet-control-zoom {
   border: var(--hairline) !important;

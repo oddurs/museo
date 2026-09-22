@@ -195,6 +195,55 @@ for (const [cls, files] of homes) {
   }
 }
 
+/* ---------- no class worn by two kinds of element ---------- */
+
+/* A structural element and some other element sharing a class is almost always
+   an accident, and a costly one: an <svg class="filters"> holding a colour
+   matrix picked up the rules meant for <nav class="filters">, which collapsed
+   the whole control bar into a 64px box in the corner of the masthead.
+   The system's own layering draws the line: a utility defined in system.css is
+   meant to be worn by anything, so .t-small on a <p> and a <ul> is correct. A
+   component defined in a composition layer names one thing, so two different
+   elements answering to it is a bug. */
+
+const utilities = new Set(
+  [...system.matchAll(/(?:^|\})\s*([^{}@]+?)\s*\{/g)]
+    .flatMap((m) => m[1].split(','))
+    .flatMap((sel) => [...sel.matchAll(/\.([\w-]+)/g)].map((c) => c[1])),
+)
+
+/* Deliberate exceptions, each with its reason, listed in the report. */
+const WORN_TWICE = new Map([
+  ['wordmark', 'the identity: an <h1> at the masthead, a <p> in the colophon and the specimen'],
+])
+
+const PAGES = ['web/index.html', 'web/design/index.html']
+const worn = new Map()
+
+for (const page of PAGES) {
+  const html = await read(page)
+  for (const tag of html.matchAll(/<([a-zA-Z][\w-]*)\b[^>]*\bclass="([^"]+)"/g)) {
+    const name = tag[1].toLowerCase()
+    for (const cls of tag[2].split(/\s+/).filter(Boolean)) {
+      if (!worn.has(cls)) worn.set(cls, new Map())
+      const tags = worn.get(cls)
+      tags.set(name, (tags.get(name) ?? 0) + 1)
+    }
+  }
+}
+
+for (const [cls, tags] of worn) {
+  if (tags.size < 2 || utilities.has(cls)) continue
+  if (WORN_TWICE.has(cls)) {
+    exemptions.push(`.${cls} on <${[...tags.keys()].join('>/<')}> — ${WORN_TWICE.get(cls)}`)
+    continue
+  }
+  problems.push(
+    `.${cls} is worn by <${[...tags.keys()].join('> and <')}> — ` +
+    'a component class answering to two kinds of element is almost always a collision',
+  )
+}
+
 /* ---------- report ---------- */
 
 console.log(`space scale  ${spaceScale.join(' ')}`)
