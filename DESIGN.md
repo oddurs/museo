@@ -332,6 +332,14 @@ than gaining a second one.
 Ink rather than the accent is also the more accessible choice: 18.9:1 against
 the vermilion's 3.6:1.
 
+**On the public site the type is a fallback.** Whitney is licensed and is not
+served there, so `npm run site` ships `fonts.fallback.css` — local
+Helvetica/Arial restated to Whitney's metrics, carrying no font data — and the
+colophon and the specimen say so. Small caps are asked for through
+`font-variant-caps` as well as `smcp`, so a face without them synthesises them
+instead of dropping to mixed case; on real Whitney that changes nothing,
+measured across forty labels.
+
 **Pointer presses never show focus.** Leaflet focuses the map on every mouse
 press, and Chrome counts that programmatic focus as `:focus-visible` — so the
 first version of this drew a vermilion frame round the whole map every time
@@ -426,10 +434,17 @@ rebalanced per channel through a colour matrix. Each pass fixed something and
 none made it look designed, because it is half the screen and it was always
 someone else's beige map under a filter.
 
-The map is now the five boroughs' own coastline, from NYC Planning, simplified
-by Douglas–Peucker from 4,009 points to 2,343 and **157KB to 44KB**, drawn in
-`--paper-wash` on paper water with a `--rule` hairline shore. It sits in its own
-pane beneath everything else.
+The map is now the five boroughs' own shoreline: *Borough Boundaries (water
+areas excluded)* from the NYC Department of City Planning, fetched from NYC Open
+Data by `npm run boroughs` and simplified by Douglas–Peucker from 81,085 points
+to 3,811 — about **3MB to 67KB** — drawn in `--paper-wash` on paper water with a
+`--rule` hairline shore. It sits in its own pane beneath everything else.
+
+It was first built from a derivative published under GPL-3.0, which would have
+pulled copyleft into a public repository. That derivative's own README named
+DCP as the original source, so the map is now built from DCP directly, and the
+earlier file was rewritten out of history before the repository was first
+published.
 
 **Streets arrive only where you need them.** At city scale the silhouette *is*
 the map. From zoom 13 street tiles fade up over a zoom and a half to 55%,

@@ -6,7 +6,10 @@
 import { readFile, writeFile } from 'node:fs/promises'
 
 const DATA = new URL('../data/museums.json', import.meta.url)
-const UA = 'museo/0.1 (NYC museum directory; contact oddurs@gmail.com)'
+// Nominatim's usage policy asks for a way to reach whoever is running this.
+// That is the project's page, unless MUSEO_CONTACT overrides it.
+const CONTACT = process.env.MUSEO_CONTACT ?? 'https://github.com/oddurs/museo'
+const UA = `museo/0.1 (+${CONTACT})`
 const NYC = { minLat: 40.46, maxLat: 40.95, minLng: -74.32, maxLng: -73.66 }
 
 const force = new Set(

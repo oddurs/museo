@@ -4,3 +4,6 @@ node_modules/
 # Licensed Whitney OTFs are not redistributed; rebuild with: npm run fonts
 web/fonts/
 web/fonts.css
+
+# the assembled public site
+_site/

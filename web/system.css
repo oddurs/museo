@@ -272,6 +272,11 @@ img, svg { display: block; max-width: 100%; }
   line-height: 1;
   letter-spacing: var(--track-smallcap);
   font-feature-settings: "smcp" 1, "c2sc" 1, var(--figures-tabular);
+  /* Whitney has true small caps and uses them. A face without them — the
+     public fallback — ignores smcp, and the labels fell back to mixed case.
+     Asking through font-variant-caps as well lets the browser synthesise them
+     there, and changes nothing where real ones exist. */
+  font-variant-caps: all-small-caps;
 }
 
 /* Catalogue figures — Condensed, lining and tabular, so a column of numbers
@@ -325,6 +330,7 @@ img, svg { display: block; max-width: 100%; }
   font-weight: 600;
   letter-spacing: var(--track-smallcap);
   font-feature-settings: "smcp" 1, "c2sc" 1, var(--figures-tabular);
+  font-variant-caps: all-small-caps;  /* synthesised where the face has none */
   color: var(--ink-tertiary);
   cursor: pointer;
   padding: var(--space-1) 0;

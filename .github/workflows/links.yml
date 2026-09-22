@@ -1,0 +1,19 @@
+name: Links
+
+# A directory rots from the outside: museums move domains and restructure
+# sites. Once a week, every outbound link is checked. Bot-blocked sites are
+# reported as unverifiable and do not fail the run; broken or moved ones do.
+on:
+  schedule:
+    - cron: '0 13 * * 1'
+  workflow_dispatch:
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - run: node scripts/check-links.mjs --slow

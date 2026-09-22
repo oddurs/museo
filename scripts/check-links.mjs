@@ -16,7 +16,10 @@
 import { readFile } from 'node:fs/promises'
 
 const DATA = new URL('../data/museums.json', import.meta.url)
-const UA = 'museo-linkcheck/1.0 (+https://github.com/; contact oddurs@gmail.com)'
+// Nominatim's usage policy asks for a way to reach whoever is running this.
+// That is the project's page, unless MUSEO_CONTACT overrides it.
+const CONTACT = process.env.MUSEO_CONTACT ?? 'https://github.com/oddurs/museo'
+const UA = `museo-linkcheck/1.0 (+${CONTACT})`
 const TIMEOUT = 15000
 const CONCURRENCY = process.argv.includes('--slow') ? 1 : 6
 

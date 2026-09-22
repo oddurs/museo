@@ -1,3 +1,6 @@
+// Where the dataset lives, relative to this page. The one path a deploy moves.
+const DATA = '../data/'
+
 const BOROUGHS = ['Manhattan', 'Brooklyn', 'Queens', 'Bronx', 'Staten Island']
 
 const PRIMARY = '#ff3b00'
@@ -458,7 +461,7 @@ function initMap() {
   map.createPane('land')
   map.getPane('land').style.zIndex = 150
 
-  fetch('../data/boroughs.json')
+  fetch(DATA + 'boroughs.json')
     .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
     .then((geo) => {
       L.geoJSON(geo, {
@@ -798,7 +801,7 @@ function fail(message) {
 }
 
 try {
-  const res = await fetch('../data/museums.json')
+  const res = await fetch(DATA + 'museums.json')
   if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
   state.museums = (await res.json())
     .filter((m) => typeof m.lat === 'number' && typeof m.lng === 'number')

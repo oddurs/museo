@@ -3,6 +3,15 @@
 
 body { display: block; }
 
+/* Shown only on a copy without Whitney (build-site adds it). */
+.spec-notice {
+  max-width: 1120px;
+  margin: var(--space-5) auto 0;
+  padding: var(--space-3) var(--space-6);
+  color: var(--primary-ink);
+  border-left: var(--stroke-marker) solid var(--primary);
+}
+
 .spec-head,
 main,
 .spec-foot { max-width: 1120px; margin: 0 auto; padding-left: var(--space-6); padding-right: var(--space-6); }
