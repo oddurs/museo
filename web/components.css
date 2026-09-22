@@ -6,27 +6,25 @@
 
 /* --------------------------------------------------------------------------
    WORDMARK
-   Whitney Light, uppercase, tracked wider as it gets smaller — the setting
-   opens up rather than holding one value. The weight it gives up is supplied
-   by the keyline above it. The negative margin absorbs the trailing track so
-   the mark still aligns on the gutter.
+   Whitney Bold, uppercase, set tight. Bold is what lets it be small: at 30px
+   it holds the masthead that Light needed 54px to hold, and the furniture
+   around it gets to be light. Tight tracking leaves no trailing gap, so it
+   sits on the gutter without correction.
    -------------------------------------------------------------------------- */
 
 .wordmark {
   font-family: var(--font-display);
-  font-size: 38px;
-  font-weight: 300;
+  font-size: 30px;
+  font-weight: 700;
   line-height: 0.9;
   letter-spacing: var(--track-wordmark);
   text-transform: uppercase;
-  margin-right: calc(-1 * var(--track-wordmark));
 }
 
 .wordmark--imprint {
   font-size: var(--size-body);
   line-height: 1;
   letter-spacing: var(--track-imprint);
-  margin-right: calc(-1 * var(--track-imprint));
 }
 
 /* The deck is the identity's voice — the one line of writing that says what
@@ -41,7 +39,7 @@
 
 .deck em {
   font-style: normal;
-  color: var(--primary-deep);
+  color: var(--primary-ink);
 }
 
 /* --------------------------------------------------------------------------
@@ -131,7 +129,7 @@
 
 /* A museum whose website has gone says so, rather than offering a dead link. */
 .entry__link--none { color: var(--ink-tertiary); font-style: italic; }
-.entry__link:hover { color: var(--primary-deep); border-bottom-color: var(--primary); }
+.entry__link:hover { color: var(--primary-ink); border-bottom-color: var(--primary); }
 
 /* Classification stack, flush right: borough on the name's baseline,
    discipline beneath it one step quieter. */

@@ -42,8 +42,8 @@
           <div class="demo__label">
             <span class="t-label">Mark</span>
             <p class="t-small u-quiet">
-              Whitney Semibold, which holds its counters where Light would close up. The
-              cap sits on an optical centre, not a mathematical one. Reverse it on a dark
+              Whitney Bold — the wordmark's own weight — which holds its counters at 16px.
+              The cap sits on an optical centre, not a mathematical one. Reverse it on a dark
               or busy ground; never on another color.
             </p>
           </div>
@@ -62,20 +62,20 @@
           <div class="demo__label">
             <span class="t-label">Wordmark</span>
             <p class="t-small u-quiet">
-              Whitney Light, uppercase, and tracked wider as it gets smaller — the setting
-              opens up rather than holding one value. The weight it gives up is supplied
-              by the keyline above it.
+              Whitney Bold, uppercase, set tight. Bold is what lets it be small: at 30px it
+              holds a masthead that Light needed 54px to hold, so the furniture around it
+              gets to be light.
             </p>
           </div>
           <div class="demo__stage">
             <div class="lockups">
               <div>
                 <p class="wordmark">Museo</p>
-                <p class="t-label u-quiet">Masthead &middot; 38px &middot; tracking 0.17em</p>
+                <p class="t-label u-quiet">Masthead &middot; 30px &middot; tracking &minus;0.02em</p>
               </div>
               <div>
                 <p class="wordmark wordmark--imprint">Museo</p>
-                <p class="t-label u-quiet">Imprint &middot; 15px &middot; tracking 0.22em</p>
+                <p class="t-label u-quiet">Imprint &middot; 15px &middot; tracking &minus;0.01em</p>
               </div>
             </div>
           </div>
@@ -104,7 +104,7 @@
               <li>Do not set the wordmark in another face, or in another weight of Whitney.</li>
               <li>Do not letterspace it by eye — the two values are tokens.</li>
               <li>Do not put the mark and the wordmark in a lockup. They do separate jobs: the mark is for a tab or an app icon, the wordmark for a page.</li>
-              <li>Do not add a second color. Cinnabar is the identity; anything else is decoration.</li>
+              <li>Do not add a second color. Vermilion is the identity; anything else is decoration.</li>
             </ul>
           </div>
         </div>
@@ -125,9 +125,9 @@
           <li>
             <span class="t-label">Two</span>
             <p class="t-body">
-              <b>One color, and it must earn its place.</b> Cinnabar marks the exhibition
-              bar, the current selection, the pins and focus — the things you act on.
-              It is never decoration, and there is never a second accent.
+              <b>One color, and it must earn its place.</b> Vermilion marks the keyline,
+              the current selection, the pins and focus — the things you act on. It is never
+              decoration, and there is never a second accent.
             </p>
           </li>
           <li>
@@ -159,10 +159,9 @@
       <section class="spec">
         <h2 class="spec__title t-title"><span class="spec__num">03</span> The neutral ramp</h2>
         <p class="spec__lede t-body">
-          Warm, not gray — every step carries the same red-over-blue bias as the paper, so
-          nothing reads as cold against it. Ratios are measured against
-          <code>--paper</code> in the browser. The 4.5:1 line falls between 400 and 500,
-          and that is the hard floor for text.
+          Neutral and barely cool. The warm ramp this replaced read as parchment and dated
+          the whole page. Ratios are measured against <code>--paper</code> in the browser. The
+          4.5:1 line falls between 400 and 500, and that is the hard floor for text.
         </p>
         <ol class="ramp" id="ramp"></ol>
       </section>
@@ -170,9 +169,10 @@
       <section class="spec">
         <h2 class="spec__title t-title"><span class="spec__num">04</span> The primary</h2>
         <p class="spec__lede t-body">
-          Cinnabar. One hue, four values, used only where something is live: the bar, the
-          selection, the pins, focus, and the underline beneath a link you are about to
-          follow.
+          Vermilion. One hue, in two values for two jobs. <code>--primary</code> is 3.57:1 on
+          paper — enough to draw with, not enough to read at 11px — so the pins, keyline and
+          markers use it, and anything <em>set</em> in the accent uses <code>--primary-ink</code>
+          at 4.96:1. Marks draw; text speaks.
         </p>
         <ol class="ramp ramp--primary" id="primary"></ol>
       </section>

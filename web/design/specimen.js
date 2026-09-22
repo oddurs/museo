@@ -73,8 +73,8 @@ document.getElementById('ramp').append(
 /* ---------- 03 primary ---------- */
 
 document.getElementById('primary').append(
-  swatch('--primary', 'Primary', 'The bar, selection, pins, focus'),
-  swatch('--primary-deep', 'Deep', 'Hover, and the primary as text'),
+  swatch('--primary', 'Primary', 'Pins, keyline, markers, focus — draws, never text'),
+  swatch('--primary-ink', 'Ink', 'The accent as text, at any size'),
   swatch('--primary-line', 'Line', 'Keylines and link underlines'),
   swatch('--primary-wash', 'Wash', 'The selected row’s bed'),
 )

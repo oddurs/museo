@@ -6,7 +6,7 @@
     <meta name="color-scheme" content="light" />
     <title>Museo — New York City Museums</title>
     <meta name="description" content="An index of every museum in the five boroughs of New York City — art, history, science and the specific." />
-    <meta name="theme-color" content="#c0361b" />
+    <meta name="theme-color" content="#ff3b00" />
     <link rel="icon" href="mark.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="mark.svg" />
 
@@ -25,24 +25,6 @@
   </head>
 
   <body class="is-loading">
-    <!-- The basemap's colour, rebalanced per channel. CSS saturate() treats
-         every hue alike, which left OpenStreetMap's motorway network a dusty
-         pink in the same family as the pins. This matrix keeps most of the
-         blue, a little of the green and almost none of the red, so roads go
-         neutral, water stays water, parks stay parks — and cinnabar is the
-         only warm thing on the page. Values from
-         out = luminance + k·(channel − luminance), k = 0.10 / 0.26 / 0.60. -->
-    <svg class="svg-defs" aria-hidden="true" focusable="false" width="0" height="0">
-      <filter id="basemap" color-interpolation-filters="sRGB">
-        <feColorMatrix
-          type="matrix"
-          values="0.2913 0.6437 0.0650 0 0
-                  0.1573 0.7892 0.0534 0 0
-                  0.0850 0.2861 0.6289 0 0
-                  0      0      0      1 0" />
-      </filter>
-    </svg>
-
     <div class="bar" role="presentation"></div>
 
     <header class="masthead">
@@ -91,11 +73,6 @@
         <div class="filter-set__items" id="category-filters" role="group" aria-label="Filter by discipline"></div>
       </div>
 
-      <div class="filter-set">
-        <span class="t-label filter-set__name">Order</span>
-        <div class="filter-set__items" id="sort-options" role="radiogroup" aria-label="Order the index"></div>
-      </div>
-
       <div class="filter-set filter-set--end">
         <button type="button" class="toggle" id="viewport-only" aria-pressed="false">
           On map only
@@ -109,10 +86,13 @@
       <p class="notice t-small" id="notice" hidden></p>
 
       <section class="index" aria-label="Museum index">
-        <div class="index__head" aria-hidden="true">
-          <span class="t-label">N&#186;</span>
-          <span class="t-label">Museum</span>
-          <span class="t-label" id="head-class">Borough</span>
+        <div class="index__head">
+          <span class="t-label" aria-hidden="true">N&#186;</span>
+          <span class="t-label" aria-hidden="true">Museum</span>
+          <div class="index__order">
+            <span class="t-label index__order-name" aria-hidden="true">Order</span>
+            <div class="index__order-items" id="sort-options" role="radiogroup" aria-label="Order the index"></div>
+          </div>
         </div>
         <div class="index__scroll" id="scroll">
           <ol class="index__list" id="list"></ol>

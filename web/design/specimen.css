@@ -56,7 +56,7 @@ code {
 .swatch__meta { display: flex; justify-content: space-between; gap: var(--space-2); margin-top: var(--space-1); }
 .swatch__hex { color: var(--ink-tertiary); font-feature-settings: var(--figures-tabular); }
 .swatch__ratio { color: var(--ink-tertiary); font-feature-settings: var(--figures-tabular); }
-.swatch__ratio.is-text { color: var(--primary-deep); font-weight: 500; }
+.swatch__ratio.is-text { color: var(--primary-ink); font-weight: 500; }
 .swatch__role { margin-top: var(--space-1); }
 
 /* 04 families */
@@ -103,7 +103,7 @@ code {
   align-items: start;
 }
 .feature:first-child { border-top: 0; padding-top: 0; }
-.feature__tag { display: block; margin-top: var(--space-1); color: var(--primary-deep); }
+.feature__tag { display: block; margin-top: var(--space-1); color: var(--primary-ink); }
 .feature__meta p { margin-top: var(--space-2); }
 
 .feature__pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-5); }

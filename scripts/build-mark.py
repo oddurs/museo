@@ -20,10 +20,10 @@ from fontTools.ttLib import TTFont
 DEFAULT_SRC = pathlib.Path.home() / "Fonts" / "Master Library"
 OUT = pathlib.Path(__file__).resolve().parent.parent / "web"
 
-FACE = "Whitney-Semibld-ProGkCy.otf"   # holds its counters at 16px
+FACE = "Whitney-Bold-ProGkCy.otf"      # the wordmark's own weight, and it holds at 16px
 LETTER = "M"
-PAPER = "#fbf9f5"
-PRIMARY = "#c0361b"
+PAPER = "#ffffff"
+PRIMARY = "#ff3b00"
 
 # The letter sits on an optical centre, not a mathematical one: caps read low
 # in a square, so the cap-height box is centred and then nudged up a touch.

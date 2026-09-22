@@ -1,8 +1,8 @@
 # Museo
 
 A browsable directory of museums across all five boroughs of New York City.
-A typographic exhibition set in Whitney — warm paper, a twelve-step neutral
-ramp, one primary color — built on a documented design system.
+Set in Whitney on white, with one accent — vermilion — and the city drawn from
+its own coastline rather than tiled. Built on a documented design system.
 Static HTML/CSS/JS, no build step, no dependencies to install.
 
 ```
@@ -21,9 +21,10 @@ npm run geocode # fill in coordinates for any new entries
 ## What's here
 
 - **107 museums** — Manhattan 58, Brooklyn 16, Queens 15, Bronx 8, Staten Island 10.
-- **Map** (Leaflet + OpenStreetMap), desaturated and warmed to the paper's
-  temperature so it joins the system. Clicking a pin scrolls the index to that
-  museum; clicking an entry flies the map to the pin.
+- **Map** — the five boroughs drawn from NYC Planning's coastline, with
+  OpenStreetMap streets fading in only once you zoom to neighbourhood level.
+  Clicking a pin centres that museum in the index; clicking an entry brings its
+  pin into view.
 - **Filters** — borough, category, and full-text search over name, neighborhood and
   address. Filters combine, and search terms are matched independently
   ("children brooklyn" works).
@@ -43,6 +44,7 @@ npm run geocode # fill in coordinates for any new entries
 
 ```
 data/museums.json       the dataset (hand-curated, machine-geocoded)
+data/boroughs.json      the five boroughs' coastline, simplified to 44KB
 web/index.html          the app
 web/app.js              behaviour
 web/system.css          design system — tokens, primitives, elements

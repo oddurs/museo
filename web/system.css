@@ -15,32 +15,26 @@
 
 :root {
   /* 1.1 Neutral ramp
-     Warm, not gray — every step holds the same red-over-blue bias as the paper,
-     so nothing in the interface reads as cold against it. Twelve steps because
-     hairlines, marks and text each need their own, and borrowing one step for
-     two jobs is what makes an interface look approximate.
-
-     Ratios are measured against --paper. The 4.5:1 line falls between 400 and
-     500, and that is the hard floor for text: --gray-500 is the lightest value
-     allowed to carry a word. Everything above it draws, it does not speak. */
-  --gray-000: #fbf9f5;  /*  1.00:1  paper */
-  --gray-050: #f5f2eb;  /*  1.06:1  sunk — hover beds */
-  --gray-100: #ede8df;  /*  1.16:1  wash — inset panels */
-  --gray-150: #e3dcd0;  /*  1.30:1  hairline, light */
-  --gray-200: #d6cebf;  /*  1.49:1  hairline, standard */
-  --gray-300: #bcb2a0;  /*  1.99:1  hairline, strong */
-  --gray-400: #9e9482;  /*  2.85:1  the boundary step — the last value before
-                             text becomes legal. Draw-only; no alias, because no
-                             component currently plays that role. */
-  --gray-500: #7b7260;  /*  4.52:1  metadata — lightest text allowed */
-  --gray-600: #645c4c;  /*  6.29:1  supporting text */
-  --gray-700: #4a4335;  /*  9.31:1  secondary text */
-  --gray-800: #312c22;  /* 13.19:1  strong text */
-  --gray-900: #1c1810;  /* 16.82:1  ink — primary text, structural edges */
+     Neutral, barely cool — the warm ramp read as parchment and dated the whole
+     page. Twelve steps because hairlines, marks and text each need their own.
+     Ratios are against --paper. The 4.5:1 line falls between 400 and 500, and
+     that is the hard floor for text: --gray-500 is the lightest value allowed
+     to carry a word. Everything above it draws, it does not speak. */
+  --gray-000: #ffffff;  /*  1.00:1  paper */
+  --gray-050: #f7f7f6;  /*  1.07:1  sunk — hover beds */
+  --gray-100: #f0f0ee;  /*  1.14:1  wash — the drawn city */
+  --gray-150: #e7e7e4;  /*  1.24:1  hairline, light */
+  --gray-200: #dcdcd9;  /*  1.37:1  hairline, standard — the coastline */
+  --gray-300: #c4c4c0;  /*  1.75:1  hairline, strong */
+  --gray-400: #a3a39e;  /*  2.53:1  the boundary step — draw only */
+  --gray-500: #767672;  /*  4.56:1  metadata — lightest text allowed */
+  --gray-600: #5c5c58;  /*  6.72:1  supporting text */
+  --gray-700: #434340;  /*  9.93:1  secondary text */
+  --gray-800: #2a2a28;  /* 14.38:1  strong text */
+  --gray-900: #111111;  /* 18.88:1  ink — primary text, structural edges */
 
   /* 1.2 Semantic aliases
-     Components reference these, never the ramp directly, so the ramp can be
-     retuned in one place. */
+     Components reference these, never the ramp directly. */
   --paper:         var(--gray-000);
   --paper-sunk:    var(--gray-050);
   --paper-wash:    var(--gray-100);
@@ -52,14 +46,19 @@
   --ink-muted:     var(--gray-700);
   --ink:           var(--gray-900);
 
-  /* 1.3 Primary — cinnabar
-     One hue, and it earns its place each time: the exhibition bar, the current
-     selection, the pins on the map, and focus. It is never decoration, and a
-     second accent color is never added. At 5.28:1 it may carry text. */
-  --primary:      #c0361b;  /* 5.28:1 on paper */
-  --primary-deep: #8e2812;  /* 8.11:1 — hover, and text at small sizes */
-  --primary-line: #e7c6b9;  /* keylines and rules in the primary hue */
-  --primary-wash: #f7eae4;  /* 1.12:1 — the selected row's bed */
+  /* 1.3 Primary — vermilion
+     One hue, and it earns its place each time: the keyline, the current
+     selection, the pins on the map, focus. Never decoration, and never a
+     second accent.
+
+     It comes in two values, and the reason is measured rather than aesthetic.
+     --primary is 3.57:1 on paper: enough to draw with, not enough to read at
+     11px. Anything set in the accent therefore uses --primary-ink (4.96:1).
+     Marks draw, text speaks, and they are not the same job. */
+  --primary:      #ff3b00;  /* 3.57:1 — pins, keyline, rules, markers, focus */
+  --primary-ink:  #d62d00;  /* 4.96:1 — the accent as text, at any size */
+  --primary-line: #ffc9b8;  /* keylines and link underlines */
+  --primary-wash: #fff0eb;  /* the selected row's bed */
 
   /* 1.4 Type families
      Three cuts of one typeface, chosen by role, not by taste. Each stack names
@@ -85,9 +84,9 @@
      --size-heading to --size-small is deliberately wider than a modular scale
      would give: a museum's name and its address must never be mistaken for one
      another at a glance. */
-  --size-banner:  72px;  /* the tally figure */
-  --size-display: 48px;
-  --size-title:   30px;
+  --size-banner:  38px;  /* the tally figure — big against 11px caps, not big in itself */
+  --size-display: 40px;
+  --size-title:   28px;
   --size-heading: 21px;  /* museum names — the interface's reading size */
   --size-body:    15px;
   --size-small:   13px;  /* addresses, secondary lines */
@@ -107,8 +106,8 @@
   --track-heading: -0.018em;
   --track-normal:  0;
   --track-smallcap: 0.09em;
-  --track-wordmark: 0.17em;  /* the wordmark at masthead size */
-  --track-imprint:  0.22em;  /* and at imprint size — small caps open up */
+  --track-wordmark: -0.02em;  /* Bold and tight: the wordmark holds at 30px */
+  --track-imprint:  -0.01em;
 
   /* 1.9 Space — 4px base. Only these steps. */
   --space-1: 4px;
@@ -315,7 +314,7 @@ img, svg { display: block; max-width: 100%; }
   transition: border-color var(--duration) var(--easing),
               color var(--duration) var(--easing);
 }
-.link:hover { color: var(--primary-deep); border-bottom-color: var(--primary); }
+.link:hover { color: var(--primary-ink); border-bottom-color: var(--primary); }
 
 /* 4.3 Toggle — the one interactive control. States selection with a rule
    beneath it in the primary, never a fill and never a pill. */
@@ -340,7 +339,7 @@ img, svg { display: block; max-width: 100%; }
    radio semantics. Both wear the same rule. */
 .toggle[aria-pressed="true"],
 .toggle[aria-checked="true"] {
-  color: var(--primary-deep);
+  color: var(--primary-ink);
   border-bottom-color: var(--primary);
 }
 
@@ -359,7 +358,7 @@ img, svg { display: block; max-width: 100%; }
 .field {
   width: 100%;
   font-family: var(--font-display);
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 300;
   line-height: var(--leading-snug);
   letter-spacing: var(--track-heading);

@@ -30,8 +30,8 @@ body { display: flex; flex-direction: column; overflow: hidden; }
   align-items: flex-end;
   justify-content: space-between;
   gap: var(--space-6);
-  padding: var(--space-5) var(--gutter) var(--space-2);
-  padding-top: calc(var(--space-5) + env(safe-area-inset-top, 0px));
+  padding: var(--space-4) var(--gutter) var(--space-2);
+  padding-top: calc(var(--space-4) + env(safe-area-inset-top, 0px));
   flex: none;
 }
 
@@ -54,7 +54,7 @@ body { display: flex; flex-direction: column; overflow: hidden; }
   bottom: var(--space-3);
   color: var(--ink-tertiary);
 }
-.field-clear:hover { color: var(--primary-deep); }
+.field-clear:hover { color: var(--primary-ink); }
 
 .filters {
   display: flex;
@@ -91,7 +91,7 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 
 /* Reset is an action, not a selection, so it never takes the rule. */
 .toggle--plain { border-bottom-color: transparent !important; }
-.toggle--plain:hover { color: var(--primary-deep); }
+.toggle--plain:hover { color: var(--primary-ink); }
 
 /* A facet that would return nothing says so instead of looking available. */
 .toggle.is-empty {
@@ -105,7 +105,7 @@ body { display: flex; flex-direction: column; overflow: hidden; }
    a declined permission, or a location far from the city. */
 .notice {
   padding: 0 var(--gutter) var(--space-3);
-  color: var(--primary-deep);
+  color: var(--primary-ink);
   flex: none;
 }
 
@@ -142,12 +142,24 @@ body { display: flex; flex-direction: column; overflow: hidden; }
   padding-left: calc(var(--gutter) - var(--stroke-marker));
   border-left: var(--stroke-marker) solid transparent;
   color: var(--ink-tertiary);
+  align-items: baseline;   /* labels and the order's toggles share one line */
   flex: none;
 }
 
-.index__head span:first-child { text-align: right; }
+.index__head > span:first-child { text-align: right; }
 
-.index__head span:last-child { text-align: right; }
+/* The order lives on the list it orders, flush right where the column heads
+   end — which is what let the filter bar above return to a single line. */
+.index__order {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+.index__order-name { color: var(--ink-tertiary); }
+.index__order-items { display: flex; align-items: baseline; gap: var(--space-4); }
+
+
 
 /* One scroll region holding the rows, the empty message and the imprint, so
    reaching the end of the index reaches the end of the publication. */
@@ -192,7 +204,7 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 }
 
 /* A dead end always offers the way out of it. */
-.empty__reset { color: var(--primary-deep); }
+.empty__reset { color: var(--primary-ink); }
 
 /* Until the index arrives there is nothing to read, so nothing is shown —
    no skeleton pretending to be content. */
@@ -238,34 +250,28 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 
 /* --------------------------------------------------------------------------
    MAP
-   The basemap is desaturated and warmed to the paper's temperature, so it
-   reads as part of the system rather than a window cut through it. Pins are
-   the primary: 107 cinnabar dots on warm gray is the whole picture.
+   The city is drawn from its own coastline rather than tiled: pale land on
+   paper water, a hairline shore, and 107 vermilion pins. Streets appear only
+   once you are close enough to need them.
    -------------------------------------------------------------------------- */
 
 .map-pane { position: relative; min-height: 0; }
 
-#map { position: absolute; inset: 0; background: var(--paper-sunk); }
+/* The paper is the water. */
+#map { position: absolute; inset: 0; background: var(--paper); }
 
-.leaflet-container { font-family: var(--font-text); background: var(--paper-sunk); }
+.leaflet-container { font-family: var(--font-text); background: var(--paper); }
 
 /* Leaflet colors its own links (#0078A8). Nothing here carries a stray hue. */
 .leaflet-container a { color: inherit; }
 
-/* Not desaturated to nothing. Fully grey, the Hudson read exactly like the
-   city either side of it — a map that cannot tell water from land. A trace of
-   the basemap's own colour survives, warmed toward the paper and pulled well
-   below the pins: water is water, parks are parks, and cinnabar still owns the
-   page. Chosen by rendering six treatments of the same view side by side. */
+/* Streets only ever arrive as linework over the drawn land: greyed, lifted,
+   and multiplied, so OpenStreetMap's own fills fall away to paper and only its
+   roads and buildings remain. Opacity is set from the zoom in app.js. */
 .leaflet-tile-pane {
-  filter: url(#basemap) sepia(0.12) brightness(1.06) contrast(0.84);
-  opacity: 0.96;
+  filter: grayscale(1) brightness(1.08) contrast(1.12);
+  mix-blend-mode: multiply;
 }
-
-/* The filter definition itself takes no space. Named svg-defs, not filters:
-   `.filters` is the control bar, and giving both the same class collapsed the
-   bar into a 64px box in the corner of the masthead. */
-.svg-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
 
 .leaflet-control-zoom {
   border: var(--hairline) !important;
@@ -283,7 +289,7 @@ body { display: flex; flex-direction: column; overflow: hidden; }
   border-bottom: var(--hairline-light) !important;
 }
 .leaflet-control-zoom a:last-child { border-bottom: 0 !important; }
-.leaflet-control-zoom a:hover { background: var(--primary-wash) !important; color: var(--primary-deep) !important; }
+.leaflet-control-zoom a:hover { background: var(--primary-wash) !important; color: var(--primary-ink) !important; }
 
 .leaflet-popup-content-wrapper {
   background: var(--paper);
@@ -337,8 +343,7 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 
 @media (max-width: 1100px) {
   :root { --gutter: var(--space-5); --index-min: 340px; }
-  .wordmark { font-size: 32px; }
-  .tally-block__figure { font-size: var(--size-display); }
+  .wordmark { font-size: 28px; }
 }
 
 @media (max-width: 900px) {
@@ -358,11 +363,11 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 
   .wordmark { font-size: 24px; }
   .deck { margin-top: var(--space-2); }
-  .tally-block__figure { font-size: 34px; }
+  .tally-block__figure { font-size: 30px; }
   .tally-block__no { padding-top: var(--space-1); }
 
   .search-bar { padding-top: var(--space-4); }
-  .field { font-size: 19px; }
+  .field { font-size: 18px; }
 
   .filters {
     gap: var(--space-3) var(--space-5);
@@ -396,6 +401,33 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 }
 
 @media (max-width: 620px) {
+  /* Each facet is one line that scrolls sideways rather than wrapping into a
+     block: five lines of controls above the map on a phone was furniture
+     outweighing the thing it serves. The cut-off last option says there is
+     more. */
+  .filters { flex-direction: column; align-items: stretch; gap: var(--space-2); }
+  .filter-set { min-width: 0; width: 100%; }
+  .filter-set__items {
+    /* a flex child will not shrink below its content unless told it may, and
+       without that the row overflows the page instead of scrolling itself */
+    min-width: 0;
+    flex: 1 1 auto;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    padding-bottom: var(--space-1);
+  }
+  .filter-set__items::-webkit-scrollbar { display: none; }
+  /* Soft edges, so an option cut by the scroll reads as "more this way" rather
+     than as a word broken against its label. Mask alpha only — the keyword
+     carries no colour. */
+  .filter-set__items {
+    mask-image: linear-gradient(to right, transparent, black var(--space-3),
+                                black calc(100% - var(--space-6)), transparent);
+  }
+  .filter-set__items .toggle { flex: none; }
+
   /* Two columns. The classification stack unwraps into a row beneath the entry
      body rather than being squeezed off the edge. */
   .entry { grid-template-columns: var(--number-col) 1fr; column-gap: var(--space-4); }
@@ -413,5 +445,6 @@ body { display: flex; flex-direction: column; overflow: hidden; }
   .deck { display: none; }
 
   .index__head { grid-template-columns: var(--number-col) 1fr; column-gap: var(--space-4); }
-  .index__head span:last-child { display: none; }
+  /* On a phone the order drops to its own line under the column heads. */
+  .index__order { grid-column: 1 / -1; justify-content: flex-start; margin-top: var(--space-2); }
 }

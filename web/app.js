@@ -1,8 +1,17 @@
 const BOROUGHS = ['Manhattan', 'Brooklyn', 'Queens', 'Bronx', 'Staten Island']
 
-const PRIMARY = '#c0361b'
-const INK = '#1c1810'
-const PAPER = '#fbf9f5'
+const PRIMARY = '#ff3b00'
+const INK = '#111111'
+const PAPER = '#ffffff'
+const LAND = '#f0f0ee'
+const COAST = '#dcdcd9'
+
+// Streets arrive only where you need them to find a door: invisible at city
+// scale, where the drawn silhouette is the map, and faded up over a zoom and a
+// half once you are looking at a neighbourhood.
+const STREETS_FROM = 13
+const STREETS_FULL = 14.5
+const STREETS_MAX_OPACITY = 0.55
 
 // Every pin carries a paper ring. Without it, museums a block apart fuse into
 // one lump — in midtown that was most of them — and the map stopped reporting
@@ -41,7 +50,6 @@ const els = {
   list: document.getElementById('list'),
   scroll: document.getElementById('scroll'),
   colophonCount: document.getElementById('colophon-count'),
-  headClass: document.getElementById('head-class'),
   empty: document.getElementById('empty'),
   search: document.getElementById('search'),
   boroughFilters: document.getElementById('borough-filters'),
@@ -262,9 +270,6 @@ function renderIndex() {
     }),
   )
 
-  // Grouped by borough, that column holds the discipline instead.
-  els.headClass.textContent = grouped ? 'Discipline' : 'Borough'
-
   els.empty.hidden = state.rows.length > 0
   els.count.textContent = state.rows.length
   els.countLabel.textContent =
@@ -447,12 +452,39 @@ function initMap() {
     renderer: L.canvas({ padding: 0.6 }),
   }).setView([40.7128, -73.96], 11)
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  // The city is drawn, not tiled: borough coastline from NYC Planning,
+  // simplified to 44KB, in its own pane beneath the street tiles so streets —
+  // when they appear — read as linework laid over the land.
+  map.createPane('land')
+  map.getPane('land').style.zIndex = 150
+
+  fetch('../data/boroughs.json')
+    .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+    .then((geo) => {
+      L.geoJSON(geo, {
+        pane: 'land',
+        interactive: false,
+        style: { fillColor: LAND, fillOpacity: 1, color: COAST, weight: 1, lineJoin: 'round' },
+      }).addTo(map)
+    })
+    .catch((err) => console.warn('museo: borough outlines unavailable', err))
+
+  const streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
-    keepBuffer: 4,            // hold tiles either side, so panning has no white edge
-    updateWhenZooming: false, // one tile update at the end of a zoom, not every frame
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    opacity: 0,
+    keepBuffer: 4,
+    updateWhenZooming: false,
+    attribution:
+      'Boroughs: NYC Planning · Streets: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   }).addTo(map)
+
+  const streetOpacity = () => {
+    const z = map.getZoom()
+    const t = Math.min(1, Math.max(0, (z - STREETS_FROM) / (STREETS_FULL - STREETS_FROM)))
+    streets.setOpacity(t * STREETS_MAX_OPACITY)
+  }
+  map.on('zoomend', streetOpacity)
+  streetOpacity()
 
   halo = L.circleMarker([0, 0], { ...HALO })
 

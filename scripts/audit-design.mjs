@@ -44,12 +44,19 @@ for (const file of LAYERS) {
     const exempt = line.match(EXEMPT)
     if (exempt) exemptions.push(`${at} — ${exempt[1].trim()}`)
 
-    const decl = line.match(/^\s*([a-z-]+)\s*:\s*([^;]+);/)
-    if (!decl) return
-    const [, prop, rawValue] = decl
-    const value = rawValue.replace(EXEMPT, '').trim()
     if (exempt) return
 
+    // Every declaration on the line, not only one that opens it: a one-line
+    // rule such as `.link:hover { color: …; }` used to escape every check.
+    const body = line.replace(/\/\*.*?\*\//g, '').replace(/^[^{]*\{/, '')
+    for (const decl of body.matchAll(/([a-z-]+)\s*:\s*([^;{}]+);/g)) {
+      checkDeclaration(at, decl[1], decl[2].trim())
+    }
+  })
+}
+
+function checkDeclaration(at, prop, value) {
+  {
     // 1. raw colors outside the system layer
     const hex = value.match(/#[0-9a-fA-F]{3,8}/)
     if (hex) problems.push(`${at}  raw color ${hex[0]} in "${prop}" — use a token`)
@@ -80,8 +87,16 @@ for (const file of LAYERS) {
         problems.push(`${at}  unknown token ${ref[1]}`)
       }
     }
-  })
+  }
 }
+
+/* The system layer defines the raw values, so only its references are checked:
+   a token it names must exist too. */
+system.split('\n').forEach((line, i) => {
+  for (const ref of line.matchAll(/var\((--[\w-]+)/g)) {
+    if (!defined.has(ref[1])) problems.push(`${SYSTEM}:${i + 1}  unknown token ${ref[1]}`)
+  }
+})
 
 /* ---------- the index's columns must share one grid ---------- */
 

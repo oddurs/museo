@@ -1,7 +1,8 @@
 # Museo — Design System
 
-A typographic exhibition set in Whitney. Warm paper, a twelve-step neutral ramp,
-and one primary color. Light mode only.
+A typographic index set in Whitney. White paper, true black, a twelve-step
+neutral ramp, and one primary — vermilion. The city is drawn, not tiled. Light
+mode only.
 
 The system lives in three files, loaded in this order:
 
@@ -29,24 +30,26 @@ because it is the same outline the wordmark is set in.
 
 | Piece | What it is | Where it goes |
 | --- | --- | --- |
-| **Mark** | Whitney Semibold `M`, paper on cinnabar, cap on an optical centre | Browser tab, app icon, the colophon. 16px minimum |
-| **Wordmark** | Whitney Light, uppercase, `--track-wordmark` (0.17em) | The masthead |
-| **Wordmark, imprint** | The same, at body size and `--track-imprint` (0.22em) | The colophon |
-| **Keyline** | 3px cinnabar across the full width | The top of every page |
+| **Mark** | Whitney Bold `M`, paper on vermilion, cap on an optical centre | Browser tab, app icon, the colophon. 16px minimum |
+| **Wordmark** | Whitney Bold, uppercase, 30px, `--track-wordmark` (−0.02em) | The masthead |
+| **Wordmark, imprint** | The same, at body size and `--track-imprint` (−0.01em) | The colophon |
+| **Keyline** | 3px vermilion across the full width | The top of every page |
 | **Deck** | One line saying what this is | Under the wordmark |
 
-The wordmark is tracked **wider as it gets smaller** — the setting opens up
-rather than holding one value, which is why there are two tokens rather than
-one. Both are `text-transform: uppercase` on mixed-case source, so the word
-stays "Museo" to a screen reader and to anyone copying it.
+The wordmark is **Bold and small**. The previous identity set it in Light at 38px,
+tracked wide; the first draft of this one set it Bold at 54px. Both made the
+masthead the heaviest furniture on the page. Bold is what allows 30px: the
+weight holds the masthead that size alone would otherwise have to, and
+everything around it gets to be light. Set uppercase from mixed-case source, so
+the word stays "Museo" to a screen reader and to anyone copying it.
 
 Clear space is the wordmark's own cap height on every side. Minimum mark size
-is 16px, which is where Semibold's counters still hold.
+is 16px, which is where Bold's counters still hold.
 
 **Not this:** the wordmark in another face or another weight; tracking set by
 eye instead of from the tokens; the mark and wordmark locked up together (they
 do separate jobs — the mark is for a tab, the wordmark for a page); a second
-color, since cinnabar *is* the identity and anything else is decoration.
+color, since vermilion *is* the identity and anything else is decoration.
 
 ### The colophon
 
@@ -67,7 +70,7 @@ its tab says so.
 **1. Systems before screens.** The ramp, the scale and the figure sets were
 settled and measured before any component was composed.
 
-**2. One color, and it must earn its place.** Cinnabar marks the exhibition bar,
+**2. One color, and it must earn its place.** Vermilion marks the keyline,
 the current selection, the pins and focus — the things you act on. It is never
 decoration, and there is never a second accent.
 
@@ -85,49 +88,47 @@ Nothing moves on selection — weight and color carry it.
 
 ## The neutral ramp
 
-Warm, not gray: every step holds the same red-over-blue bias as the paper, so
-nothing reads as cold against it. Ratios are against `--paper`.
+Neutral and barely cool. The previous ramp was warm — every step biased
+red-over-blue to sit on cream paper — and it read as parchment, dating the whole
+page. Ratios are against `--paper`.
 
 | Token | Value | Ratio | Role |
 | --- | --- | --- | --- |
-| `--gray-000` | `#fbf9f5` | 1.00 | Paper |
-| `--gray-050` | `#f5f2eb` | 1.06 | Sunk — hover beds |
-| `--gray-100` | `#ede8df` | 1.16 | Wash — inset panels |
-| `--gray-150` | `#e3dcd0` | 1.30 | Hairline, light |
-| `--gray-200` | `#d6cebf` | 1.49 | Hairline, standard |
-| `--gray-300` | `#bcb2a0` | 1.99 | Hairline, strong |
-| `--gray-400` | `#9e9482` | 2.85 | Boundary — draw only |
-| `--gray-500` | `#7b7260` | 4.52 | Metadata — **lightest text allowed** |
-| `--gray-600` | `#645c4c` | 6.29 | Supporting text |
-| `--gray-700` | `#4a4335` | 9.31 | Secondary text |
-| `--gray-800` | `#312c22` | 13.19 | Strong text |
-| `--gray-900` | `#1c1810` | 16.82 | Ink — primary text, edges |
+| `--gray-000` | `#ffffff` | 1.00 | Paper — and, on the map, water |
+| `--gray-050` | `#f7f7f6` | 1.07 | Sunk — hover beds |
+| `--gray-100` | `#f0f0ee` | 1.14 | Wash — the drawn city |
+| `--gray-150` | `#e7e7e4` | 1.24 | Hairline, light |
+| `--gray-200` | `#dcdcd9` | 1.37 | Hairline, standard — the coastline |
+| `--gray-300` | `#c4c4c0` | 1.75 | Hairline, strong |
+| `--gray-400` | `#a3a39e` | 2.53 | Boundary — draw only |
+| `--gray-500` | `#767672` | 4.56 | Metadata — **lightest text allowed** |
+| `--gray-600` | `#5c5c58` | 6.72 | Supporting text |
+| `--gray-700` | `#434340` | 9.93 | Secondary text |
+| `--gray-800` | `#2a2a28` | 14.38 | Strong text |
+| `--gray-900` | `#111111` | 18.88 | Ink — primary text, edges |
 
-The 4.5:1 line falls between 400 and 500, and it is a hard floor. `--gray-500`
-was originally `#7e7563` at 4.33:1 — close enough to look fine and not close
-enough to pass, so it was darkened by three values until it did.
-
-`--gray-400` has no semantic alias. It is the last step before text becomes
-legal, kept in the ramp as the boundary marker; an alias naming a role that no
-component plays is noise.
+The 4.5:1 line falls between 400 and 500, and it is a hard floor.
 
 Components reference the **semantic aliases** (`--ink`, `--ink-secondary`,
 `--rule`, `--paper-sunk` …), never the ramp directly, so the ramp can be retuned
-in one place.
+in one place — which is exactly how this rebrand was made without touching a
+component.
 
 ---
 
-## The primary — cinnabar
+## The primary — vermilion
 
 | Token | Value | Ratio | Use |
 | --- | --- | --- | --- |
-| `--primary` | `#c0361b` | 5.28 | The bar, selection, pins, focus |
-| `--primary-deep` | `#8e2812` | 8.11 | Hover, and the primary as small text |
-| `--primary-line` | `#e7c6b9` | 1.52 | Keylines, link underlines |
-| `--primary-wash` | `#f7eae4` | 1.12 | The selected row's bed |
+| `--primary` | `#ff3b00` | 3.57 | Pins, keyline, markers, focus — **draws, never text** |
+| `--primary-ink` | `#d62d00` | 4.96 | The accent as text, at any size |
+| `--primary-line` | `#ffc9b8` | — | Keylines, link underlines |
+| `--primary-wash` | `#fff0eb` | — | The selected row's bed |
 
-Chosen from twelve candidates by contrast: it is the warmest red that still
-clears 4.5:1 on this paper and so may carry text, not only marks.
+Two values, and the reason is measured rather than aesthetic. The vermilion
+that makes the pins sing is 3.57:1 on white — enough to draw with, not enough
+to read at 11px. So anything *set* in the accent uses `--primary-ink`. Marks
+draw; text speaks; they are not the same job.
 
 ---
 
@@ -186,7 +187,7 @@ treatment in small caps, where the counters must stay open.
 | `--track-heading` | `-0.018em` | Museum names, the search field |
 | `--track-normal` | `0` | All running text |
 | `--track-smallcap` | `0.09em` | Small-cap labels |
-| `--track-wordmark` | `0.17em` | The wordmark only, which absorbs the trailing track with a negative margin |
+| `--track-wordmark` | `-0.02em` | The wordmark — Bold, tight, no trailing gap to correct |
 
 ### Fallbacks that don't reflow
 
@@ -349,7 +350,7 @@ the link from assistive technology.
 
 Four states: resting, hovered, **peeked** (its pin is under the cursor on the
 map, shown with a `--primary-line` inset rule, which never steals the current
-selection), and selected — a primary rule at the left edge, a warm bed, the
+selection), and selected — a primary rule at the left edge, a vermilion-washed bed, the
 figure going to the primary, and the name stepping from Book to Medium. Nothing
 moves.
 
@@ -372,7 +373,7 @@ reporting how many things are actually there. A 1.4px ring in `--paper`
 separates them at every zoom.
 
 **Selection is a ring, not a size.** The chosen pin takes an ink fill and a
-separate halo layer draws a cinnabar circle around it, so choosing a museum
+separate halo layer draws a vermilion circle around it, so choosing a museum
 does not make it look like a different *kind* of place. A selection the filters
 have since excluded is cleared rather than left as a halo on empty map with the
 URL still naming it.
@@ -401,31 +402,23 @@ and `--primary` on the link itself.
 
 ## The map
 
-**The basemap's colour is rebalanced per channel, not merely turned down.**
+**The city is drawn, not tiled.** Every earlier version of this map filtered
+OpenStreetMap's raster tiles — desaturated, then warmed, then re-saturated, then
+rebalanced per channel through a colour matrix. Each pass fixed something and
+none made it look designed, because it is half the screen and it was always
+someone else's beige map under a filter.
 
-It was fully desaturated once, which looked disciplined and read badly: the
-Hudson was the same value as the city either side of it, so the map could not
-tell water from land. Turning saturation back up fixed that and introduced a
-worse problem — CSS `saturate()` treats every hue alike, so OpenStreetMap's
-motorway network came back as a dusty pink web in the same family as the pins.
-The map went muddy and the cinnabar stopped separating.
+The map is now the five boroughs' own coastline, from NYC Planning, simplified
+by Douglas–Peucker from 4,009 points to 2,343 and **157KB to 44KB**, drawn in
+`--paper-wash` on paper water with a `--rule` hairline shore. It sits in its own
+pane beneath everything else.
 
-A filter cannot desaturate one hue selectively, but a colour matrix can. The
-basemap now runs through `#basemap`, an `feColorMatrix` built from
-
-```
-out = luminance + k · (channel − luminance)      k = 0.10 / 0.26 / 0.60
-```
-
-Almost none of the red survives, a little of the green, most of the blue: roads
-go neutral, water stays water, parks stay parks, and **cinnabar is the only
-warm thing on the page.** Chosen by rendering ten treatments — four `saturate`
-variants, three matrices and two alternative keyless tile styles — of the same
-view side by side.
-
-It costs nothing: 16.7ms median frame interval idle and while panning, which is
-60fps either way. Leaflet's own link colour and its attribution flag are still
-overridden — nothing else carries a stray hue.
+**Streets arrive only where you need them.** At city scale the silhouette *is*
+the map. From zoom 13 street tiles fade up over a zoom and a half to 55%,
+greyed and multiplied so OpenStreetMap's own fills fall away to paper and only
+its roads and buildings remain — enough to find a door, without the beige. Zoom
+back out and they go again. Measured: 60fps idle and while panning, the
+multiply blend included.
 
 **One movement, landing correctly.** Choosing a museum used to centre its pin
 and then let the popup auto-pan the map a second time. The view is now placed
@@ -445,7 +438,7 @@ Other smoothness settings: continuous zoom (`zoomSnap: 0`) rather than quarter
 steps, a slower wheel, a canvas margin of 0.6 so pins do not pop in at the edge
 of the frame while panning, and `keepBuffer: 4` so panning has no white edge.
 
-Pins are the primary: 107 cinnabar dots on warm gray. The selected pin takes an
+Pins are the primary: 107 vermilion dots on pale land. The selected pin takes an
 ink fill with a wide, low-opacity primary halo.
 
 The cost is worth naming: **boroughs are not color-coded.** One primary means
@@ -483,6 +476,18 @@ its count head each run, and the per-row borough label — which would otherwise
 repeat 58 times under a heading that already says it — comes off the screen
 while staying in the document for assistive technology. The column head follows
 the column: it reads *Discipline* while grouped, because that is what is in it.
+
+**The order lives on the list it orders.** A–Z, by borough and by distance used
+to sit in the filter bar beside the facets. They are not filters — they
+arrange the index, not what is in it — so they moved onto the index's own
+header, flush right. That also returned the filter bar to a single line from
+1440px up, which was most of what made the top of the page feel heavy.
+
+**On a phone each facet is one line that scrolls sideways** rather than wrapping
+into a block. Five lines of controls above the map was the furniture
+outweighing the thing it serves: controls went from about 350px to 134px, and
+the map rose from 634px down the screen to 248px. The rows fade at their edges
+so a cut option reads as *more this way*.
 
 **Three orders, one of them yours.** A–Z, by borough (in the boroughs' own
 order, matching the filter bar), and by distance. Distance asks the browser
@@ -532,6 +537,13 @@ unstyled. Anything shared belongs in `components.css`. The audit enforces this:
 a bare single-class selector at base level may define a component in only one
 layer, while `.colophon .wordmark {}` and rules inside `@media` stay free,
 being contextual and responsive rather than second definitions.
+
+**The audit reads every declaration on a line.** It used to match only lines
+that *opened* with a property, so a one-line rule — `.link:hover { color: …; }`
+— escaped every check it runs: raw colours, off-scale spacing, unknown tokens.
+Renaming one token during this rebrand left thirteen dangling references and
+the audit reported two. It now parses every declaration wherever it sits, and
+checks the tokens `system.css` itself references.
 
 **The audit.** `npm run audit` is a static linter over the composition layers.
 It fails on a raw color, a spacing value off the 4px scale, a border width off
