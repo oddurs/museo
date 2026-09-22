@@ -276,6 +276,7 @@ Borders run on their own scale, not the spacing scale:
 | `--stroke-hairline` | 1px | Every rule and edge |
 | `--stroke-marker` | 2px | Selection markers, toggle underlines |
 | `--stroke-keyline` | 3px | The exhibition bar |
+| `--stroke-focus` | 1.5px | Keyboard focus |
 
 Weight tracks **structural significance** — but it is scaled by *length*, not
 only by what the rule separates. A 1px rule at 16.8:1 is a slab when it runs
@@ -319,7 +320,24 @@ selection, so it never takes the rule.
 
 **Mark** — search hits take a primary underline, not a highlighter.
 
-**Focus** — 2px solid primary, 3px offset, square. Always visible.
+**Focus** — never removed, and never a box. It is drawn the way the rest of the
+system draws: as a rule under the thing, in ink. A toggle's rule slot already
+means *selected* in vermilion, so focus takes the same slot in ink; selected
+and focused at once, the ink runs just beneath the vermilion and both states
+read. A museum's name takes an underline. A link's underline darkens to ink.
+The map, which has no text to underline, gets an inset hairline that stays
+inside its own pane. Leaflet's zoom buttons darken their own square rather
+than gaining a second one.
+
+Ink rather than the accent is also the more accessible choice: 18.9:1 against
+the vermilion's 3.6:1.
+
+**Pointer presses never show focus.** Leaflet focuses the map on every mouse
+press, and Chrome counts that programmatic focus as `:focus-visible` — so the
+first version of this drew a vermilion frame round the whole map every time
+someone clicked or dragged it. `app.js` records whether the last input was a
+pointer or a key, and the map's focus shows only after a key. Tabbing into the
+map still shows it; clicking never does.
 
 ---
 

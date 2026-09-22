@@ -126,6 +126,7 @@
   --stroke-hairline: 1px;  /* every rule and edge */
   --stroke-marker:   2px;  /* selection markers and toggle underlines */
   --stroke-keyline:  3px;  /* the exhibition bar */
+  --stroke-focus:    1.5px;  /* keyboard focus — visible, not a frame */
 
   /* 1.11 The border ladder
      Weight tracks structural significance — but it is scaled by LENGTH, not
@@ -381,8 +382,30 @@ mark {
   box-shadow: inset 0 -0.09em 0 0 var(--primary);
 }
 
-/* 4.6 Focus */
-:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+/* 4.6 Focus
+   Keyboard focus is never removed. It is drawn the way the rest of the system
+   draws: as a rule under the thing, in ink — never a box round it. Ink is also
+   the more accessible choice, 18.9:1 against 3.6:1 for the accent.
+
+   The ring below is only the fallback for anything not given a rule of its
+   own; every control in the app has one. */
+:focus-visible {
+  outline: var(--stroke-focus) solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* A toggle's rule slot already means "selected" in vermilion; focus takes the
+   same slot in ink. Selected and focused at once, the ink runs just beneath
+   the vermilion, so both states read. */
+.toggle:focus-visible { outline: none; border-bottom-color: var(--ink); }
+.toggle[aria-pressed="true"]:focus-visible,
+.toggle[aria-checked="true"]:focus-visible {
+  border-bottom-color: var(--primary);
+  box-shadow: 0 var(--stroke-focus) 0 0 var(--ink);
+}
+
+/* Links carry their underline already; focus darkens it to ink. */
+.link:focus-visible { outline: none; color: var(--ink); border-bottom-color: var(--ink); }
 
 /* 4.7 Screen-reader only */
 .sr-only {

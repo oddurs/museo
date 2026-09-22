@@ -773,6 +773,17 @@ document.addEventListener('keydown', (e) => {
   }
 })
 
+/* --------------------------------------------------------- modality --- */
+
+/* Leaflet focuses its container on every pointer press, and Chrome counts that
+   programmatic focus as :focus-visible — so a mouse user got a ring round the
+   whole map each time they touched it. Record how the last input arrived, and
+   let the stylesheet show the map's focus only after a key. Capture phase, so
+   this runs before Leaflet's own handlers move focus. */
+const setModality = (how) => { document.documentElement.dataset.input = how }
+document.addEventListener('pointerdown', () => setModality('pointer'), true)
+document.addEventListener('keydown', () => setModality('keyboard'), true)
+
 /* --------------------------------------------------------------- boot --- */
 
 function fail(message) {

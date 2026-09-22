@@ -107,6 +107,16 @@
   padding: 0;
 }
 
+/* A box round a museum's name reads as a frame, and the row already carries
+   its own selection marker. Keyboard focus on a name is an underline — the
+   same device a link uses — which says "here" without drawing a box. */
+.entry__select:focus-visible {
+  outline: none;
+  text-decoration: underline;
+  text-decoration-thickness: var(--stroke-focus);
+  text-underline-offset: 0.18em;
+}
+
 /* Old-style figures put the street number into the line rather than standing
    it up like a heading — the detail that makes an address read as prose. */
 .entry__meta {
@@ -130,6 +140,7 @@
 /* A museum whose website has gone says so, rather than offering a dead link. */
 .entry__link--none { color: var(--ink-tertiary); font-style: italic; }
 .entry__link:hover { color: var(--primary-ink); border-bottom-color: var(--primary); }
+.entry__link:focus-visible { outline: none; color: var(--ink); border-bottom-color: var(--ink); }
 
 /* Classification stack, flush right: borough on the name's baseline,
    discipline beneath it one step quieter. */

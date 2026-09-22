@@ -27,7 +27,7 @@ const read = async (f) => (await readFile(new URL('../' + f, import.meta.url), '
 const system = await read(SYSTEM)
 const defined = new Set([...system.matchAll(/^\s*(--[\w-]+):/gm)].map((m) => m[1]))
 const spaceScale = [...system.matchAll(/--space-(\d+):\s*(\d+)px/g)].map((m) => Number(m[2]))
-const strokeScale = [...system.matchAll(/--stroke-[\w-]+:\s*(\d+)px/g)].map((m) => Number(m[1]))
+const strokeScale = [...system.matchAll(/--stroke-[\w-]+:\s*([\d.]+)px/g)].map((m) => Number(m[1]))
 
 const problems = []
 const exemptions = []
