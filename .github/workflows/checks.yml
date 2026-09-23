@@ -14,5 +14,5 @@ jobs:
           node-version: 24
       - name: Data — schema, coordinates, typography
         run: node scripts/check-data.mjs
-      - name: Design system — spacing, strokes, tokens, one home per component
-        run: node scripts/audit-design.mjs
+      - name: Map — the drawn city still matches the data
+        run: node scripts/check-map.mjs

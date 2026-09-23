@@ -2,18 +2,18 @@
   "name": "museo",
   "version": "0.1.0",
   "private": true,
-  "description": "An index of every museum in the five boroughs of New York City, set in type and drawn on the city’s own coastline.",
+  "description": "An index of every museum in the five boroughs of New York City, on a drawn map of the city after dark.",
   "type": "module",
   "scripts": {
     "start": "node scripts/serve.mjs",
     "site": "node scripts/build-site.mjs",
     "check": "node scripts/check-data.mjs",
-    "audit": "node scripts/audit-design.mjs",
-    "links": "node scripts/check-links.mjs",
-    "geocode": "node scripts/geocode.mjs",
+    "map": "node scripts/check-map.mjs",
+    "city": "node scripts/build-city.mjs",
+    "streets": "node scripts/build-streets.mjs",
     "boroughs": "node scripts/build-boroughs.mjs",
-    "fonts": "python3 scripts/build-fonts.py",
-    "mark": "python3 scripts/build-mark.py"
+    "geocode": "node scripts/geocode.mjs",
+    "links": "node scripts/check-links.mjs"
   },
   "homepage": "https://oddurs.github.io/museo/",
   "repository": {

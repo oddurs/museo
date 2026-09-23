@@ -1,0 +1,125 @@
+#!/usr/bin/env node
+/**
+ * Fetch the NYC street centreline and pack it small enough to inline.
+ *
+ *   npm run streets      NYC Open Data  ->  web/streets-data.js
+ *
+ * Source: NYC Department of Transportation / DoITT "NYC Street Centerline
+ * (CSCL)", dataset inkn-q76z on NYC Open Data, public domain under the NYC
+ * Open Data terms of use. Only rw_type 1, 2 and 3 are taken — the streets
+ * and highways people navigate by, not driveways, ferry routes or paper
+ * streets.
+ *
+ * The geometry is projected into the same 1000x1000 frame as web/city.js
+ * (Web Mercator fitted to data/boroughs.json), simplified with
+ * Douglas-Peucker, then written as delta-encoded varints in a 64-character
+ * alphabet that needs no quoting. Roughly 112,000 polylines land in about
+ * 1.2 MB, which the page decodes after its first paint.
+ *
+ * This takes a few minutes and several requests. The result is committed,
+ * so an ordinary build never needs to run it.
+ */
+
+import { readFile, writeFile } from 'node:fs/promises'
+
+const root = new URL('../', import.meta.url)
+const W = 1000, H = 1000, PAD = 26, Q = 10
+const merc = ([lng, lat]) => [lng, (Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI / 180) / 2)) * 180) / Math.PI]
+
+/* ---------- the same frame the boroughs are drawn in ---------- */
+
+const geo = JSON.parse(await readFile(new URL('data/boroughs.json', root), 'utf8'))
+let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity
+for (const f of geo.features)
+  for (const poly of f.geometry.coordinates)
+    for (const ring of poly)
+      for (const pt of ring) {
+        const [x, y] = merc(pt)
+        if (x < x0) x0 = x; if (x > x1) x1 = x
+        if (y < y0) y0 = y; if (y > y1) y1 = y
+      }
+const s = Math.min((W - PAD * 2) / (x1 - x0), (H - PAD * 2) / (y1 - y0))
+const ox = (W - (x1 - x0) * s) / 2, oy = (H - (y1 - y0) * s) / 2
+const proj = (p) => { const [x, y] = merc(p); return [Math.round(((x - x0) * s + ox) * Q), Math.round(((y1 - y) * s + oy) * Q)] }
+
+/* ---------- Douglas-Peucker ---------- */
+
+const perp = (p, a, b) => {
+  const dx = b[0] - a[0], dy = b[1] - a[1]
+  if (!dx && !dy) return Math.hypot(p[0] - a[0], p[1] - a[1])
+  const t = Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / (dx * dx + dy * dy)))
+  return Math.hypot(p[0] - (a[0] + t * dx), p[1] - (a[1] + t * dy))
+}
+function simp(pts, tol) {
+  if (pts.length < 3) return pts
+  let most = 0, at = 0
+  for (let j = 1; j < pts.length - 1; j++) {
+    const d = perp(pts[j], pts[0], pts[pts.length - 1])
+    if (d > most) { most = d; at = j }
+  }
+  return most <= tol ? [pts[0], pts[pts.length - 1]]
+    : [...simp(pts.slice(0, at + 1), tol).slice(0, -1), ...simp(pts.slice(at), tol)]
+}
+
+/* ---------- fetch ---------- */
+
+const BASE = 'https://data.cityofnewyork.us/resource/inkn-q76z.geojson'
+const WHERE = encodeURIComponent("rw_type in ('1','2','3')")
+const PAGE = 50000
+const lines = [], names = new Map()
+
+for (let off = 0; ; off += PAGE) {
+  const url = `${BASE}?$select=the_geom,rw_type,stname_label&$where=${WHERE}&$limit=${PAGE}&$offset=${off}`
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`NYC Open Data returned HTTP ${res.status} at offset ${off}`)
+  const fc = await res.json()
+  if (!fc.features?.length) break
+  for (const f of fc.features) {
+    if (!f.geometry) continue
+    const parts = f.geometry.type === 'LineString' ? [f.geometry.coordinates] : f.geometry.coordinates
+    const nm = (f.properties.stname_label || '').trim()
+    let ni = -1
+    if (nm) { if (!names.has(nm)) names.set(nm, names.size); ni = names.get(nm) }
+    for (const part of parts) {
+      const pts = simp(part.map(proj), 1.5)
+      if (pts.length >= 2) lines.push({ t: +f.properties.rw_type, n: ni, pts })
+    }
+  }
+  console.log(`  offset ${off}: ${fc.features.length} features, ${lines.length} polylines so far`)
+}
+
+/* ---------- pack ---------- */
+
+// 64 safe characters, five data bits and a continuation bit — no quoting hazards
+const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'
+const zig = (v) => (v << 1) ^ (v >> 31)
+function put(out, v) { do { const c = v & 31; v >>>= 5; out.push(A[v ? c | 32 : c]) } while (v) }
+
+// Sort so neighbours in the file are neighbours on the ground: the first
+// point of each line then encodes as a small delta from the one before.
+const cell = (l) => (Math.floor(l.pts[0][1] / 200) << 10) | Math.floor(l.pts[0][0] / 200)
+lines.sort((a, b) => cell(a) - cell(b) || a.pts[0][1] - b.pts[0][1] || a.pts[0][0] - b.pts[0][0])
+
+const out = []
+let px = 0, py = 0
+for (const l of lines) {
+  put(out, l.n + 1)                          // 0 = unnamed
+  put(out, l.t)
+  put(out, l.pts.length - 1)
+  put(out, zig(l.pts[0][0] - px))
+  put(out, zig(l.pts[0][1] - py))
+  for (let i = 1; i < l.pts.length; i++) {
+    put(out, zig(l.pts[i][0] - l.pts[i - 1][0]))
+    put(out, zig(l.pts[i][1] - l.pts[i - 1][1]))
+  }
+  px = l.pts[0][0]; py = l.pts[0][1]
+}
+
+const d = out.join('')
+const payload = `/* Generated by scripts/build-streets.mjs from NYC Open Data inkn-q76z
+   (NYC Street Centerline, DoITT). Do not edit by hand.
+   ${lines.length} polylines, ${names.size} street names. */
+const ST={n:${JSON.stringify([...names.keys()])},d:${JSON.stringify(d)},q:${Q}};
+`
+await writeFile(new URL('web/streets-data.js', root), payload)
+console.log(`web/streets-data.js — ${lines.length} polylines, ${names.size} names, ${(payload.length / 1024) | 0} KB`)

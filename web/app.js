@@ -1,833 +1,443 @@
-// Where the dataset lives, relative to this page. The one path a deploy moves.
-const DATA = '../data/'
 
-const BOROUGHS = ['Manhattan', 'Brooklyn', 'Queens', 'Bronx', 'Staten Island']
+/* ── state ─────────────────────────────────────────────────────── */
 
-const PRIMARY = '#ff3b00'
-const INK = '#111111'
-const PAPER = '#ffffff'
-const LAND = '#f0f0ee'
-const COAST = '#dcdcd9'
+const BOROUGHS = ['Manhattan', 'Brooklyn', 'Queens', 'Bronx', 'Staten Island'];
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// Streets arrive only where you need them to find a door: invisible at city
-// scale, where the drawn silhouette is the map, and faded up over a zoom and a
-// half once you are looking at a neighbourhood.
-const STREETS_FROM = 13
-const STREETS_FULL = 14.5
-const STREETS_MAX_OPACITY = 0.55
+const el = (id) => document.getElementById(id);
+const svg = el('map'), scene = el('scene'), pinsG = el('pins');
+const cv = el('base'), ctx = cv.getContext('2d');
+const listEl = el('list'), qEl = el('q'), segs = el('segs'), thumb = el('thumb');
+const card = el('card');
 
-// Every pin carries a paper ring. Without it, museums a block apart fuse into
-// one lump — in midtown that was most of them — and the map stopped reporting
-// how many things are actually there.
-const PIN = { radius: 3.6, weight: 1.4, color: PAPER, fillColor: PRIMARY, fillOpacity: 1, opacity: 1 }
-const PIN_HOVER = { radius: 5, weight: 1.6, color: PAPER, fillColor: PRIMARY, fillOpacity: 1, opacity: 1 }
-const PIN_ACTIVE = { radius: 5, weight: 1.6, color: PAPER, fillColor: INK, fillOpacity: 1, opacity: 1 }
+let rows = M.slice();
+let borough = null, query = '', chosen = null, cursor = -1;
+const pinOf = new Map();
+let view = { k: 1, x: 0, y: 0 };
 
-// The selection reads as a ring around the pin rather than a change of size,
-// so choosing a museum does not make it look like a different kind of place.
-const HALO = { radius: 10, weight: 1.5, color: PRIMARY, opacity: 0.65, fill: false, interactive: false }
+const LAND_PATHS = LAND.map((b) => ({ n: b.n, p: new Path2D(b.d) }));
 
-const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-const animate = !reduceMotion
+/* ── pins ──────────────────────────────────────────────────────────
+   Each pin is a zero-length path drawn with a round cap, so the dot
+   you see is the stroke — and a non-scaling stroke holds its size
+   through every zoom without the script touching it. */
 
-const SORTS = {
-  az:      { label: 'A–Z' },
-  borough: { label: 'Borough' },
-  near:    { label: 'Near me' },
+const NS = 'http://www.w3.org/2000/svg';
+const mk = (tag, cls) => { const e = document.createElementNS(NS, tag); e.setAttribute('class', cls); return e; };
+const dotAt = (m) => `M${m.x} ${m.y}l0 0`;
+
+const glow = mk('path', 'glow');
+const halo = mk('circle', 'halo');
+halo.setAttribute('r', 0);
+pinsG.append(glow, halo);
+
+for (const m of M) {
+  const c = mk('path', 'pin');
+  c.setAttribute('d', dotAt(m));
+  c.dataset.id = m.i;
+  c.addEventListener('click', (e) => { e.stopPropagation(); choose(m.i, { from: 'map' }); });
+  c.addEventListener('pointerenter', () => peek(m.i, true));
+  c.addEventListener('pointerleave', () => peek(m.i, false));
+  pinsG.appendChild(c);
+  pinOf.set(m.i, c);
 }
 
-const state = {
-  museums: [],
-  sort: 'az',
-  origin: null,    // {lat, lng} once the browser has told us where we are
-  query: '',
-  boroughs: new Set(),
-  categories: new Set(),
-  viewportOnly: false,
-  activeId: null,
-  rows: [],        // what the index is currently showing, in order
-  cursor: -1,      // index into rows for roving focus
+/* ── canvas ────────────────────────────────────────────────────── */
+
+/* While the map is moving, the city is drawn at one device pixel per CSS
+   pixel instead of two. That is a quarter of the raster work for the one
+   moment nobody is reading hairlines, and it costs one reallocation at
+   each end of the gesture rather than anything per frame. It comes back
+   at full resolution the instant you let go. */
+let dpr = 1, cw = 0, ch = 0, moving = false;
+
+function sizeCanvas() {
+  dpr = moving ? 1 : Math.min(2, devicePixelRatio || 1);
+  cw = cv.clientWidth; ch = cv.clientHeight;
+  remeasure();
+  cv.width = Math.round(cw * dpr);
+  cv.height = Math.round(ch * dpr);
+  commit();              // synchronous: resizing clears it, so refill it now
 }
 
-const els = {
-  list: document.getElementById('list'),
-  scroll: document.getElementById('scroll'),
-  colophonCount: document.getElementById('colophon-count'),
-  empty: document.getElementById('empty'),
-  search: document.getElementById('search'),
-  boroughFilters: document.getElementById('borough-filters'),
-  categoryFilters: document.getElementById('category-filters'),
-  viewportOnly: document.getElementById('viewport-only'),
-  count: document.getElementById('count'),
-  countLabel: document.getElementById('count-label'),
-  reset: document.getElementById('reset'),
-  searchClear: document.getElementById('search-clear'),
-  status: document.getElementById('status'),
-  notice: document.getElementById('notice'),
-  sortOptions: document.getElementById('sort-options'),
+let settling = 0;
+function setMoving(on) {
+  clearTimeout(settling);
+  if (on) { if (!moving) { moving = true; sizeCanvas(); } }
+  else settling = setTimeout(() => { if (moving) { moving = false; sizeCanvas(); } }, 90);
 }
 
-const toggles = { borough: new Map(), category: new Map() }
-const markers = new Map()
-const sortToggles = new Map()
-let map
-let halo
-let hereMarker
+/* Every write the view needs happens once, inside one frame. Pointer
+   events only mark the view dirty; nothing touches the DOM until the
+   browser asks for a frame, and nothing reads layout afterwards. */
+let queued = false;
+function paint() {
+  if (queued) return;
+  queued = true;
+  requestAnimationFrame(() => { queued = false; commit(); });
+}
 
-/* ---------------------------------------------------------------- text --- */
+function commit() {
+  scene.setAttribute('transform', `translate(${view.x} ${view.y}) scale(${view.k})`);
+  if (chosen) halo.setAttribute('r', 21 / view.k);
+  updateScale();
+  render3d();
+}
 
-const norm = (s) => s.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
+function render3d() {
+  const { k, x, y } = view;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.fillStyle = css('--water');
+  ctx.fillRect(0, 0, cv.width, cv.height);
 
-const escapeHtml = (s) =>
-  s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
-
-const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-
-const terms = () => norm(state.query).split(/\s+/).filter(Boolean)
-
-const hostOf = (url) => {
-  try {
-    return new URL(url).hostname.replace(/^www\./, '')
-  } catch {
-    return url
+  ctx.setTransform(dpr * k, 0, 0, dpr * k, dpr * x, dpr * y);
+  const lit = borough;
+  for (const b of LAND_PATHS) {
+    ctx.fillStyle = lit && b.n === lit ? css('--land-hi') : css('--land');
+    ctx.fill(b.p);
   }
+  ctx.strokeStyle = css('--shore');
+  ctx.lineWidth = 1 / k;
+  for (const b of LAND_PATHS) ctx.stroke(b.p);
+
+  const labels = drawStreets(ctx, k, x, y, cw, ch);
+  drawLabels(ctx, labels, k, x, y, dpr);
+  const i = insets();
+  drawWater(ctx, k, x, y, cw, ch, dpr, { l: i.l + 6, t: i.t, r: i.r, b: i.b + 18 });
+
+  document.body.classList.toggle('close', k >= 5.2);
 }
 
-const ordinal = (n) => String(n).padStart(3, '0')
+let cssCache = {};
+const css = (v) => (cssCache[v] ??= getComputedStyle(document.documentElement).getPropertyValue(v).trim());
 
-/** Great-circle distance in miles. The index is walked, so miles read better
-    than kilometres here and a tenth of a mile is as precise as it gets. */
-function milesBetween(a, b) {
-  const R = 3958.8
-  const rad = (x) => (x * Math.PI) / 180
-  const dLat = rad(b.lat - a.lat)
-  const dLng = rad(b.lng - a.lng)
-  const h =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLng / 2) ** 2
-  return 2 * R * Math.asin(Math.sqrt(h))
+/* ── viewport ──────────────────────────────────────────────────── */
+
+/* One map unit on the ground. The projection is Web Mercator, so a
+   unit is a fixed number of metres at a given latitude; New York sits
+   close enough to one parallel for a single figure to hold. */
+const METRES_PER_UNIT = (111320 * Math.cos(40.73 * Math.PI / 180)) / 1706.2553;
+const RUNGS = [
+  [200, '200 ft'], [500, '500 ft'], [1000, '1000 ft'], [1320, '\u00bc mile'],
+  [2640, '\u00bd mile'], [5280, '1 mile'], [10560, '2 miles'],
+  [26400, '5 miles'], [52800, '10 miles'],
+];
+
+const scaleBar = el('scaleBar'), scaleTxt = el('scaleTxt');
+let lastBar = -1, lastTxt = '';
+function updateScale() {
+  const pxPerFoot = view.k / (METRES_PER_UNIT * 3.28084);
+  let pick = RUNGS[0];
+  for (const r of RUNGS) { if (r[0] * pxPerFoot <= 96) pick = r; else break; }
+  const w = Math.round(pick[0] * pxPerFoot);
+  if (w !== lastBar) { scaleBar.style.width = (lastBar = w) + 'px'; }
+  if (pick[1] !== lastTxt) { scaleTxt.textContent = (lastTxt = pick[1]); }
 }
 
-/** Under a tenth of a mile, feet are the honest unit — rounded to ten, which
-    is about as much as a street address and a phone's fix can support. */
-function formatMiles(mi) {
-  if (mi < 0.1) return `${Math.max(10, Math.round((mi * 5280) / 10) * 10)} ft`
-  if (mi < 10) return `${mi.toFixed(1)} mi`
-  return `${Math.round(mi)} mi`
-}
+/* The part of the map nothing is sitting on. On a phone the card
+   takes the bottom of the stage, so the museum it names has to be
+   framed above it rather than underneath it. */
+let _insets = null, sw = 0, sh = 0;
+const remeasure = () => { _insets = null; sw = svg.clientWidth; sh = svg.clientHeight; };
 
-/** The city/state/zip tail is the same on every record; the index drops it. */
-const street = (address) =>
-  address.replace(/,\s*(New York|Brooklyn|Queens|Bronx|Staten Island),\s*NY.*$/i, '')
-
-/** Marks search hits by slicing the original string, so accents survive. */
-function highlight(text) {
-  const t = terms()
-  if (!t.length) return escapeHtml(text)
-  const re = new RegExp(`(${t.map(escapeRe).join('|')})`, 'gi')
-  let html = ''
-  let last = 0
-  for (const hit of norm(text).matchAll(re)) {
-    html += escapeHtml(text.slice(last, hit.index))
-    html += `<mark>${escapeHtml(text.slice(hit.index, hit.index + hit[0].length))}</mark>`
-    last = hit.index + hit[0].length
+function insets() {
+  if (_insets) return _insets;
+  if (innerWidth <= 780) {
+    const c = card.classList.contains('show') ? card.offsetHeight + 16 : 0;
+    return (_insets = { l: 20, t: 20, r: 20, b: 20 + c });
   }
-  return html + escapeHtml(text.slice(last))
+  const p = el('panel').getBoundingClientRect();
+  return (_insets = { l: p.right + 28, t: 28, r: 28, b: 28 });
 }
 
-/* ----------------------------------------------------------- filtering --- */
+function apply() { paint(); }
 
-const haystack = (m) => norm([m.name, m.borough, m.neighborhood, m.address, m.category].join(' '))
-
-const matchesText = (m) => terms().every((t) => haystack(m).includes(t))
-
-/**
- * A museum passes when every filter agrees. `except` skips one facet, which is
- * how each facet counts what selecting it would actually yield.
- */
-function matches(m, except) {
-  if (except !== 'borough' && state.boroughs.size && !state.boroughs.has(m.borough)) return false
-  if (except !== 'category' && state.categories.size && !state.categories.has(m.category)) return false
-  return matchesText(m)
-}
-
-function inViewport(m) {
-  if (!state.viewportOnly || !map) return true
-  return map.getBounds().contains([m.lat, m.lng])
-}
-
-const byName = (a, b) => a.name.localeCompare(b.name, 'en')
-
-/** The index's order. Distance falls back to A–Z until the browser has placed
-    us, so choosing "Near me" never empties or scrambles the list while the
-    permission prompt is open. */
-function ordered(rows) {
-  if (state.sort === 'borough') {
-    return [...rows].sort(
-      (a, b) => BOROUGHS.indexOf(a.borough) - BOROUGHS.indexOf(b.borough) || byName(a, b),
-    )
+function boundsOf(list) {
+  if (!list.length) return { x0: 0, y0: 0, x1: VIEW.w, y1: VIEW.h };
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const m of list) {
+    x0 = Math.min(x0, m.x); x1 = Math.max(x1, m.x);
+    y0 = Math.min(y0, m.y); y1 = Math.max(y1, m.y);
   }
-  if (state.sort === 'near' && state.origin) {
-    return [...rows].sort(
-      (a, b) => milesBetween(state.origin, a) - milesBetween(state.origin, b) || byName(a, b),
-    )
+  return { x0, y0, x1, y1 };
+}
+
+function frame(b, { pad = 70, maxK = 9 } = {}) {
+  const i = insets();
+  const w = Math.max(80, sw - i.l - i.r);
+  const h = Math.max(80, sh - i.t - i.b);
+  // A single museum is framed at a fixed closeness, so the cross
+  // streets read the same on a phone as on a desk. Only a spread of
+  // them has to be fitted to whatever room there is.
+  const point = b.x0 === b.x1 && b.y0 === b.y1;
+  const k = point ? maxK
+    : Math.min(maxK, w / Math.max(1, b.x1 - b.x0 + pad * 2), h / Math.max(1, b.y1 - b.y0 + pad * 2));
+  const cx = (b.x0 + b.x1) / 2, cy = (b.y0 + b.y1) / 2;
+  return { k, x: i.l + w / 2 - cx * k, y: i.t + h / 2 - cy * k };
+}
+
+let anim = 0;
+function glide(to, ms = 640) {
+  cancelAnimationFrame(anim);
+  if (reduce) { view = to; setMoving(false); apply(); return; }
+  const from = { ...view }, t0 = performance.now();
+  setMoving(true);
+  const step = (now) => {
+    const p = Math.min(1, Math.max(0, (now - t0) / ms));
+    const e = 1 - Math.pow(1 - p, 3);
+    view = { k: from.k + (to.k - from.k) * e, x: from.x + (to.x - from.x) * e, y: from.y + (to.y - from.y) * e };
+    apply();
+    if (p < 1) anim = requestAnimationFrame(step);
+    else setMoving(false);
+  };
+  anim = requestAnimationFrame(step);
+}
+
+const fitK = () => frame(boundsOf(M)).k;
+function zoomAt(sx, sy, factor) {
+  const k = Math.min(34, Math.max(fitK() * 0.85, view.k * factor));
+  const wx = (sx - view.x) / view.k, wy = (sy - view.y) / view.k;
+  view = { k, x: sx - wx * k, y: sy - wy * k };
+  apply();
+}
+
+let drag = null;
+svg.addEventListener('pointerdown', (e) => {
+  if (e.target.classList.contains('pin')) return;
+  setMoving(true);
+  drag = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y, moved: false };
+  svg.setPointerCapture(e.pointerId);
+  svg.classList.add('dragging');
+  cancelAnimationFrame(anim);
+});
+svg.addEventListener('pointermove', (e) => {
+  if (!drag) return;
+  view.x = drag.vx + (e.clientX - drag.x);
+  view.y = drag.vy + (e.clientY - drag.y);
+  if (Math.abs(e.clientX - drag.x) + Math.abs(e.clientY - drag.y) > 3) drag.moved = true;
+  apply();
+});
+const endDrag = (e) => {
+  if (drag && !drag.moved) choose(null);
+  drag = null; svg.classList.remove('dragging'); setMoving(false);
+  if (e?.pointerId != null) { try { svg.releasePointerCapture(e.pointerId); } catch {} }
+};
+svg.addEventListener('pointerup', endDrag);
+svg.addEventListener('pointercancel', () => { drag = null; svg.classList.remove('dragging'); setMoving(false); });
+
+svg.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  setMoving(true);
+  const r = svg.getBoundingClientRect();
+  zoomAt(e.clientX - r.left, e.clientY - r.top, Math.exp(-e.deltaY * 0.0016));
+  setMoving(false);            // debounced: a wheel is a run of events
+}, { passive: false });
+
+el('zin').addEventListener('click', () => zoomAt(sw / 2, sh / 2, 1.6));
+el('zout').addEventListener('click', () => zoomAt(sw / 2, sh / 2, 1 / 1.6));
+
+/* ── filtering ─────────────────────────────────────────────────── */
+
+const fold = (s) => s.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
+const hay = (m) => fold([m.n, m.b, m.h, m.a, m.c].join(' '));
+const terms = () => fold(query).split(/\s+/).filter(Boolean);
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+function matches(m, skipBorough) {
+  if (!skipBorough && borough && m.b !== borough) return false;
+  return terms().every((t) => hay(m).includes(t));
+}
+
+function mark(text) {
+  const t = terms();
+  if (!t.length) return esc(text);
+  const re = new RegExp('(' + t.map((s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')', 'gi');
+  let out = '', last = 0;
+  for (const hit of fold(text).matchAll(re)) {
+    out += esc(text.slice(last, hit.index)) + '<mark>' + esc(text.slice(hit.index, hit.index + hit[0].length)) + '</mark>';
+    last = hit.index + hit[0].length;
   }
-  return [...rows].sort(byName)
+  return out + esc(text.slice(last));
 }
 
-const visible = () => ordered(state.museums.filter((m) => matches(m) && inViewport(m)))
-
-/* ----------------------------------------------------------- url state --- */
-
-function writeUrl() {
-  const p = new URLSearchParams()
-  if (state.query) p.set('q', state.query)
-  if (state.boroughs.size) p.set('borough', [...state.boroughs].join(','))
-  if (state.categories.size) p.set('type', [...state.categories].join(','))
-  if (state.sort !== 'az') p.set('sort', state.sort)
-  if (state.viewportOnly) p.set('onmap', '1')
-  if (state.activeId) p.set('at', state.activeId)
-  const url = p.toString() ? `?${p}` : location.pathname
-  history.replaceState(null, '', url)
-}
-
-function readUrl() {
-  const p = new URLSearchParams(location.search)
-  state.query = p.get('q') ?? ''
-  const known = (set, values) => values.filter(Boolean).forEach((v) => set.add(v))
-  known(state.boroughs, (p.get('borough') ?? '').split(',').filter((b) => BOROUGHS.includes(b)))
-  known(state.categories, (p.get('type') ?? '').split(',').filter(Boolean))
-  const sort = p.get('sort')
-  if (sort && sort in SORTS) state.sort = sort
-  state.viewportOnly = p.get('onmap') === '1'
-  state.activeId = p.get('at')
-  els.search.value = state.query
-}
-
-/* -------------------------------------------------------------- index --- */
-
-// Pricing and opening hours land here later; render whatever exists today.
-function facts(m) {
-  const bits = [m.admission, m.hoursSummary].filter(Boolean)
-  return bits.length ? `<p class="entry__meta t-small">${escapeHtml(bits.join(' · '))}</p>` : ''
-}
-
-const showDistance = () => state.sort === 'near' && !!state.origin
-const isGrouped = () => state.sort === 'borough'
-
-/** A section rule announcing each borough. Presentational: every row still
-    carries its borough for assistive technology, just not on screen. */
-function sectionRow(borough, count) {
-  const li = document.createElement('li')
-  li.className = 'index__section'
-  li.setAttribute('aria-hidden', 'true')
-  li.innerHTML =
-    `<span class="index__section-name t-label">${escapeHtml(borough)}</span>` +
-    `<span class="index__section-count t-figure">${count}</span>`
-  return li
-}
-
-function renderIndex() {
-  state.rows = visible()
-  const active = state.rows.findIndex((m) => m.id === state.activeId)
-  state.cursor = active >= 0 ? active : state.rows.length ? 0 : -1
-
-  const grouped = isGrouped()
-  const counts = {}
-  if (grouped) for (const m of state.rows) counts[m.borough] = (counts[m.borough] ?? 0) + 1
-  let section = null
-  const children = []
-
-  els.list.classList.toggle('is-grouped', grouped)
-  els.list.replaceChildren(
-    ...state.rows.flatMap((m, i) => {
-      const before = []
-      if (grouped && m.borough !== section) {
-        section = m.borough
-        before.push(sectionRow(m.borough, counts[m.borough]))
-      }
-      const li = document.createElement('li')
-      li.innerHTML = `
-        <article class="entry" data-id="${escapeHtml(m.id)}">
-          <span class="entry__no t-figure" aria-hidden="true">${ordinal(i + 1)}</span>
-          <div class="entry__body">
-            <h2 class="entry__name t-heading">
-              <button type="button" class="entry__select" tabindex="-1">${highlight(m.name)}</button>
-            </h2>
-            <p class="entry__meta t-small">${
-              showDistance() ? `<span class="entry__distance">${formatMiles(milesBetween(state.origin, m))}</span> &middot; ` : ''
-            }${m.neighborhood ? highlight(m.neighborhood) + ' &middot; ' : ''
-            }${highlight(street(m.address))}</p>
-            ${m.url
-              ? `<a class="entry__link t-fine" href="${escapeHtml(m.url)}" tabindex="-1"
-                    target="_blank" rel="noopener noreferrer">${escapeHtml(hostOf(m.url))} &#8599;</a>`
-              : '<span class="entry__link entry__link--none t-fine">No website</span>'}
-            ${facts(m)}
-          </div>
-          <span class="entry__class">
-            <span class="entry__borough t-label${grouped ? ' sr-only' : ''}">${escapeHtml(m.borough)}</span>
-            <span class="entry__discipline t-label">${escapeHtml(m.category)}</span>
-          </span>
-        </article>`
-      return [...before, li]
-    }),
-  )
-
-  els.empty.hidden = state.rows.length > 0
-  els.count.textContent = state.rows.length
-  els.countLabel.textContent =
-    state.rows.length === state.museums.length
-      ? state.rows.length === 1 ? 'Museum' : 'Museums'
-      : `of ${state.museums.length}`
-
-  announce()
-  title()
-  syncActive()
-  syncRoving()
-}
-
-/** The tab says what is on screen — a filtered view is a different page. */
-function title() {
-  const parts = []
-  if (state.query) parts.push(`“${state.query}”`)
-  if (state.boroughs.size) parts.push([...state.boroughs].join(' + '))
-  if (state.categories.size) parts.push([...state.categories].join(' + '))
-  document.title = parts.length ? `${parts.join(' · ')} — Museo` : 'Museo — New York City Museums'
-}
-
-function announce() {
-  const bits = []
-  if (state.query) bits.push(`matching “${state.query}”`)
-  if (state.boroughs.size) bits.push(`in ${[...state.boroughs].join(', ')}`)
-  if (state.categories.size) bits.push(`${[...state.categories].join(', ')}`)
-  if (state.viewportOnly) bits.push('within the map view')
-  els.status.textContent =
-    `${state.rows.length} ${state.rows.length === 1 ? 'museum' : 'museums'}${bits.length ? ' ' + bits.join(', ') : ''}.`
-}
-
-const entryFor = (id) => els.list.querySelector(`.entry[data-id="${CSS.escape(id)}"]`)
-
-function syncActive() {
-  for (const entry of els.list.querySelectorAll('.entry')) {
-    entry.classList.toggle('is-active', entry.dataset.id === state.activeId)
-  }
-  for (const [id, marker] of markers) {
-    marker.setStyle(id === state.activeId ? PIN_ACTIVE : PIN)
-  }
-
-  // A pin the filters have removed cannot be the selection: its halo would sit
-  // on empty map and the URL would still name it.
-  const marker = state.activeId ? markers.get(state.activeId) : null
-  const active = marker && map && map.hasLayer(marker) ? marker : null
-  if (active && map) {
-    halo.setLatLng(active.getLatLng())
-    if (!map.hasLayer(halo)) halo.addTo(map)
-    active.bringToFront()
-  } else if (halo && map && map.hasLayer(halo)) {
-    map.removeLayer(halo)
-  }
-}
-
-/** Roving tabindex: the list is two tab stops, not two hundred. */
-function syncRoving() {
-  const entries = [...els.list.querySelectorAll('.entry')]
-  entries.forEach((entry, i) => {
-    const on = i === state.cursor ? '0' : '-1'
-    entry.querySelector('.entry__select')?.setAttribute('tabindex', on)
-    entry.querySelector('a.entry__link')?.setAttribute('tabindex', on)
-  })
-}
-
-function moveCursor(delta, { focus = true } = {}) {
-  if (!state.rows.length) return
-  const next = Math.min(Math.max(state.cursor + delta, 0), state.rows.length - 1)
-  if (next === state.cursor) return
-  state.cursor = next
-  syncRoving()
-  const m = state.rows[next]
-  select(m.id, { scroll: true, focus })
-}
-
-function setCursorTo(index, { focus = true } = {}) {
-  if (!state.rows.length) return
-  state.cursor = Math.min(Math.max(index, 0), state.rows.length - 1)
-  syncRoving()
-  select(state.rows[state.cursor].id, { scroll: true, focus })
-}
-
-/* ---------------------------------------------------------- selection --- */
-
-const POPUP_ROOM = 150   // vertical clearance a popup needs above its pin
-
-const targetZoom = () => Math.max(map.getZoom(), 15)
-
-/* A canvas renderer scales its whole surface during a zoom animation and only
-   redraws when the animation ends, so every pin swells by the zoom factor and
-   snaps back — measured at 16.8× across a city-wide fly. Under a step and a
-   half that magnification is imperceptible and the movement is worth having;
-   beyond it, placing the view outright looks deliberate where a swelling,
-   popping zoom looks broken. */
-const ANIMATABLE_ZOOM_STEP = 1.5
-
-function moveTo(centre, zoom, { duration = 0.6 } = {}) {
-  const far = Math.abs(zoom - map.getZoom()) > ANIMATABLE_ZOOM_STEP
-  if (!animate || far) map.setView(centre, zoom, { animate: false })
-  else map.flyTo(centre, zoom, { animate: true, duration, easeLinearity: 0.22 })
-}
-
-/** Where the map should centre so the pin sits below the middle and its popup
-    has room above — one movement that lands correctly, rather than a centre
-    followed by an auto-pan correction. */
-function centreFor(latlng) {
-  const z = targetZoom()
-  return map.unproject(map.project(latlng, z).subtract([0, POPUP_ROOM / 2]), z)
-}
-
-function select(id, { pan = true, scroll = false, focus = false, center = false } = {}) {
-  state.activeId = id
-  const i = state.rows.findIndex((m) => m.id === id)
-  if (i >= 0) { state.cursor = i; syncRoving() }
-  syncActive()
-
-  const marker = markers.get(id)
-  if (marker && pan) {
-    // With "on map only" on, the list is the map's contents — changing the
-    // zoom would empty it out from under whoever just chose a row. Nudge the
-    // view only as far as it takes to bring the pin inside.
-    if (state.viewportOnly) {
-      map.panInside(marker.getLatLng(), { padding: [48, POPUP_ROOM], animate })
-    } else {
-      moveTo(centreFor(marker.getLatLng()), targetZoom(), { duration: 0.7 })
-    }
-  }
-  if (marker) {
-    marker.openPopup()
-    // The popup opens above the pin; make room for it without a second jump.
-    if (!pan) map.panInside(marker.getLatLng(), { padding: [48, POPUP_ROOM], animate })
-  }
-
-  const entry = entryFor(id)
-  if (scroll) {
-    entry?.scrollIntoView({ block: center ? 'center' : 'nearest', behavior: animate ? 'smooth' : 'auto' })
-  }
-  if (focus) entry?.querySelector('.entry__select')?.focus({ preventScroll: true })
-  writeUrl()
-}
-
-els.list.addEventListener('click', (e) => {
-  if (e.target.closest('a')) return // let the outbound link through
-  const entry = e.target.closest('.entry')
-  if (entry) select(entry.dataset.id)
-})
-
-els.list.addEventListener('keydown', (e) => {
-  const entry = e.target.closest('.entry')
-  if (!entry) return
-  const at = state.rows.findIndex((m) => m.id === entry.dataset.id)
-  switch (e.key) {
-    case 'ArrowDown': e.preventDefault(); state.cursor = at; moveCursor(1); break
-    case 'ArrowUp':   e.preventDefault(); state.cursor = at; moveCursor(-1); break
-    case 'Home':      e.preventDefault(); setCursorTo(0); break
-    case 'End':       e.preventDefault(); setCursorTo(state.rows.length - 1); break
-    case 'PageDown':  e.preventDefault(); state.cursor = at; moveCursor(10); break
-    case 'PageUp':    e.preventDefault(); state.cursor = at; moveCursor(-10); break
-  }
-})
-
-/* ---------------------------------------------------------------- map --- */
-
-function initMap() {
-  map = L.map('map', {
-    zoomControl: true,
-    // Continuous zoom rather than quarter steps, and a slower wheel, so the
-    // map glides instead of clicking between stops.
-    zoomSnap: 0,
-    zoomDelta: 0.6,
-    wheelPxPerZoomLevel: 130,
-    wheelDebounceTime: 20,
-    zoomAnimation: true,
-    fadeAnimation: true,
-    inertia: true,
-    easeLinearity: 0.22,
-    // A generous canvas margin: at the default 10% the pins pop in at the edge
-    // of the frame while panning.
-    preferCanvas: true,
-    renderer: L.canvas({ padding: 0.6 }),
-  }).setView([40.7128, -73.96], 11)
-
-  // The city is drawn, not tiled: borough coastline from NYC Planning,
-  // simplified to 44KB, in its own pane beneath the street tiles so streets —
-  // when they appear — read as linework laid over the land.
-  map.createPane('land')
-  map.getPane('land').style.zIndex = 150
-
-  fetch(DATA + 'boroughs.json')
-    .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-    .then((geo) => {
-      L.geoJSON(geo, {
-        pane: 'land',
-        interactive: false,
-        style: { fillColor: LAND, fillOpacity: 1, color: COAST, weight: 1, lineJoin: 'round' },
-      }).addTo(map)
-    })
-    .catch((err) => console.warn('museo: borough outlines unavailable', err))
-
-  const streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    opacity: 0,
-    keepBuffer: 4,
-    updateWhenZooming: false,
-    attribution:
-      'Boroughs: NYC Planning · Streets: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-  }).addTo(map)
-
-  const streetOpacity = () => {
-    const z = map.getZoom()
-    const t = Math.min(1, Math.max(0, (z - STREETS_FROM) / (STREETS_FULL - STREETS_FROM)))
-    streets.setOpacity(t * STREETS_MAX_OPACITY)
-  }
-  map.on('zoomend', streetOpacity)
-  streetOpacity()
-
-  halo = L.circleMarker([0, 0], { ...HALO })
-
-  for (const m of state.museums) {
-    const marker = L.circleMarker([m.lat, m.lng], { ...PIN })
-
-    marker.bindPopup(
-      `<div class="pop">
-         <div class="pop__name">${escapeHtml(m.name)}</div>
-         <div class="pop__meta">${escapeHtml(m.address)}</div>
-         <div class="pop__foot">
-           <span class="t-label">${escapeHtml(m.borough)} &middot; ${escapeHtml(m.category)}</span>
-           ${m.url
-             ? `<a class="link t-small" href="${escapeHtml(m.url)}" target="_blank"
-                   rel="noopener noreferrer">${escapeHtml(hostOf(m.url))} &#8599;</a>`
-             : '<span class="t-small u-quiet">No website</span>'}
-         </div>
-       </div>`,
-      { closeButton: false, offset: [0, -10], autoPan: false },
-    )
-
-    marker.on('click', () => select(m.id, { pan: false, scroll: true, center: true }))
-    marker.on('mouseover', () => {
-      if (m.id !== state.activeId) marker.setStyle(PIN_HOVER)
-      entryFor(m.id)?.classList.add('is-peeked')
-    })
-    marker.on('mouseout', () => {
-      if (m.id !== state.activeId) marker.setStyle(PIN)
-      entryFor(m.id)?.classList.remove('is-peeked')
-    })
-
-    markers.set(m.id, marker)
-  }
-
-  map.on('moveend', () => {
-    if (state.viewportOnly) { renderIndex(); writeUrl() }
-  })
-}
-
-function syncMarkers() {
-  const shown = new Set(state.museums.filter((m) => matches(m)).map((m) => m.id))
-  for (const [id, marker] of markers) {
-    const on = shown.has(id)
-    if (on && !map.hasLayer(marker)) marker.addTo(map)
-    if (!on && map.hasLayer(marker)) map.removeLayer(marker)
-  }
-}
-
-function fitToResults() {
-  const rows = state.museums.filter((m) => matches(m))
-  if (!rows.length) return
-  const bounds = L.latLngBounds(rows.map((m) => [m.lat, m.lng]))
-  const zoom = Math.min(map.getBoundsZoom(bounds, false, L.point(32, 32)), 15)
-  moveTo(bounds.getCenter(), zoom)
-}
-
-/* ------------------------------------------------------------ controls --- */
-
-function buildSort() {
-  for (const [key, { label }] of Object.entries(SORTS)) {
-    const btn = document.createElement('button')
-    btn.type = 'button'
-    btn.className = 'toggle'
-    btn.dataset.sort = key
-    btn.setAttribute('role', 'radio')
-    btn.setAttribute('aria-checked', String(state.sort === key))
-    btn.textContent = label
-    btn.addEventListener('click', () => chooseSort(key))
-    sortToggles.set(key, btn)
-    els.sortOptions.append(btn)
-  }
-}
-
-function chooseSort(key) {
-  if (key === 'near' && !state.origin) {
-    locate()
-    return
-  }
-  state.sort = key
-  notice('')
-  update()
-}
-
-/** Ask the browser where we are. The order only changes once it answers, so a
-    refused or slow prompt leaves the index exactly as it was. */
-function locate() {
-  if (!navigator.geolocation) {
-    notice('This browser cannot share a location.')
-    return
-  }
-  notice('Finding you…')
-  navigator.geolocation.getCurrentPosition(
-    ({ coords }) => {
-      state.origin = { lat: coords.latitude, lng: coords.longitude }
-      state.sort = 'near'
-      showHere()
-      const nearest = Math.min(...state.museums.map((m) => milesBetween(state.origin, m)))
-      notice(nearest > 50 ? 'You are some way from New York — distances are as the crow flies.' : '')
-      update()
-    },
-    (err) => {
-      notice(
-        err.code === err.PERMISSION_DENIED
-          ? 'Location permission was declined, so the index stays in alphabetical order.'
-          : 'Your location is not available right now.',
-      )
-      syncToggles()
-    },
-    { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 },
-  )
-}
-
-function notice(text) {
-  els.notice.textContent = text
-  els.notice.hidden = !text
-}
-
-/** A hollow marker, so it cannot be mistaken for one of the museums. */
-function showHere() {
-  if (!map || !state.origin) return
-  const at = [state.origin.lat, state.origin.lng]
-  if (hereMarker) hereMarker.setLatLng(at)
-  else {
-    hereMarker = L.circleMarker(at, {
-      radius: 5, weight: 2, color: INK, fillColor: PAPER, fillOpacity: 1, interactive: false,
-    })
-  }
-  if (!map.hasLayer(hereMarker)) hereMarker.addTo(map)
-  // Bring it into view only if it is not already there, and never change the
-  // zoom: the map's framing is the reader's, not ours.
-  map.panInside(at, { padding: [48, 48], animate })
-}
-
-function buildFilters() {
-  for (const b of BOROUGHS) {
-    els.boroughFilters.append(makeToggle('borough', b, () => toggleValue(state.boroughs, b, { refit: true })))
-  }
-  const cats = [...new Set(state.museums.map((m) => m.category))].sort()
-  for (const c of cats) {
-    els.categoryFilters.append(makeToggle('category', c, () => toggleValue(state.categories, c, { refit: false })))
-  }
-}
-
-function makeToggle(facet, label, onClick) {
-  const btn = document.createElement('button')
-  btn.type = 'button'
-  btn.className = 'toggle'
-  btn.dataset.value = label
-  btn.setAttribute('aria-pressed', 'false')
-  btn.innerHTML = `${escapeHtml(label)}<span class="tally" aria-hidden="true"></span>`
-  btn.addEventListener('click', () => onClick())
-  toggles[facet].set(label, btn)
-  return btn
-}
-
-/**
- * Each facet counts what choosing it would actually yield, given every OTHER
- * filter. A count of zero means the option is a dead end, so it is disabled
- * rather than left to look available.
- */
-function syncToggles() {
-  for (const [facet, key, set] of [
-    ['borough', 'borough', state.boroughs],
-    ['category', 'category', state.categories],
-  ]) {
-    const pool = state.museums.filter((m) => matches(m, facet))
-    for (const [value, btn] of toggles[facet]) {
-      const n = pool.filter((m) => m[key] === value).length
-      const on = set.has(value)
-      btn.setAttribute('aria-pressed', String(on))
-      btn.querySelector('.tally').textContent = n
-      const dead = n === 0 && !on
-      btn.disabled = dead
-      btn.classList.toggle('is-empty', dead)
-      btn.setAttribute('aria-label', `${value}, ${n} ${n === 1 ? 'museum' : 'museums'}`)
-    }
-  }
-  els.viewportOnly.setAttribute('aria-pressed', String(state.viewportOnly))
-  for (const [key, btn] of sortToggles) btn.setAttribute('aria-checked', String(state.sort === key))
-  const dirty = !!(state.query || state.boroughs.size || state.categories.size ||
-                   state.viewportOnly || state.sort !== 'az')
-  els.reset.disabled = !dirty
-  els.reset.hidden = !dirty
-  els.searchClear.hidden = !state.query
-}
-
-function toggleValue(set, value, { refit }) {
-  set.has(value) ? set.delete(value) : set.add(value)
-  update({ refit })
-}
-
-function update({ refit = false, keepScroll = false } = {}) {
-  // renderIndex replaces every row, so anyone reading the index by keyboard
-  // would be dropped back to the top of the document. Put them back.
-  const hadFocus = els.list.contains(document.activeElement)
-
-  // A selection the filters have excluded is no longer a selection.
-  if (state.activeId) {
-    const chosen = state.museums.find((m) => m.id === state.activeId)
-    if (!chosen || !matches(chosen)) {
-      state.activeId = null
-      map?.closePopup()
-    }
-  }
-
-  syncToggles()
-  syncMarkers()
-  if (refit) fitToResults()
-  renderIndex()
-  if (!keepScroll) els.scroll.scrollTo({ top: 0 })
-
-  if (hadFocus && state.cursor >= 0) {
-    const row = els.list.querySelectorAll('.entry')[state.cursor]
-    row?.querySelector('.entry__select')?.focus({ preventScroll: true })
-  }
-  writeUrl()
-}
-
-let searchTimer
-els.search.addEventListener('input', () => {
-  clearTimeout(searchTimer)
-  searchTimer = setTimeout(() => {
-    state.query = els.search.value.trim()
-    update()
-  }, 90)
-})
-
-els.search.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    if (els.search.value) { els.search.value = ''; state.query = ''; update() }
-    else els.search.blur()
-  }
-  if (e.key === 'ArrowDown' && state.rows.length) { e.preventDefault(); setCursorTo(0) }
-  if (e.key === 'Enter' && state.rows.length) { e.preventDefault(); setCursorTo(0) }
-})
-
-els.searchClear.addEventListener('click', () => {
-  els.search.value = ''
-  state.query = ''
-  update()
-  els.search.focus()
-})
-
-els.viewportOnly.addEventListener('click', () => {
-  state.viewportOnly = !state.viewportOnly
-  update()
-})
-
-els.reset.addEventListener('click', () => {
-  reset()
-  els.search.focus()
-})
-
-function reset() {
-  state.query = ''
-  state.sort = 'az'
-  notice('')
-  if (hereMarker && map?.hasLayer(hereMarker)) map.removeLayer(hereMarker)
-  state.boroughs.clear()
-  state.categories.clear()
-  state.viewportOnly = false
-  state.activeId = null
-  els.search.value = ''
-  map?.closePopup()
-  update({ refit: true })
-}
-
-els.empty.querySelector('.empty__reset')?.addEventListener('click', () => {
-  reset()
-  els.search.focus()
-})
-
-/* Type-anywhere: "/" jumps to the field the way a reader reaches for an index. */
-document.addEventListener('keydown', (e) => {
-  const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName)
-  if (e.key === '/' && !typing && !e.metaKey && !e.ctrlKey) {
-    e.preventDefault()
-    els.search.focus()
-    els.search.select()
-  }
-  if (e.key === 'Escape' && !typing && state.activeId) {
-    state.activeId = null
-    map?.closePopup()
-    syncActive()
-    writeUrl()
-  }
-})
-
-/* --------------------------------------------------------- modality --- */
-
-/* Leaflet focuses its container on every pointer press, and Chrome counts that
-   programmatic focus as :focus-visible — so a mouse user got a ring round the
-   whole map each time they touched it. Record how the last input arrived, and
-   let the stylesheet show the map's focus only after a key. Capture phase, so
-   this runs before Leaflet's own handlers move focus. */
-const setModality = (how) => { document.documentElement.dataset.input = how }
-document.addEventListener('pointerdown', () => setModality('pointer'), true)
-document.addEventListener('keydown', () => setModality('keyboard'), true)
-
-/* --------------------------------------------------------------- boot --- */
-
-function fail(message) {
-  els.list.replaceChildren()
-  els.empty.hidden = false
-  els.empty.innerHTML =
-    `<span class="t-label">${escapeHtml(message)}</span>` +
-    '<button type="button" class="empty__reset toggle toggle--plain">Try again</button>'
-  els.empty.querySelector('.empty__reset').addEventListener('click', () => location.reload())
-  els.count.textContent = '—'
-  els.countLabel.textContent = 'Unavailable'
-}
-
-try {
-  const res = await fetch(DATA + 'museums.json')
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
-  state.museums = (await res.json())
-    .filter((m) => typeof m.lat === 'number' && typeof m.lng === 'number')
-    .sort((a, b) => a.name.localeCompare(b.name, 'en'))
-  if (!state.museums.length) throw new Error('no records')
-  els.colophonCount.textContent = state.museums.length
-
-  document.body.classList.remove('is-loading')
-  readUrl()
-  buildSort()
-  buildFilters()
-  initMap()
-  if (state.sort === 'near' && !state.origin) locate()
-  syncToggles()
-  syncMarkers()
-  renderIndex()
-
-  if (state.activeId && markers.has(state.activeId)) {
-    select(state.activeId, { scroll: true })
+/* ── index ─────────────────────────────────────────────────────── */
+
+function render({ refit = false } = {}) {
+  rows = M.filter((m) => matches(m));
+  listEl.innerHTML = '';
+
+  if (!rows.length) {
+    const d = document.createElement('div');
+    d.className = 'empty';
+    d.innerHTML = 'Nothing matches.<button type="button" id="reset">Clear filters</button>';
+    listEl.appendChild(d);
+    el('reset').addEventListener('click', clearAll);
   } else {
-    state.activeId = null
-    fitToResults()
+    const frag = document.createDocumentFragment();
+    for (const m of rows) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'row' + (m.i === chosen ? ' on' : '');
+      b.dataset.id = m.i;
+      b.setAttribute('role', 'listitem');
+      b.innerHTML = `<div class="row-n">${mark(m.n)}</div>
+        <div class="row-m">${mark(m.h || m.b)} · ${mark(m.a)}</div>`;
+      b.addEventListener('click', () => choose(m.i, { from: 'list' }));
+      b.addEventListener('pointerenter', () => peek(m.i, true));
+      b.addEventListener('pointerleave', () => peek(m.i, false));
+      frag.appendChild(b);
+    }
+    listEl.appendChild(frag);
   }
-  writeUrl()
-} catch (err) {
-  console.error('museo:', err)
-  document.body.classList.remove('is-loading')
-  fail('The index could not be loaded')
+
+  el('count').textContent = rows.length;
+  el('countLabel').textContent = rows.length === M.length ? 'Museums' : `of ${M.length}`;
+
+  for (const s of segs.querySelectorAll('.seg')) {
+    const b = s.dataset.b || null;
+    const n = M.filter((m) => matches(m, true) && (!b || m.b === b)).length;
+    s.querySelector('.n').textContent = n;
+    s.disabled = n === 0 && b !== borough;
+    s.style.opacity = s.disabled ? 0.35 : '';
+  }
+
+  for (const [id, c] of pinOf) c.style.display = rows.some((m) => m.i === id) ? '' : 'none';
+
+  cursor = rows.findIndex((m) => m.i === chosen);
+  if (refit) glide(frame(boundsOf(rows)));
+  else paint();
 }
+
+function peek(id, on) {
+  listEl.querySelector(`.row[data-id="${CSS.escape(id)}"]`)?.classList.toggle('peek', on);
+  const p = pinOf.get(id);
+  if (p && id !== chosen) p.style.stroke = on ? 'var(--pin-hover)' : '';
+}
+
+/* ── selection ─────────────────────────────────────────────────── */
+
+function choose(id, { from = 'list' } = {}) {
+  chosen = id;
+  document.body.classList.toggle('picked', !!id);
+  for (const [mid, c] of pinOf) { c.style.stroke = ''; c.classList.toggle('on', mid === id); }
+  for (const r of listEl.querySelectorAll('.row')) r.classList.toggle('on', r.dataset.id === id);
+
+  if (!id) { card.classList.remove('show'); halo.setAttribute('r', 0); _insets = null; return; }
+
+  const m = M.find((x) => x.i === id);
+  cursor = rows.findIndex((x) => x.i === id);
+  halo.setAttribute('cx', m.x); halo.setAttribute('cy', m.y); halo.setAttribute('r', 21 / view.k);
+  glow.setAttribute('d', dotAt(m));
+  _insets = null;                    // the card changes the room the map has
+
+  el('cName').textContent = m.n;
+  el('cTags').innerHTML =
+    `<span class="tag amber">${esc(m.c)}</span><span class="tag">${esc(m.b)}</span>` +
+    (m.h ? `<span class="tag">${esc(m.h)}</span>` : '');
+  el('cAddr').textContent = m.f;
+
+  const site = el('cSite');
+  if (m.u) { site.href = m.u; site.removeAttribute('aria-disabled'); site.textContent = 'Visit site'; }
+  else { site.removeAttribute('href'); site.setAttribute('aria-disabled', 'true'); site.textContent = 'No website'; }
+  el('cMap').href = `https://maps.apple.com/?q=${encodeURIComponent(m.n)}&ll=${m.lat},${m.lng}`;
+  card.classList.add('show');
+
+  // close enough that the cross streets are legible
+  if (from === 'list') glide(frame({ x0: m.x, y0: m.y, x1: m.x, y1: m.y }, { pad: 27, maxK: 15 }), 780);
+  else listEl.querySelector(`.row[data-id="${CSS.escape(id)}"]`)?.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+}
+
+/* ── controls ──────────────────────────────────────────────────── */
+
+function buildSegs() {
+  const make = (label, b) => {
+    const s = document.createElement('button');
+    s.type = 'button'; s.className = 'seg';
+    s.setAttribute('role', 'tab');
+    s.setAttribute('aria-selected', String(borough === b));
+    if (b) s.dataset.b = b;
+    s.innerHTML = `${label}<span class="n"></span>`;
+    s.addEventListener('click', () => {
+      borough = b;
+      for (const o of segs.querySelectorAll('.seg')) o.setAttribute('aria-selected', String(o === s));
+      moveThumb(s);
+      render({ refit: true });
+    });
+    segs.appendChild(s);
+    return s;
+  };
+  const all = make('All', null);
+  for (const b of BOROUGHS) make(b === 'Staten Island' ? 'Staten Is.' : b, b);
+  requestAnimationFrame(() => moveThumb(all));
+}
+
+function moveThumb(s) {
+  thumb.style.width = s.offsetWidth + 'px';
+  thumb.style.height = s.offsetHeight + 'px';
+  thumb.style.transform = `translate(${s.offsetLeft}px, ${s.offsetTop}px)`;
+}
+
+let t;
+qEl.addEventListener('input', () => {
+  el('searchWrap').classList.toggle('has-text', !!qEl.value);
+  clearTimeout(t);
+  t = setTimeout(() => { query = qEl.value.trim(); render({ refit: true }); }, 110);
+});
+el('clear').addEventListener('click', () => {
+  qEl.value = ''; query = ''; el('searchWrap').classList.remove('has-text');
+  render({ refit: true }); qEl.focus();
+});
+el('cClose').addEventListener('click', () => choose(null));
+
+function clearAll() {
+  query = ''; qEl.value = ''; borough = null; chosen = null;
+  el('searchWrap').classList.remove('has-text');
+  for (const o of segs.querySelectorAll('.seg')) o.setAttribute('aria-selected', String(!o.dataset.b));
+  moveThumb(segs.querySelector('.seg'));
+  choose(null);
+  render({ refit: true });
+}
+
+function step(d) {
+  if (!rows.length) return;
+  cursor = Math.min(rows.length - 1, Math.max(0, cursor + d));
+  const m = rows[cursor];
+  choose(m.i, { from: 'map' });
+  glide(frame({ x0: m.x, y0: m.y, x1: m.x, y1: m.y }, { pad: 27, maxK: 15 }), 640);
+}
+
+addEventListener('keydown', (e) => {
+  const typing = /^(INPUT|TEXTAREA)$/.test(document.activeElement?.tagName);
+  if (e.key === '/' && !typing) { e.preventDefault(); qEl.focus(); qEl.select(); return; }
+  if (e.key === 'Escape') { if (chosen) choose(null); else clearAll(); return; }
+  if (typing && e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+  if (e.key === 'ArrowDown') { e.preventDefault(); step(1); }
+  if (e.key === 'ArrowUp') { e.preventDefault(); step(-1); }
+  if (e.key === 'Enter' && chosen) {
+    const m = M.find((x) => x.i === chosen);
+    if (m?.u) window.open(m.u, '_blank', 'noopener');
+  }
+});
+
+addEventListener('resize', () => {
+  cssCache = {};
+  _insets = null;
+  sizeCanvas();
+  const s = segs.querySelector('.seg[aria-selected="true"]');
+  if (s) moveThumb(s);
+  const m = chosen && M.find((x) => x.i === chosen);
+  if (m) glide(frame({ x0: m.x, y0: m.y, x1: m.x, y1: m.y }, { pad: 27, maxK: 15 }), 260);
+  else glide(frame(boundsOf(rows)), 260);
+});
+
+/* ── open ──────────────────────────────────────────────────────── */
+
+buildSegs();
+sizeCanvas();          // measure the stage first: framing depends on it
+render();
+view = frame(boundsOf(M));
+apply();
+
+// The city draws first; the street network unpacks behind it.
+const unpack = () => { decodeStreets(); paint(); };
+'requestIdleCallback' in window ? requestIdleCallback(unpack, { timeout: 1200 }) : setTimeout(unpack, 80);

@@ -2,9 +2,16 @@ Museo
 
 The code in this repository is licensed under the MIT License (see LICENSE).
 
-The data in data/ carries its own terms — see data/README.md:
-  data/museums.json   ODbL 1.0; coordinates © OpenStreetMap contributors
-  data/boroughs.json  NYC Department of City Planning, NYC Open Data Terms of Use
+The data carries its own terms:
 
-The Whitney typeface is © Hoefler & Co. It is not included in this repository
-and is not covered by its licence.
+  data/museums.json      ODbL 1.0; coordinates © OpenStreetMap contributors
+  data/boroughs.json     NYC Department of City Planning, NYC Open Data Terms
+                         of Use
+  web/city.js            generated from the two files above; same terms
+  web/streets-data.js    generated from the NYC Street Centerline (CSCL),
+                         NYC DoITT, dataset inkn-q76z, NYC Open Data Terms
+                         of Use
+
+See data/README.md for how each was obtained and rebuilt.
+
+The site is set in the reader's own system sans and serves no font files.

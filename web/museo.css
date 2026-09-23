@@ -1,0 +1,495 @@
+  /* ────────────────────────────────────────────────────────────────
+     Museo — an index of the museums of New York City.
+     One visual world: the city after dark, seen from above. Single
+     theme by intent, so every colour is stated and the page holds on
+     any host ground.
+     ──────────────────────────────────────────────────────────────── */
+
+  :root {
+    color-scheme: dark;
+
+    /* Graphite with a blue bias — a chosen neutral, not inherited black. */
+    --ground:   #0b0c0e;
+    --water:    #0b0c0e;
+    --land:     #1c1f24;
+    --land-hi:  #22262b;
+    --shore:    rgba(255, 255, 255, 0.17);
+
+    /* Glass: panels sit over the city and let it through. */
+    /* No backdrop blur. Measured against this map it changed 0.06 of
+       255, and it re-blurred the whole panel on every frame of every
+       drag to do it. The glass is carried by opacity, edge and shadow
+       instead — which the compositor gets for free. */
+    --glass:      rgba(19, 21, 25, 0.93);
+    --glass-edge: rgba(255, 255, 255, 0.09);
+    --glass-lip:  rgba(255, 255, 255, 0.06);
+    --fill:       rgba(255, 255, 255, 0.055);
+    --fill-hi:    rgba(255, 255, 255, 0.09);
+
+    --ink:   #f2f3f5;
+    --ink-2: rgba(242, 243, 245, 0.62);
+    --ink-3: rgba(242, 243, 245, 0.34);
+    --line:  rgba(255, 255, 255, 0.07);
+
+    /* The one warm thing on the page: gallery light. It marks the
+       museum you have chosen, and nothing else. */
+    --amber:     #e9b872;
+    --amber-dim: rgba(233, 184, 114, 0.16);
+
+    --pin:       rgba(255, 255, 255, 0.76);
+    --pin-hover: #ffffff;
+
+    --r-lg: 22px;
+    --r-md: 14px;
+    --r-sm: 10px;
+
+    --ease: cubic-bezier(0.32, 0.72, 0, 1);
+    --panel-w: 372px;
+  }
+
+  /* The artifact host supplied these; a page that stands on its own
+     states them itself. */
+  html { color-scheme: dark; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI",
+                 system-ui, Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  /* Display optical size, tight, for anything set large. */
+  .display {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui,
+                 "Helvetica Neue", Arial, sans-serif;
+    letter-spacing: -0.024em;
+  }
+
+  .micro {
+    font-size: 11px;
+    font-weight: 590;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .tnum { font-variant-numeric: tabular-nums; }
+
+  :focus-visible {
+    outline: 2px solid var(--amber);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* ── the city ─────────────────────────────────────────────────── */
+
+  #stage { position: fixed; inset: 0; background: var(--water); }
+
+  #base { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+  #map {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    display: block;
+    touch-action: none;
+    cursor: grab;
+  }
+  #map.dragging { cursor: grabbing; }
+
+  /* A real scale. Distance here is counted in blocks and avenues, so
+     the bar answers in feet until feet stop being useful. Under it,
+     the one line that says why the grid has not arrived yet. */
+  .scale {
+    position: fixed;
+    left: calc(18px + var(--panel-w) + 22px);
+    bottom: 20px;
+    z-index: 2;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .scale-bar { display: flex; align-items: flex-end; gap: 8px; }
+  .scale-bar i {
+    display: block;
+    height: 5px;
+    width: 64px;
+    border: 1px solid rgba(242, 243, 245, 0.28);
+    border-top: 0;
+    transition: width 0.15s linear;
+  }
+  .scale-bar b {
+    font-size: 10.5px;
+    font-weight: 500;
+    line-height: 1;
+    color: rgba(242, 243, 245, 0.42);
+    font-variant-numeric: tabular-nums;
+  }
+  .scale-note {
+    margin: 0;
+    font-size: 11.5px;
+    color: var(--ink-3);
+    transition: opacity 0.4s var(--ease);
+  }
+  body.close .scale-note { opacity: 0; }
+
+  /* A pin is a zero-length path with a round cap — a dot — and its
+     stroke does not scale with the map. So the whole set stays the
+     same size on screen at any zoom without a single write per frame:
+     the browser holds them steady, not the script. */
+  .pin {
+    fill: none;
+    stroke: var(--pin);
+    stroke-width: 6.6px;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+    cursor: pointer;
+    transition: stroke 0.18s ease, stroke-width 0.18s ease;
+  }
+  .pin:hover { stroke: var(--pin-hover); }
+  .pin.on { stroke: var(--amber); stroke-width: 10px; }
+
+  /* The glow is a wider dot underneath, not a filter: same look, none
+     of the per-frame rasterising a drop-shadow costs during a zoom. */
+  .glow {
+    fill: none;
+    stroke: var(--amber);
+    stroke-width: 26px;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s var(--ease);
+  }
+  body.picked .glow { opacity: 0.17; }
+
+  .halo {
+    fill: none;
+    stroke: var(--amber);
+    stroke-width: 1px;
+    vector-effect: non-scaling-stroke;
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  /* ── glass ────────────────────────────────────────────────────── */
+
+  .glass {
+    background: var(--glass);
+    border: 1px solid var(--glass-edge);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55),
+                inset 0 1px 0 var(--glass-lip);
+  }
+
+  /* ── panel ────────────────────────────────────────────────────── */
+
+  #panel {
+    position: fixed;
+    top: max(18px, env(safe-area-inset-top, 0px));
+    left: 18px;
+    bottom: 18px;
+    width: var(--panel-w);
+    border-radius: var(--r-lg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 3;
+  }
+
+  .masthead {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 20px 14px;
+  }
+
+  .wordmark {
+    margin: 0;
+    font-size: 25px;
+    font-weight: 680;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+  }
+  .sub { margin: 3px 0 0; font-size: 13px; color: var(--ink-3); }
+
+  .tally { text-align: right; flex: none; }
+  .tally-n {
+    font-size: 27px;
+    font-weight: 640;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    display: block;
+  }
+  .tally-l { margin-top: 3px; }
+
+  .controls { padding: 0 16px 12px; display: flex; flex-direction: column; gap: 10px; }
+
+  .search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: var(--fill);
+    border: 1px solid transparent;
+    border-radius: var(--r-md);
+    padding: 0 10px 0 34px;
+    height: 38px;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+  .search:focus-within { background: var(--fill-hi); border-color: var(--glass-edge); }
+  .search svg { position: absolute; left: 11px; width: 15px; height: 15px; color: var(--ink-3); }
+  .search input {
+    flex: 1; min-width: 0;
+    background: none; border: 0; outline: none;
+    color: var(--ink); font: inherit; font-size: 15px;
+    padding: 0;
+  }
+  .search input::placeholder { color: var(--ink-3); }
+  .search button {
+    flex: none; border: 0; background: none; padding: 4px;
+    color: var(--ink-3); cursor: pointer; display: none; line-height: 0;
+  }
+  .search button:hover { color: var(--ink); }
+  .search.has-text button { display: block; }
+
+  /* Borough filter. Two rows of three, so every borough is on screen
+     at once: nothing is parked off an edge waiting to be scrolled to.
+     One pill slides between them, in both directions. */
+  .segmented {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: var(--fill);
+    border-radius: var(--r-md);
+    padding: 3px;
+  }
+  .thumb {
+    position: absolute;
+    top: 0; left: 0;
+    width: 0; height: 0;
+    border-radius: 11px;
+    background: var(--fill-hi);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4), inset 0 1px 0 var(--glass-lip);
+    transition: transform 0.36s var(--ease), width 0.36s var(--ease),
+                height 0.36s var(--ease);
+    pointer-events: none;
+  }
+  .seg {
+    position: relative;
+    min-width: 0;
+    border: 0; background: none;
+    padding: 7px 6px;
+    border-radius: 11px;
+    color: var(--ink-2);
+    font: inherit; font-size: 13px; font-weight: 510;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+  .seg[aria-selected="true"] { color: var(--ink); font-weight: 590; }
+  .seg .n { color: var(--ink-3); font-variant-numeric: tabular-nums; margin-left: 5px; }
+  .seg[aria-selected="true"] .n { color: var(--ink-2); }
+
+  /* ── index ────────────────────────────────────────────────────── */
+
+  #list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 4px 8px 12px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+  }
+  #list {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 10px,
+                                        black calc(100% - 22px), transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, black 10px,
+                                black calc(100% - 22px), transparent 100%);
+  }
+  #list::-webkit-scrollbar { width: 8px; }
+  #list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.14);
+    border-radius: 99px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  .row {
+    display: block;
+    width: 100%;
+    text-align: left;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    padding: 9px 12px;
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    transition: background 0.16s ease;
+  }
+  .row:hover, .row.peek { background: var(--fill); }
+  .row.on { background: var(--amber-dim); }
+
+  .row-n {
+    font-size: 15.5px;
+    font-weight: 560;
+    letter-spacing: -0.014em;
+    line-height: 1.3;
+  }
+  .row.on .row-n { color: var(--amber); }
+  .row-m {
+    margin-top: 2px;
+    font-size: 12.5px;
+    color: var(--ink-3);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .row mark { background: none; color: var(--amber); }
+
+  .empty { padding: 30px 20px; text-align: center; color: var(--ink-3); font-size: 14px; }
+  .empty button {
+    display: block; margin: 12px auto 0;
+    background: var(--fill); border: 1px solid var(--glass-edge);
+    color: var(--ink); font: inherit; font-size: 13px;
+    padding: 7px 14px; border-radius: 99px; cursor: pointer;
+  }
+  .empty button:hover { background: var(--fill-hi); }
+
+  .hint {
+    padding: 10px 20px calc(12px + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid var(--line);
+    display: flex; gap: 14px; align-items: center;
+    font-size: 11px; color: var(--ink-3);
+  }
+  kbd {
+    font: inherit; font-size: 10.5px;
+    background: var(--fill); border: 1px solid var(--glass-edge);
+    border-radius: 5px; padding: 1px 5px; color: var(--ink-2);
+  }
+
+  /* ── detail card ──────────────────────────────────────────────── */
+
+  #card {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    width: 348px;
+    max-width: calc(100vw - 36px);
+    border-radius: var(--r-lg);
+    padding: 18px;
+    z-index: 4;
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+    pointer-events: none;
+    transition: opacity 0.34s var(--ease), transform 0.34s var(--ease);
+  }
+  #card.show { opacity: 1; transform: none; pointer-events: auto; }
+
+  .card-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+  .card-n { margin: 0; font-size: 21px; font-weight: 650; letter-spacing: -0.026em; line-height: 1.18; }
+  .card-x {
+    flex: none; width: 26px; height: 26px; border-radius: 99px;
+    border: 0; background: var(--fill); color: var(--ink-2);
+    cursor: pointer; line-height: 0; display: grid; place-items: center;
+  }
+  .card-x:hover { background: var(--fill-hi); color: var(--ink); }
+  .card-tags { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .tag {
+    font-size: 11px; font-weight: 560; letter-spacing: 0.02em;
+    padding: 3px 8px; border-radius: 99px;
+    background: var(--fill); color: var(--ink-2);
+  }
+  .tag.amber { background: var(--amber-dim); color: var(--amber); }
+  .card-a { margin: 12px 0 0; font-size: 13.5px; color: var(--ink-2); line-height: 1.5; }
+  .card-do { display: flex; gap: 8px; margin-top: 14px; }
+  .btn {
+    flex: 1;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    height: 36px; border-radius: 11px;
+    font: inherit; font-size: 13.5px; font-weight: 560; letter-spacing: -0.01em;
+    text-decoration: none; cursor: pointer; border: 1px solid transparent;
+    transition: filter 0.18s ease, background 0.18s ease;
+  }
+  .btn-1 { background: var(--amber); color: #201603; }
+  .btn-1:hover { filter: brightness(1.08); }
+  .btn-2 { background: var(--fill); color: var(--ink); border-color: var(--glass-edge); }
+  .btn-2:hover { background: var(--fill-hi); }
+  .btn[aria-disabled="true"] { opacity: 0.4; pointer-events: none; }
+
+  /* ── map controls ─────────────────────────────────────────────── */
+
+  #zoom {
+    position: fixed;
+    top: max(18px, env(safe-area-inset-top, 0px));
+    right: 18px;
+    z-index: 3;
+    border-radius: var(--r-md);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  #zoom button {
+    width: 36px; height: 36px;
+    border: 0; background: none; color: var(--ink);
+    cursor: pointer; display: grid; place-items: center;
+    font-size: 17px; line-height: 0;
+  }
+  #zoom button + button { border-top: 1px solid var(--line); }
+  #zoom button:hover { background: var(--fill); }
+
+  .credit {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 2;
+    font-size: 10.5px;
+    color: rgba(242, 243, 245, 0.26);
+    text-align: right;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .credit a { color: inherit; pointer-events: auto; }
+  body.picked .credit { opacity: 0; }
+
+  /* ── narrow ───────────────────────────────────────────────────── */
+
+  @media (max-width: 780px) {
+    :root { --panel-w: auto; }
+    #stage { bottom: 54%; inset-inline: 0; top: 0; }
+    #panel {
+      top: auto;
+      left: 0; right: 0; bottom: 0;
+      height: 54%;
+      border-radius: var(--r-lg) var(--r-lg) 0 0;
+      border-bottom: 0;
+    }
+    #zoom { top: max(14px, env(safe-area-inset-top, 0px)); bottom: auto; right: 14px; }
+    #card { bottom: calc(54% + 14px); right: 14px; left: 14px; width: auto; }
+    .credit { bottom: calc(54% + 10px); left: 14px; right: auto; text-align: left; }
+    .scale { left: 14px; bottom: calc(54% + 28px); }
+    body.picked .scale { opacity: 0; }
+    .hint { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
+  }

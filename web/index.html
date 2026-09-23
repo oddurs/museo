@@ -1,129 +1,109 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="color-scheme" content="light" />
-    <title>Museo — New York City Museums</title>
-    <meta name="description" content="An index of every museum in the five boroughs of New York City — art, history, science and the specific." />
-    <meta name="theme-color" content="#ff3b00" />
-    <link rel="icon" href="mark.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="mark.svg" />
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Museo — Museums of New York City</title>
+<meta name="description" content="An index of the 107 museums of the five boroughs, on a drawn map of the city after dark.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0b0c0e">
+<link rel="icon" href="mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="museo.css">
+</head>
+<body>
+<div id="stage">
+  <canvas id="base" aria-hidden="true"></canvas>
+  <svg id="map" role="img" aria-label="New York City, with a point at each museum">
+    <g id="scene">
+      <g id="pins"></g>
+    </g>
+  </svg>
+</div>
 
-    <link rel="preload" as="font" type="font/woff2" href="fonts/whitney-light.woff2" crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href="fonts/whitney-book.woff2" crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href="fonts/whitney-ssm-book.woff2" crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href="fonts/whitney-cond-medium.woff2" crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href="fonts/whitney-ssm-medium.woff2" crossorigin />
-    <link rel="preload" as="font" type="font/woff2" href="fonts/whitney-ssm-semibold.woff2" crossorigin />
+<div class="scale" aria-hidden="true">
+  <div class="scale-bar"><i id="scaleBar"></i><b id="scaleTxt">1 mile</b></div>
+  <p class="scale-note" id="scaleNote">Zoom in for streets</p>
+</div>
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-    <link rel="stylesheet" href="fonts.css" />
-    <link rel="stylesheet" href="system.css" />
-    <link rel="stylesheet" href="components.css" />
-    <link rel="stylesheet" href="app.css" />
-  </head>
-
-  <body class="is-loading">
-    <div class="bar" role="presentation"></div>
-
-    <header class="masthead">
-      <div class="masthead__brand">
-        <h1 class="wordmark">Museo</h1>
-        <p class="deck t-body">
-          An index of every museum in the five boroughs —
-          <em>art, history, science and the specific</em>.
-        </p>
-      </div>
-
-      <p class="tally-block">
-        <span class="tally-block__no">N&#186;</span>
-        <span class="tally-block__figure" id="count">—</span>
-        <span class="tally-block__unit t-label" id="count-label">Museums</span>
-      </p>
-    </header>
-
-    <div class="search-bar">
-      <label class="sr-only" for="search">Search museums</label>
-      <span class="sr-only" id="search-hint">
-        Press slash to return here. Arrow down moves into the index.
-      </span>
-      <input
-        id="search"
-        class="field"
-        type="search"
-        placeholder="Search a museum, a neighborhood, an address"
-        aria-describedby="search-hint"
-        autocomplete="off"
-        spellcheck="false"
-      />
-      <button type="button" class="field-clear toggle toggle--plain" id="search-clear" hidden>
-        Clear
-      </button>
+<aside id="panel" class="glass">
+  <header class="masthead">
+    <div>
+      <h1 class="wordmark display">Museo</h1>
+      <p class="sub">Museums of New York City</p>
     </div>
+    <div class="tally">
+      <span class="tally-n display tnum" id="count">107</span>
+      <span class="micro tally-l" id="countLabel">Museums</span>
+    </div>
+  </header>
 
-    <nav class="filters">
-      <div class="filter-set">
-        <span class="t-label filter-set__name">Borough</span>
-        <div class="filter-set__items" id="borough-filters" role="group" aria-label="Filter by borough"></div>
-      </div>
+  <div class="controls">
+    <label class="search" id="searchWrap">
+      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <span class="sr-only" hidden>Search museums</span>
+      <input id="q" type="search" placeholder="Search museums, neighborhoods" autocomplete="off" spellcheck="false" aria-label="Search museums">
+      <button type="button" id="clear" aria-label="Clear search">
+        <svg viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true">
+          <circle cx="8" cy="8" r="7" fill="currentColor" opacity=".28"/>
+          <path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </label>
 
-      <div class="filter-set">
-        <span class="t-label filter-set__name">Discipline</span>
-        <div class="filter-set__items" id="category-filters" role="group" aria-label="Filter by discipline"></div>
-      </div>
+    <div class="segmented" id="segs" role="tablist" aria-label="Filter by borough">
+      <span class="thumb" id="thumb"></span>
+    </div>
+  </div>
 
-      <div class="filter-set filter-set--end">
-        <button type="button" class="toggle" id="viewport-only" aria-pressed="false">
-          On map only
-        </button>
-        <button type="button" class="toggle toggle--plain" id="reset" hidden>Reset</button>
-      </div>
-    </nav>
+  <div id="list" role="list"></div>
 
-    <main class="layout">
-      <p class="sr-only" id="status" role="status" aria-live="polite"></p>
-      <p class="notice t-small" id="notice" hidden></p>
+  <div class="hint">
+    <span><kbd>/</kbd> search</span>
+    <span><kbd>↑</kbd><kbd>↓</kbd> browse</span>
+    <span><kbd>esc</kbd> clear</span>
+  </div>
+</aside>
 
-      <section class="index" aria-label="Museum index">
-        <div class="index__head">
-          <span class="t-label" aria-hidden="true">N&#186;</span>
-          <span class="t-label" aria-hidden="true">Museum</span>
-          <div class="index__order">
-            <span class="t-label index__order-name" aria-hidden="true">Order</span>
-            <div class="index__order-items" id="sort-options" role="radiogroup" aria-label="Order the index"></div>
-          </div>
-        </div>
-        <div class="index__scroll" id="scroll">
-          <ol class="index__list" id="list"></ol>
+<section id="card" class="glass" aria-live="polite">
+  <div class="card-top">
+    <h2 class="card-n display" id="cName"></h2>
+    <button class="card-x" id="cClose" type="button" aria-label="Close">
+      <svg viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true">
+        <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+  <div class="card-tags" id="cTags"></div>
+  <p class="card-a" id="cAddr"></p>
+  <div class="card-do">
+    <a class="btn btn-1" id="cSite" target="_blank" rel="noopener noreferrer">Visit site</a>
+    <a class="btn btn-2" id="cMap" target="_blank" rel="noopener noreferrer">Directions</a>
+  </div>
+</section>
 
-          <div class="index__empty" id="empty" hidden>
-            <span class="t-label">Nothing matches</span>
-            <button type="button" class="empty__reset toggle toggle--plain">Clear the filters</button>
-          </div>
+<div id="zoom" class="glass">
+  <button type="button" id="zin" aria-label="Zoom in">
+    <svg viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true">
+      <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <button type="button" id="zout" aria-label="Zoom out">
+    <svg viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true">
+      <path d="M3 8h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+    </svg>
+  </button>
+</div>
 
-          <footer class="colophon">
-            <img class="colophon__mark" src="mark.svg" width="28" height="28" alt="" />
-            <p class="wordmark wordmark--imprint">Museo</p>
-            <p class="colophon__imprint t-small">
-              An index of the museums of New York City, all five boroughs.
-              Compiled from public sources; coordinates from OpenStreetMap.
-              Set in Whitney, Whitney ScreenSmart and Whitney Condensed.
-            </p>
-            <p class="colophon__foot">
-              <span class="t-label">N&#186; <span id="colophon-count">107</span></span>
-              <span class="t-label">New York</span>
-            </p>
-          </footer>
-        </div>
-      </section>
-
-      <section class="map-pane" aria-label="Map">
-        <div id="map"></div>
-      </section>
-    </main>
-
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-    <script src="app.js" type="module"></script>
-  </body>
+<p class="credit">
+  Boroughs: NYC Planning · Coordinates:
+  <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>
+</p>
+<script src="city.js"></script>
+<script src="streets-data.js"></script>
+<script src="cartography.js"></script>
+<script src="app.js"></script>
+</body>
 </html>
