@@ -12,6 +12,7 @@ const card = el('card');
 
 let rows = M.slice();
 let borough = null, query = '', chosen = null, cursor = -1;
+let here = null;                 // {lat, lng, x, y} once you have said where
 const pinOf = new Map();
 let view = { k: 1, x: 0, y: 0 };
 
@@ -25,6 +26,11 @@ const LAND_PATHS = LAND.map((b) => ({ n: b.n, p: new Path2D(b.d) }));
 const NS = 'http://www.w3.org/2000/svg';
 const mk = (tag, cls) => { const e = document.createElementNS(NS, tag); e.setAttribute('class', cls); return e; };
 const dotAt = (m) => `M${m.x} ${m.y}l0 0`;
+
+const youRing = mk('circle', 'you');
+const youDot = mk('path', 'you-dot');
+youRing.setAttribute('r', 0);
+pinsG.append(youDot, youRing);
 
 const glow = mk('path', 'glow');
 const halo = mk('circle', 'halo');
@@ -80,6 +86,7 @@ function paint() {
 function commit() {
   scene.setAttribute('transform', `translate(${view.x} ${view.y}) scale(${view.k})`);
   if (chosen) halo.setAttribute('r', 21 / view.k);
+  if (here) youRing.setAttribute('r', 11 / view.k);
   updateScale();
   render3d();
 }
@@ -236,6 +243,83 @@ svg.addEventListener('wheel', (e) => {
 el('zin').addEventListener('click', () => zoomAt(sw / 2, sh / 2, 1.6));
 el('zout').addEventListener('click', () => zoomAt(sw / 2, sh / 2, 1 / 1.6));
 
+/* ── where you are ──────────────────────────────────────────────────
+   Distance is the question a museum index actually gets asked in the
+   city: not what exists, but what is near. It stays off until asked —
+   nothing here wants your location for its own sake. */
+
+const R_MILES = 3958.8;
+const rad = (d) => (d * Math.PI) / 180;
+function milesFrom(a, lat, lng) {
+  const dLat = rad(lat - a.lat), dLng = rad(lng - a.lng);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(lat)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R_MILES * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+
+/* Close up, New York answers in blocks, so the reading is in feet until
+   feet stop being useful. */
+function howFar(mi) {
+  const ft = mi * 5280;
+  if (ft < 1000) return `${Math.round(ft / 50) * 50} ft`;
+  if (mi < 10) return `${mi.toFixed(1)} mi`;
+  return `${Math.round(mi)} mi`;
+}
+
+const nearBtn = el('near');
+function setHere(pos) {
+  here = pos;
+  nearBtn.setAttribute('aria-pressed', String(!!pos));
+  if (pos) {
+    const x = PROJ.sx * pos.lng + PROJ.bx;   // the projection the build published
+    const y = PROJ.sy * ((Math.log(Math.tan(Math.PI / 4 + pos.lat * Math.PI / 360)) * 180) / Math.PI) + PROJ.by;
+    here = { ...pos, x, y };
+    youDot.setAttribute('d', `M${x} ${y}l0 0`);
+    youRing.setAttribute('cx', x); youRing.setAttribute('cy', y); youRing.setAttribute('r', 11 / view.k);
+  } else {
+    youRing.setAttribute('r', 0);
+    youDot.removeAttribute('d');
+  }
+  render();
+}
+
+nearBtn.addEventListener('click', () => {
+  if (here) { setHere(null); return; }
+  if (!navigator.geolocation) { nearBtn.setAttribute('aria-label', 'This browser cannot report a location'); return; }
+  nearBtn.dataset.busy = 'true';
+  navigator.geolocation.getCurrentPosition(
+    (p) => { delete nearBtn.dataset.busy; setHere({ lat: p.coords.latitude, lng: p.coords.longitude }); },
+    () => {
+      delete nearBtn.dataset.busy;
+      nearBtn.setAttribute('aria-label', 'Location unavailable — sorting stays A to Z');
+      nearBtn.title = 'Location unavailable';
+    },
+    { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 },
+  );
+});
+
+/* ── the view in the address bar ────────────────────────────────────
+   A view you cannot send to someone, or reload, is not really a view. */
+
+function writeURL() {
+  const q = new URLSearchParams();
+  if (query) q.set('q', query);
+  if (borough) q.set('b', borough);
+  if (chosen) q.set('m', chosen);
+  const target = q.toString() ? `${location.pathname}?${q}` : location.pathname;
+  if (target !== location.pathname + location.search) history.replaceState(null, '', target);
+}
+
+function readURL() {
+  const q = new URLSearchParams(location.search);
+  query = (q.get('q') || '').trim();
+  qEl.value = query;
+  el('searchWrap').classList.toggle('has-text', !!query);
+  const b = q.get('b');
+  borough = BOROUGHS.includes(b) ? b : null;
+  const m = q.get('m');
+  return M.some((x) => x.i === m) ? m : null;
+}
+
 /* ── filtering ─────────────────────────────────────────────────── */
 
 const fold = (s) => s.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
@@ -264,6 +348,10 @@ function mark(text) {
 
 function render({ refit = false } = {}) {
   rows = M.filter((m) => matches(m));
+  if (here) {
+    for (const m of rows) m._mi = milesFrom(here, m.lat, m.lng);
+    rows.sort((a, b) => a._mi - b._mi);
+  }
   listEl.innerHTML = '';
 
   if (!rows.length) {
@@ -281,7 +369,8 @@ function render({ refit = false } = {}) {
       b.dataset.id = m.i;
       b.setAttribute('role', 'listitem');
       b.innerHTML = `<div class="row-n">${mark(m.n)}</div>
-        <div class="row-m">${mark(m.h || m.b)} · ${mark(m.a)}</div>`;
+        <div class="row-m">${mark(m.h || m.b)} · ${mark(m.a)}</div>` +
+        (here ? `<div class="row-d">${howFar(m._mi)}</div>` : '');
       b.addEventListener('click', () => choose(m.i, { from: 'list' }));
       b.addEventListener('pointerenter', () => peek(m.i, true));
       b.addEventListener('pointerleave', () => peek(m.i, false));
@@ -304,6 +393,7 @@ function render({ refit = false } = {}) {
   for (const [id, c] of pinOf) c.style.display = rows.some((m) => m.i === id) ? '' : 'none';
 
   cursor = rows.findIndex((m) => m.i === chosen);
+  writeURL();
   if (refit) glide(frame(boundsOf(rows)));
   else paint();
 }
@@ -322,7 +412,7 @@ function choose(id, { from = 'list' } = {}) {
   for (const [mid, c] of pinOf) { c.style.stroke = ''; c.classList.toggle('on', mid === id); }
   for (const r of listEl.querySelectorAll('.row')) r.classList.toggle('on', r.dataset.id === id);
 
-  if (!id) { card.classList.remove('show'); halo.setAttribute('r', 0); _insets = null; return; }
+  if (!id) { card.classList.remove('show'); halo.setAttribute('r', 0); _insets = null; writeURL(); return; }
 
   const m = M.find((x) => x.i === id);
   cursor = rows.findIndex((x) => x.i === id);
@@ -341,6 +431,7 @@ function choose(id, { from = 'list' } = {}) {
   else { site.removeAttribute('href'); site.setAttribute('aria-disabled', 'true'); site.textContent = 'No website'; }
   el('cMap').href = `https://maps.apple.com/?q=${encodeURIComponent(m.n)}&ll=${m.lat},${m.lng}`;
   card.classList.add('show');
+  writeURL();
 
   // close enough that the cross streets are legible
   if (from === 'list') glide(frame({ x0: m.x, y0: m.y, x1: m.x, y1: m.y }, { pad: 27, maxK: 15 }), 780);
@@ -368,7 +459,8 @@ function buildSegs() {
   };
   const all = make('All', null);
   for (const b of BOROUGHS) make(b === 'Staten Island' ? 'Staten Is.' : b, b);
-  requestAnimationFrame(() => moveThumb(all));
+  const active = segs.querySelector('.seg[aria-selected="true"]') || all;
+  requestAnimationFrame(() => moveThumb(active));
 }
 
 function moveThumb(s) {
@@ -396,6 +488,7 @@ function clearAll() {
   moveThumb(segs.querySelector('.seg'));
   choose(null);
   render({ refit: true });
+  writeURL();
 }
 
 function step(d) {
@@ -432,10 +525,19 @@ addEventListener('resize', () => {
 
 /* ── open ──────────────────────────────────────────────────────── */
 
+// A link carries the search, the borough and the museum. Restore them
+// before anything is drawn, so the page opens on the view that was sent
+// rather than flying to it afterwards.
+const asked = readURL();
 buildSegs();
 sizeCanvas();          // measure the stage first: framing depends on it
 render();
-view = frame(boundsOf(M));
+view = frame(boundsOf(rows));
+if (asked) {
+  const m = M.find((x) => x.i === asked);
+  choose(asked, { from: 'map' });
+  view = frame({ x0: m.x, y0: m.y, x1: m.x, y1: m.y }, { pad: 27, maxK: 15 });
+}
 apply();
 
 // The city draws first; the street network unpacks behind it.

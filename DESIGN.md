@@ -61,6 +61,18 @@ Drawn, not tiled — there is no tile server and no key.
   browser holds them at a constant size through every zoom without the script
   writing to them.
 
+## State
+
+The search, the borough and the selected museum are written to the address bar
+with `replaceState` — enough that a view survives a reload and travels in a
+link, without filling anyone's back button with keystrokes. A restored link
+sets the view directly rather than animating to it: you arrive where you were
+sent.
+
+Where you are is deliberately **not** in the link. It belongs to the device, not
+to the view, and a shared URL should never make someone else's browser ask for
+their location.
+
 ## Motion
 
 One `requestAnimationFrame` per frame does every write; pointer events only

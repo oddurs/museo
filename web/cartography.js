@@ -194,8 +194,8 @@ function drawLabels(ctx, labels, k, vx, vy, dpr) {
    names itself first; the creeks last.
    ─────────────────────────────────────────────────────────────────── */
 
-const MX = (lng) => 1706.2553 * lng + 126725.0099;
-const MY = (lat) => -97762.249 * Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360)) + 76664.8167;
+const MX = (lng) => PROJ.sx * lng + PROJ.bx;
+const MY = (lat) => PROJ.sy * ((Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360)) * 180) / Math.PI) + PROJ.by;
 
 const WATER = [
   ['Atlantic Ocean',     [40.5250, -73.9900], [40.5330, -73.8300], [40.5450, -73.7600]],

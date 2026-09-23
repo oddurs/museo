@@ -38,7 +38,14 @@ npm run site     # assemble the public site in _site/, as Pages serves it
 - **Filters** — every borough visible at once, and full-text search over name,
   neighbourhood and address. Terms match independently, so "children brooklyn"
   works.
-- **A real scale bar**, reading in feet until feet stop being useful.
+- **Distance from where you are.** Off until you ask for it; then the index
+  sorts nearest first and every entry says how far, in feet until feet stop
+  being useful. Your location never enters the URL — it is a fact about your
+  device, not about the view.
+- **A real scale bar**, on the same reading.
+- **Shareable.** The search, the borough and the selected museum live in the
+  address bar, so a view survives a reload and can be sent to someone. A link
+  opens *on* that view rather than flying to it.
 - **Keyboard** — `/` jumps to search, `↑` `↓` move through the index and fly the
   map along, `Enter` opens the museum's site, `Escape` clears.
 
