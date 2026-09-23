@@ -29,7 +29,7 @@
   <header class="masthead">
     <div>
       <h1 class="wordmark display">Museo</h1>
-      <p class="sub">Museums of New York City</p>
+      <p class="sub">The five boroughs</p>
     </div>
     <div class="tally">
       <span class="tally-n display tnum" id="count">107</span>
@@ -44,7 +44,6 @@
         <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/>
         <path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
       </svg>
-      <span class="sr-only" hidden>Search museums</span>
       <input id="q" type="search" placeholder="Search museums, neighborhoods" autocomplete="off" spellcheck="false" aria-label="Search museums">
       <button type="button" id="clear" aria-label="Clear search">
         <svg viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true">
@@ -69,7 +68,7 @@
     </div>
   </div>
 
-  <div id="list" role="list"></div>
+  <div id="list" role="listbox" aria-label="Museums" tabindex="-1"></div>
 
   <div class="hint">
     <span><kbd>/</kbd> search</span>
@@ -109,8 +108,8 @@
 </div>
 
 <p class="credit">
-  Boroughs: NYC Planning · Coordinates:
-  <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>
+  <span class="credit-long">Boroughs: </span>NYC Planning ·
+  <span class="credit-long">Coordinates: </span><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>
 </p>
 <script src="city.js"></script>
 <script src="streets-data.js"></script>

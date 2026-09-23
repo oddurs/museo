@@ -25,6 +25,7 @@ jobs:
       # nothing ships that the data or map checks would refuse
       - run: node scripts/check-data.mjs
       - run: node scripts/check-map.mjs
+      - run: node scripts/check-css.mjs
       - run: node scripts/build-site.mjs
       - name: Refuse to publish font files
         run: |

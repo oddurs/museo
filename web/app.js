@@ -367,9 +367,13 @@ function render({ refit = false } = {}) {
       b.type = 'button';
       b.className = 'row' + (m.i === chosen ? ' on' : '');
       b.dataset.id = m.i;
-      b.setAttribute('role', 'listitem');
+      // A list you choose from is a listbox, and a listbox is one stop on
+      // the tab ring, not a hundred and seven. Arrows move within it.
+      b.setAttribute('role', 'option');
+      b.setAttribute('aria-selected', String(m.i === chosen));
+      b.tabIndex = -1;
       b.innerHTML = `<div class="row-n">${mark(m.n)}</div>
-        <div class="row-m">${mark(m.h || m.b)} · ${mark(m.a)}</div>` +
+        <div class="row-m"><span class="row-h">${mark(m.h || m.b)}</span> · ${mark(m.a)}</div>` +
         (here ? `<div class="row-d">${howFar(m._mi)}</div>` : '');
       b.addEventListener('click', () => choose(m.i, { from: 'list' }));
       b.addEventListener('pointerenter', () => peek(m.i, true));
@@ -377,6 +381,7 @@ function render({ refit = false } = {}) {
       frag.appendChild(b);
     }
     listEl.appendChild(frag);
+    tabStop();
   }
 
   el('count').textContent = rows.length;
@@ -398,6 +403,13 @@ function render({ refit = false } = {}) {
   else paint();
 }
 
+/* Exactly one row is reachable by Tab: the chosen one, or the first. */
+function tabStop() {
+  for (const r of listEl.querySelectorAll('.row')) r.tabIndex = -1;
+  const one = listEl.querySelector('.row.on') || listEl.querySelector('.row');
+  if (one) one.tabIndex = 0;
+}
+
 function peek(id, on) {
   listEl.querySelector(`.row[data-id="${CSS.escape(id)}"]`)?.classList.toggle('peek', on);
   const p = pinOf.get(id);
@@ -410,7 +422,12 @@ function choose(id, { from = 'list' } = {}) {
   chosen = id;
   document.body.classList.toggle('picked', !!id);
   for (const [mid, c] of pinOf) { c.style.stroke = ''; c.classList.toggle('on', mid === id); }
-  for (const r of listEl.querySelectorAll('.row')) r.classList.toggle('on', r.dataset.id === id);
+  for (const r of listEl.querySelectorAll('.row')) {
+    const on = r.dataset.id === id;
+    r.classList.toggle('on', on);
+    r.setAttribute('aria-selected', String(on));
+  }
+  tabStop();
 
   if (!id) { card.classList.remove('show'); halo.setAttribute('r', 0); _insets = null; writeURL(); return; }
 
@@ -495,7 +512,12 @@ function step(d) {
   if (!rows.length) return;
   cursor = Math.min(rows.length - 1, Math.max(0, cursor + d));
   const m = rows[cursor];
+  const inList = listEl.contains(document.activeElement);
   choose(m.i, { from: 'map' });
+  // keep the keyboard where the eye is
+  const row = listEl.querySelector(`.row[data-id="${CSS.escape(m.i)}"]`);
+  row?.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
+  if (inList) row?.focus({ preventScroll: true });
   glide(frame({ x0: m.x, y0: m.y, x1: m.x, y1: m.y }, { pad: 27, maxK: 15 }), 640);
 }
 

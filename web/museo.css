@@ -39,6 +39,17 @@
     --pin:       rgba(255, 255, 255, 0.76);
     --pin-hover: #ffffff;
 
+    /* A type scale, not a pile of numbers. Each step carries the
+       tracking its size wants: set large, type needs tightening; set
+       small and in capitals, it needs opening. */
+    --t-mark:  26px;   --tr-mark:  -0.03em;    /* the wordmark */
+    --t-title: 20px;   --tr-title: -0.026em;   /* a museum, on its card */
+    --t-count: 21px;   --tr-count: -0.022em;   /* numbers that count */
+    --t-lead:  15px;   --tr-lead:  -0.016em;   /* a museum, in the index */
+    --t-body:  13px;   --tr-body:  -0.008em;   /* chips, buttons, the line under the mark */
+    --t-meta:  12.5px; --tr-meta:  0;          /* where a museum is */
+    --t-micro: 10.5px; --tr-micro: 0.075em;    /* tracked capitals */
+
     --r-lg: 22px;
     --r-md: 14px;
     --r-sm: 10px;
@@ -76,9 +87,9 @@
   }
 
   .micro {
-    font-size: 11px;
+    font-size: var(--t-micro);
     font-weight: 590;
-    letter-spacing: 0.07em;
+    letter-spacing: var(--tr-micro);
     text-transform: uppercase;
     color: var(--ink-3);
   }
@@ -206,32 +217,40 @@
     z-index: 3;
   }
 
+  /* The mark and the count sit on one baseline. The count used to be set
+     nearly as large as the name of the thing, which made the head of the
+     panel feel top-heavy; it is a number, and it reads as one. */
   .masthead {
     display: flex;
-    align-items: flex-start;
+    align-items: baseline;
     justify-content: space-between;
     gap: 16px;
-    padding: 20px 20px 14px;
+    padding: 20px 20px 15px;
   }
 
   .wordmark {
     margin: 0;
-    font-size: 25px;
-    font-weight: 680;
-    letter-spacing: -0.03em;
-    line-height: 1.05;
+    font-size: var(--t-mark);
+    font-weight: 660;
+    letter-spacing: var(--tr-mark);
+    line-height: 1.04;
   }
-  .sub { margin: 3px 0 0; font-size: 13px; color: var(--ink-3); }
+  .sub {
+    margin: 5px 0 0;
+    font-size: var(--t-body);
+    letter-spacing: var(--tr-body);
+    color: var(--ink-3);
+  }
 
   .tally { text-align: right; flex: none; }
   .tally-n {
-    font-size: 27px;
-    font-weight: 640;
-    letter-spacing: -0.03em;
+    font-size: var(--t-count);
+    font-weight: 620;
+    letter-spacing: var(--tr-count);
     line-height: 1;
     display: block;
   }
-  .tally-l { margin-top: 3px; }
+  .tally-l { margin-top: 5px; }
 
   .controls { padding: 0 16px 12px; display: flex; flex-direction: column; gap: 10px; }
 
@@ -272,7 +291,7 @@
     transition: background 0.2s ease, border-color 0.2s ease;
   }
   .search:focus-within { background: var(--fill-hi); border-color: var(--glass-edge); }
-  .search svg { position: absolute; left: 11px; width: 15px; height: 15px; color: var(--ink-3); }
+  .search > svg { position: absolute; left: 12px; width: 15px; height: 15px; color: var(--ink-3); }
   .search input {
     flex: 1; min-width: 0;
     background: none; border: 0; outline: none;
@@ -281,8 +300,9 @@
   }
   .search input::placeholder { color: var(--ink-3); }
   .search button {
-    flex: none; border: 0; background: none; padding: 4px;
+    flex: none; border: 0; background: none; padding: 3px;
     color: var(--ink-3); cursor: pointer; display: none; line-height: 0;
+    border-radius: 99px;
   }
   .search button:hover { color: var(--ink); }
   .search.has-text button { display: block; }
@@ -317,8 +337,8 @@
     padding: 7px 6px;
     border-radius: 11px;
     color: var(--ink-2);
-    font: inherit; font-size: 13px; font-weight: 510;
-    letter-spacing: -0.01em;
+    font: inherit; font-size: var(--t-body); font-weight: 520;
+    letter-spacing: var(--tr-body);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -326,7 +346,7 @@
     transition: color 0.2s ease;
   }
   .seg[aria-selected="true"] { color: var(--ink); font-weight: 590; }
-  .seg .n { color: var(--ink-3); font-variant-numeric: tabular-nums; margin-left: 5px; }
+  .seg .n { color: var(--ink-3); font-variant-numeric: tabular-nums; margin-left: 6px; font-size: 12px; }
   .seg[aria-selected="true"] .n { color: var(--ink-2); }
 
   /* ── index ────────────────────────────────────────────────────── */
@@ -341,10 +361,10 @@
     scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
   }
   #list {
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 10px,
-                                        black calc(100% - 22px), transparent 100%);
-    mask-image: linear-gradient(to bottom, transparent 0, black 10px,
-                                black calc(100% - 22px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 18px,
+                                        black calc(100% - 26px), transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, black 18px,
+                                black calc(100% - 26px), transparent 100%);
   }
   #list::-webkit-scrollbar { width: 8px; }
   #list::-webkit-scrollbar-thumb {
@@ -356,16 +376,16 @@
 
   .row {
     display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: baseline;
-    column-gap: 10px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'name dist' 'meta dist';
+    column-gap: 12px;
     width: 100%;
     text-align: left;
     border: 0;
     background: none;
     color: inherit;
     font: inherit;
-    padding: 9px 12px;
+    padding: 10px 12px;
     border-radius: var(--r-sm);
     cursor: pointer;
     transition: background 0.16s ease;
@@ -374,27 +394,31 @@
   .row.on { background: var(--amber-dim); }
 
   .row-n {
-    font-size: 15.5px;
-    font-weight: 560;
-    letter-spacing: -0.014em;
-    line-height: 1.3;
+    grid-area: name;
+    font-size: var(--t-lead);
+    font-weight: 570;
+    letter-spacing: var(--tr-lead);
+    line-height: 1.32;
   }
   .row.on .row-n { color: var(--amber); }
   .row-m {
-    margin-top: 2px;
-    font-size: 12.5px;
+    grid-area: meta;
+    margin-top: 3px;
+    font-size: var(--t-meta);
+    letter-spacing: var(--tr-meta);
     color: var(--ink-3);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  .row-h { color: var(--ink-2); }
+  .row.on .row-h { color: rgba(233, 184, 114, 0.72); }
   .row mark { background: none; color: var(--amber); }
 
   /* How far, once you have said where you are. Tabular so the column of
      distances lines up as you scan it. */
   .row-d {
-    grid-row: 1 / span 2;
-    grid-column: 2;
+    grid-area: dist;
     align-self: center;
     font-size: 12px;
     color: var(--ink-3);
@@ -435,7 +459,8 @@
     padding: 10px 20px calc(12px + env(safe-area-inset-bottom, 0px));
     border-top: 1px solid var(--line);
     display: flex; gap: 14px; align-items: center;
-    font-size: 11px; color: var(--ink-3);
+    font-size: var(--t-micro); color: var(--ink-3);
+    letter-spacing: 0.01em;
   }
   kbd {
     font: inherit; font-size: 10.5px;
@@ -462,7 +487,13 @@
   #card.show { opacity: 1; transform: none; pointer-events: auto; }
 
   .card-top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
-  .card-n { margin: 0; font-size: 21px; font-weight: 650; letter-spacing: -0.026em; line-height: 1.18; }
+  .card-n {
+    margin: 0;
+    font-size: var(--t-title);
+    font-weight: 650;
+    letter-spacing: var(--tr-title);
+    line-height: 1.2;
+  }
   .card-x {
     flex: none; width: 26px; height: 26px; border-radius: 99px;
     border: 0; background: var(--fill); color: var(--ink-2);
@@ -471,18 +502,25 @@
   .card-x:hover { background: var(--fill-hi); color: var(--ink); }
   .card-tags { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
   .tag {
-    font-size: 11px; font-weight: 560; letter-spacing: 0.02em;
-    padding: 3px 8px; border-radius: 99px;
+    font-size: 11.5px; font-weight: 550; letter-spacing: 0.005em;
+    padding: 3.5px 9px; border-radius: 99px;
     background: var(--fill); color: var(--ink-2);
+    white-space: nowrap;
   }
   .tag.amber { background: var(--amber-dim); color: var(--amber); }
-  .card-a { margin: 12px 0 0; font-size: 13.5px; color: var(--ink-2); line-height: 1.5; }
+  .card-a {
+    margin: 12px 0 0;
+    font-size: var(--t-body);
+    letter-spacing: var(--tr-body);
+    color: var(--ink-2);
+    line-height: 1.5;
+  }
   .card-do { display: flex; gap: 8px; margin-top: 14px; }
   .btn {
     flex: 1;
     display: inline-flex; align-items: center; justify-content: center; gap: 6px;
     height: 36px; border-radius: 11px;
-    font: inherit; font-size: 13.5px; font-weight: 560; letter-spacing: -0.01em;
+    font: inherit; font-size: var(--t-body); font-weight: 570; letter-spacing: var(--tr-body);
     text-decoration: none; cursor: pointer; border: 1px solid transparent;
     transition: filter 0.18s ease, background 0.18s ease;
   }
@@ -541,8 +579,13 @@
     }
     #zoom { top: max(14px, env(safe-area-inset-top, 0px)); bottom: auto; right: 14px; }
     #card { bottom: calc(54% + 14px); right: 14px; left: 14px; width: auto; }
-    .credit { bottom: calc(54% + 10px); left: 14px; right: auto; text-align: left; }
-    .scale { left: 14px; bottom: calc(54% + 28px); }
+    /* Above the sheet there is room for two lines, not three: the bar
+       and the credit. The note about streets goes — the bar already
+       says how close you are. */
+    .credit { bottom: calc(54% + 8px); left: 14px; right: 14px; text-align: left; }
+    .scale { left: 14px; bottom: calc(54% + 40px); }
+    .scale-note { display: none; }
+    .credit-long { display: none; }   /* the sources, not the sentence */
     body.picked .scale { opacity: 0; }
     .hint { display: none; }
   }

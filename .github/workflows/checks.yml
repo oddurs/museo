@@ -16,3 +16,5 @@ jobs:
         run: node scripts/check-data.mjs
       - name: Map — the drawn city still matches the data
         run: node scripts/check-map.mjs
+      - name: CSS — no rule reaches further than it means to
+        run: node scripts/check-css.mjs

@@ -13,7 +13,8 @@
     "streets": "node scripts/build-streets.mjs",
     "boroughs": "node scripts/build-boroughs.mjs",
     "geocode": "node scripts/geocode.mjs",
-    "links": "node scripts/check-links.mjs"
+    "links": "node scripts/check-links.mjs",
+    "css": "node scripts/check-css.mjs"
   },
   "homepage": "https://oddurs.github.io/museo/",
   "repository": {
