@@ -48,7 +48,9 @@ const LAND = geo.features.map((f) => {
   return { n: f.properties.boro_name ?? f.properties.BoroName ?? f.properties.name, d }
 })
 
-const M = museums.map((m) => {
+// The index reads A-Z. The dataset is kept in whatever order it was
+// curated in, so the sort belongs here rather than in the data file.
+const M = [...museums].sort((a, b) => a.name.localeCompare(b.name, 'en')).map((m) => {
   const [x, y] = put([m.lng, m.lat])
   return {
     i: m.id, n: m.name, b: m.borough, h: m.neighborhood ?? '',
