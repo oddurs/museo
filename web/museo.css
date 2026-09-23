@@ -31,10 +31,12 @@
     --ink-3: rgba(242, 243, 245, 0.34);
     --line:  rgba(255, 255, 255, 0.07);
 
-    /* The one warm thing on the page: gallery light. It marks the
-       museum you have chosen, and nothing else. */
-    --amber:     #e9b872;
-    --amber-dim: rgba(233, 184, 114, 0.16);
+    /* The one saturated thing on the page. It marks the museum you have
+       chosen and nothing else, so colour here always means *this one*.
+       Vermilion against graphite: 5.4:1 as type on the panel, 4.9:1 as a
+       mark on the land, both clear of the floors this system holds to. */
+    --accent:     #ff4a1f;
+    --accent-dim: rgba(255, 74, 31, 0.14);
 
     --pin:       rgba(255, 255, 255, 0.76);
     --pin-hover: #ffffff;
@@ -97,7 +99,7 @@
   .tnum { font-variant-numeric: tabular-nums; }
 
   :focus-visible {
-    outline: 2px solid var(--amber);
+    outline: 2px solid var(--accent);
     outline-offset: 3px;
     border-radius: 4px;
   }
@@ -161,20 +163,47 @@
   .pin {
     fill: none;
     stroke: var(--pin);
-    stroke-width: 6.6px;
+    stroke-width: 7.6px;
     stroke-linecap: round;
     vector-effect: non-scaling-stroke;
-    cursor: pointer;
+    pointer-events: none;
     transition: stroke 0.18s ease, stroke-width 0.18s ease;
   }
-  .pin:hover { stroke: var(--pin-hover); }
-  .pin.on { stroke: var(--amber); stroke-width: 10px; }
+  .pin.on { stroke: var(--accent); stroke-width: 11px; }
+
+  /* A dot the colour of the water, under each mark. Two museums on the
+     same block stay two museums instead of merging into one smear, and
+     a mark over the pale land keeps its edge. */
+  .pin-sep {
+    fill: none;
+    stroke: var(--ground);
+    stroke-width: 11.4px;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+    opacity: 0.82;
+    pointer-events: none;
+    transition: stroke-width 0.18s ease;
+  }
+  .pin-sep.on { stroke-width: 15px; }
+
+  /* What you actually hit. Invisible, three times the mark, and the only
+     thing here that listens — so a pin is easy to take without being
+     drawn any heavier than it deserves. */
+  .pin-hit {
+    fill: none;
+    stroke: transparent;
+    stroke-width: 22px;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+    pointer-events: stroke;
+    cursor: pointer;
+  }
 
   /* The glow is a wider dot underneath, not a filter: same look, none
      of the per-frame rasterising a drop-shadow costs during a zoom. */
   .glow {
     fill: none;
-    stroke: var(--amber);
+    stroke: var(--accent);
     stroke-width: 26px;
     stroke-linecap: round;
     vector-effect: non-scaling-stroke;
@@ -186,7 +215,7 @@
 
   .halo {
     fill: none;
-    stroke: var(--amber);
+    stroke: var(--accent);
     stroke-width: 1px;
     vector-effect: non-scaling-stroke;
     opacity: 0.55;
@@ -235,6 +264,19 @@
     letter-spacing: var(--tr-mark);
     line-height: 1.04;
   }
+
+  /* The lockup is the page's own grammar: the ring and dot that mark a
+     located museum, set to the cap height of the name and spaced off it
+     optically rather than by a round number. It stays in ink — the
+     accent is reserved for the museum you have chosen, and a logo is
+     not one. */
+  .mark {
+    width: 0.73em;
+    height: 0.73em;
+    vertical-align: -0.025em;
+    margin-right: 0.33em;
+    overflow: visible;
+  }
   .sub {
     margin: 5px 0 0;
     font-size: var(--t-body);
@@ -271,9 +313,9 @@
   }
   .near:hover { background: var(--fill-hi); color: var(--ink-2); }
   .near[aria-pressed="true"] {
-    background: var(--amber-dim);
-    border-color: rgba(233, 184, 114, 0.3);
-    color: var(--amber);
+    background: var(--accent-dim);
+    border-color: rgba(255, 74, 31, 0.34);
+    color: var(--accent);
   }
   .near[data-busy="true"] { opacity: 0.5; pointer-events: none; }
 
@@ -391,7 +433,7 @@
     transition: background 0.16s ease;
   }
   .row:hover, .row.peek { background: var(--fill); }
-  .row.on { background: var(--amber-dim); }
+  .row.on { background: var(--accent-dim); }
 
   .row-n {
     grid-area: name;
@@ -400,7 +442,7 @@
     letter-spacing: var(--tr-lead);
     line-height: 1.32;
   }
-  .row.on .row-n { color: var(--amber); }
+  .row.on .row-n { color: var(--accent); }
   .row-m {
     grid-area: meta;
     margin-top: 3px;
@@ -412,8 +454,7 @@
     text-overflow: ellipsis;
   }
   .row-h { color: var(--ink-2); }
-  .row.on .row-h { color: rgba(233, 184, 114, 0.72); }
-  .row mark { background: none; color: var(--amber); }
+  .row mark { background: none; color: var(--accent); }
 
   /* How far, once you have said where you are. Tabular so the column of
      distances lines up as you scan it. */
@@ -425,7 +466,7 @@
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
-  .row.on .row-d { color: var(--amber); }
+  .row.on .row-d { color: var(--accent); }
 
   /* You are here: a ring in ink, never in the colour reserved for the
      museum you have chosen. */
@@ -507,7 +548,7 @@
     background: var(--fill); color: var(--ink-2);
     white-space: nowrap;
   }
-  .tag.amber { background: var(--amber-dim); color: var(--amber); }
+  .tag.accent { background: var(--accent-dim); color: var(--accent); }
   .card-a {
     margin: 12px 0 0;
     font-size: var(--t-body);
@@ -524,7 +565,7 @@
     text-decoration: none; cursor: pointer; border: 1px solid transparent;
     transition: filter 0.18s ease, background 0.18s ease;
   }
-  .btn-1 { background: var(--amber); color: #201603; }
+  .btn-1 { background: var(--accent); color: #1a0600; }
   .btn-1:hover { filter: brightness(1.08); }
   .btn-2 { background: var(--fill); color: var(--ink); border-color: var(--glass-edge); }
   .btn-2:hover { background: var(--fill-hi); }

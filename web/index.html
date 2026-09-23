@@ -15,7 +15,11 @@
   <canvas id="base" aria-hidden="true"></canvas>
   <svg id="map" role="img" aria-label="New York City, with a point at each museum">
     <g id="scene">
-      <g id="pins"></g>
+      <g id="pins">
+        <g id="seps"></g>
+        <g id="dots"></g>
+        <g id="hits"></g>
+      </g>
     </g>
   </svg>
 </div>
@@ -28,7 +32,10 @@
 <aside id="panel" class="glass">
   <header class="masthead">
     <div>
-      <h1 class="wordmark display">Museo</h1>
+      <h1 class="wordmark display"><svg class="mark" viewBox="0 0 20 20" aria-hidden="true">
+        <circle cx="10" cy="10" r="7.4" fill="none" stroke="currentColor" stroke-width="1.3" opacity=".42"/>
+        <circle cx="10" cy="10" r="2.9" fill="currentColor"/>
+      </svg>Museo</h1>
       <p class="sub">The five boroughs</p>
     </div>
     <div class="tally">

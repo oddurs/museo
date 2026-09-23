@@ -15,12 +15,17 @@ Graphite with a blue bias — a chosen neutral, not inherited black.
 | `--shore` | `white 17%` | the coastline |
 | `--ink` | `#f2f3f5` | type |
 | `--ink-2`, `--ink-3` | `62%`, `34%` | secondary and quiet type |
-| `--amber` | `#e9b872` | gallery light |
+| `--accent` | `#ff4a1f` | vermilion |
 
-Amber is the one warm thing on the page. It marks the museum you have chosen
-and nothing else — the selected pin, its halo, the row in the index, the
-category tag, the one filled button. Nothing else in the interface is allowed
-to be warm, so warmth always means *this one*.
+Vermilion is the one saturated thing on the page. It marks the museum you have
+chosen and nothing else — the selected pin, its halo, the row in the index, the
+category tag, the one filled button. Nothing else in the interface carries a
+hue, so colour always means *this one*. It holds 5.4:1 as type on the panel and
+4.9:1 as a mark on the land; white on the filled button would be 3.4:1, so that
+button's label is near-black instead.
+
+The wordmark's glyph stays in ink for the same reason: a logo is not the museum
+you have chosen.
 
 ## Type
 

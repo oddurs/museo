@@ -6,6 +6,7 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const el = (id) => document.getElementById(id);
 const svg = el('map'), scene = el('scene'), pinsG = el('pins');
+const sepsG = el('seps'), dotsG = el('dots'), hitsG = el('hits');
 const cv = el('base'), ctx = cv.getContext('2d');
 const listEl = el('list'), qEl = el('q'), segs = el('segs'), thumb = el('thumb');
 const card = el('card');
@@ -14,6 +15,7 @@ let rows = M.slice();
 let borough = null, query = '', chosen = null, cursor = -1;
 let here = null;                 // {lat, lng, x, y} once you have said where
 const pinOf = new Map();
+const sepOf = new Map();
 let view = { k: 1, x: 0, y: 0 };
 
 const LAND_PATHS = LAND.map((b) => ({ n: b.n, p: new Path2D(b.d) }));
@@ -30,22 +32,23 @@ const dotAt = (m) => `M${m.x} ${m.y}l0 0`;
 const youRing = mk('circle', 'you');
 const youDot = mk('path', 'you-dot');
 youRing.setAttribute('r', 0);
-pinsG.append(youDot, youRing);
 
 const glow = mk('path', 'glow');
 const halo = mk('circle', 'halo');
 halo.setAttribute('r', 0);
-pinsG.append(glow, halo);
+sepsG.before(glow, halo);
+dotsG.append(youDot, youRing);
 
 for (const m of M) {
-  const c = mk('path', 'pin');
-  c.setAttribute('d', dotAt(m));
-  c.dataset.id = m.i;
-  c.addEventListener('click', (e) => { e.stopPropagation(); choose(m.i, { from: 'map' }); });
-  c.addEventListener('pointerenter', () => peek(m.i, true));
-  c.addEventListener('pointerleave', () => peek(m.i, false));
-  pinsG.appendChild(c);
-  pinOf.set(m.i, c);
+  const d = dotAt(m);
+  const sep = mk('path', 'pin-sep'); sep.setAttribute('d', d);
+  const c = mk('path', 'pin'); c.setAttribute('d', d); c.dataset.id = m.i;
+  const hit = mk('path', 'pin-hit'); hit.setAttribute('d', d); hit.dataset.id = m.i;
+  hit.addEventListener('click', (e) => { e.stopPropagation(); choose(m.i, { from: 'map' }); });
+  hit.addEventListener('pointerenter', () => peek(m.i, true));
+  hit.addEventListener('pointerleave', () => peek(m.i, false));
+  sepsG.appendChild(sep); dotsG.appendChild(c); hitsG.appendChild(hit);
+  pinOf.set(m.i, c); sepOf.set(m.i, hit === null ? c : sep);
 }
 
 /* ── canvas ────────────────────────────────────────────────────── */
@@ -210,7 +213,7 @@ function zoomAt(sx, sy, factor) {
 
 let drag = null;
 svg.addEventListener('pointerdown', (e) => {
-  if (e.target.classList.contains('pin')) return;
+  if (e.target.classList.contains('pin-hit')) return;
   setMoving(true);
   drag = { x: e.clientX, y: e.clientY, vx: view.x, vy: view.y, moved: false };
   svg.setPointerCapture(e.pointerId);
@@ -395,7 +398,13 @@ function render({ refit = false } = {}) {
     s.style.opacity = s.disabled ? 0.35 : '';
   }
 
-  for (const [id, c] of pinOf) c.style.display = rows.some((m) => m.i === id) ? '' : 'none';
+  const shown = new Set(rows.map((m) => m.i));
+  for (const [id, c] of pinOf) {
+    const vis = shown.has(id) ? '' : 'none';
+    c.style.display = vis;
+    sepOf.get(id).style.display = vis;
+    hitsG.querySelector(`.pin-hit[data-id="${CSS.escape(id)}"]`).style.display = vis;
+  }
 
   cursor = rows.findIndex((m) => m.i === chosen);
   writeURL();
@@ -413,7 +422,10 @@ function tabStop() {
 function peek(id, on) {
   listEl.querySelector(`.row[data-id="${CSS.escape(id)}"]`)?.classList.toggle('peek', on);
   const p = pinOf.get(id);
-  if (p && id !== chosen) p.style.stroke = on ? 'var(--pin-hover)' : '';
+  if (p && id !== chosen) {
+    p.style.stroke = on ? 'var(--pin-hover)' : '';
+    p.style.strokeWidth = on ? '9.4px' : '';
+  }
 }
 
 /* ── selection ─────────────────────────────────────────────────── */
@@ -421,7 +433,11 @@ function peek(id, on) {
 function choose(id, { from = 'list' } = {}) {
   chosen = id;
   document.body.classList.toggle('picked', !!id);
-  for (const [mid, c] of pinOf) { c.style.stroke = ''; c.classList.toggle('on', mid === id); }
+  for (const [mid, c] of pinOf) {
+    c.style.stroke = ''; c.style.strokeWidth = '';
+    c.classList.toggle('on', mid === id);
+    sepOf.get(mid)?.classList.toggle('on', mid === id);
+  }
   for (const r of listEl.querySelectorAll('.row')) {
     const on = r.dataset.id === id;
     r.classList.toggle('on', on);
@@ -439,7 +455,7 @@ function choose(id, { from = 'list' } = {}) {
 
   el('cName').textContent = m.n;
   el('cTags').innerHTML =
-    `<span class="tag amber">${esc(m.c)}</span><span class="tag">${esc(m.b)}</span>` +
+    `<span class="tag accent">${esc(m.c)}</span><span class="tag">${esc(m.b)}</span>` +
     (m.h ? `<span class="tag">${esc(m.h)}</span>` : '');
   el('cAddr').textContent = m.f;
 
