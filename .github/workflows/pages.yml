@@ -22,21 +22,24 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 24
-      # nothing ships that the data or map checks would refuse
+          cache: npm
+      # nothing ships that the data, map or css checks would refuse
       - run: node scripts/check-data.mjs
       - run: node scripts/check-map.mjs
       - run: node scripts/check-css.mjs
-      - run: node scripts/build-site.mjs
+      - run: npm ci
+      # Pages serves this project under /museo/
+      - run: BASE_PATH=/museo npm run build
       - name: Refuse to publish font files
         run: |
-          if find _site -iname '*.woff*' -o -iname '*.otf' -o -iname '*.ttf' | grep -q .; then
-            echo "::error::a font file reached _site/ — this site is set in system type and ships none"
+          if find build -iname '*.woff*' -o -iname '*.otf' -o -iname '*.ttf' | grep -q .; then
+            echo "::error::a font file reached build/ — this site is set in system type and ships none"
             exit 1
           fi
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:
-          path: _site
+          path: build
 
   deploy:
     needs: build

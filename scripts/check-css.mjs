@@ -16,11 +16,22 @@
  * markup. Scoping it with `>` is usually the fix.
  */
 
-import { readFile } from 'node:fs/promises'
+import { readFile, readdir } from 'node:fs/promises'
 
 const root = new URL('../', import.meta.url)
-const css = await readFile(new URL('web/museo.css', root), 'utf8')
-const html = await readFile(new URL('web/index.html', root), 'utf8')
+const css = await readFile(new URL('src/lib/museo.css', root), 'utf8')
+
+// The markup lives in components now, so the lint reads all of them.
+const dir = new URL('src/', root)
+async function* walk(d) {
+  for (const e of await readdir(d, { withFileTypes: true })) {
+    const u = new URL(e.name + (e.isDirectory() ? '/' : ''), d)
+    if (e.isDirectory()) yield* walk(u)
+    else if (e.name.endsWith('.svelte')) yield u
+  }
+}
+let html = ''
+for await (const f of walk(dir)) html += await readFile(f, 'utf8') + '\n'
 
 const VOID = new Set(['meta', 'link', 'br', 'img', 'input', 'hr', 'source', 'area', 'base', 'col'])
 

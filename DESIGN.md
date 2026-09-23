@@ -78,6 +78,23 @@ Where you are is deliberately **not** in the link. It belongs to the device, not
 to the view, and a shared URL should never make someone else's browser ask for
 their location.
 
+## Where the framework stops
+
+Svelte owns the panel and the card. They change when you do something — a
+keystroke, a click — which is exactly what a reactive framework is for.
+
+Svelte does not own the map. The view changes sixty times a second while you
+drag, and a component update per frame is the wrong shape for that, so
+`src/lib/map.js` keeps `view` as a plain object and writes to the canvas and the
+SVG directly. The page tells it what to show (`setVisible`, `setChosen`,
+`fitTo`); it tells the page what was clicked. That boundary is the whole
+architecture, and it is why the port cost nothing in frame budget.
+
+One consequence worth stating: mounting the map is not a reaction to anything.
+It belongs in `onMount`. Written as an `$effect` it depends on everything it
+touches, so a keystroke re-runs it — which, the first time round, quietly reset
+the search on every character typed.
+
 ## Motion
 
 One `requestAnimationFrame` per frame does every write; pointer events only

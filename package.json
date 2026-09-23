@@ -1,20 +1,29 @@
 {
   "name": "museo",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "An index of every museum in the five boroughs of New York City, on a drawn map of the city after dark.",
   "type": "module",
   "scripts": {
-    "start": "node scripts/serve.mjs",
-    "site": "node scripts/build-site.mjs",
+    "dev": "vite dev",
+    "start": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
     "check": "node scripts/check-data.mjs",
     "map": "node scripts/check-map.mjs",
+    "css": "node scripts/check-css.mjs",
     "city": "node scripts/build-city.mjs",
     "streets": "node scripts/build-streets.mjs",
     "boroughs": "node scripts/build-boroughs.mjs",
     "geocode": "node scripts/geocode.mjs",
-    "links": "node scripts/check-links.mjs",
-    "css": "node scripts/check-css.mjs"
+    "links": "node scripts/check-links.mjs"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-static": "^3.0.10",
+    "@sveltejs/kit": "^2.70.3",
+    "@sveltejs/vite-plugin-svelte": "^7.3.1",
+    "svelte": "^5.57.1",
+    "vite": "^8.3.0"
   },
   "homepage": "https://oddurs.github.io/museo/",
   "repository": {

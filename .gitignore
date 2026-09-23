@@ -1,5 +1,6 @@
 node_modules/
 .DS_Store
 
-# the assembled public site
-_site/
+# build output
+.svelte-kit/
+build/

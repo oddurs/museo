@@ -1,4 +1,6 @@
 
+import { PROJ } from './city.js'
+
 /* ── the street network ────────────────────────────────────────────
    112,489 segments of NYC street centreline, delta-encoded. New York
    is navigated by cross street, so the grid has to be there when you
@@ -11,10 +13,17 @@ const SV = new Int16Array(128);
 for (let i = 0; i < SA.length; i++) SV[SA.charCodeAt(i)] = i;
 
 let S = null;                 // decoded network
+let NAMES = [];               // street names, by index
 const CELL = 20;              // index cell, in map units
 const GRID = Math.ceil(1000 / CELL);
 
-function decodeStreets() {
+export const decoded = () => S !== null;
+
+/* A megabyte of geometry the first paint does not need, so it is its own
+   chunk and it is asked for late. */
+export async function decodeStreets() {
+  const { ST } = await import('./streets-data.js');
+  NAMES = ST.n;
   const d = ST.d, q = ST.q, n = d.length;
   const guessLines = Math.ceil(n / 7), guessPts = Math.ceil(n / 3);
   const px = new Float32Array(guessPts), py = new Float32Array(guessPts);
@@ -76,7 +85,7 @@ const streetAlpha = (k) => (k < 4 ? 0 : Math.min(0.5, (k - 4) / 14));
 const showAll = (k) => k >= 7;
 const showNames = (k) => k >= 10.5;
 
-function drawStreets(ctx, k, vx, vy, w, h) {
+export function drawStreets(ctx, k, vx, vy, w, h) {
   if (!S) return;
   const a = streetAlpha(k);
   if (a <= 0.001) return;
@@ -144,7 +153,7 @@ function drawStreets(ctx, k, vx, vy, w, h) {
    written or it is not, wherever you have scrolled to, so panning moves
    the type with the map and nothing blinks.
    ─────────────────────────────────────────────────────────────────── */
-function drawLabels(ctx, labels, k, vx, vy, dpr) {
+export function drawLabels(ctx, labels, k, vx, vy, dpr) {
   if (!labels || !labels.length) return;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.font = '500 10.5px -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif';
@@ -177,7 +186,7 @@ function drawLabels(ctx, labels, k, vx, vy, dpr) {
     ctx.save();
     ctx.translate(sx, sy);
     ctx.rotate(a);
-    ctx.fillText(ST.n[ni], 0, 0);
+    ctx.fillText(NAMES[ni], 0, 0);
     ctx.restore();
   }
 }
@@ -266,7 +275,7 @@ function walk(pts, d) {
   }
 }
 
-function drawWater(ctx, k, vx, vy, w, h, dpr, pad) {
+export function drawWater(ctx, k, vx, vy, w, h, dpr, pad) {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.font = 'italic 400 10.5px -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif';
   ctx.textAlign = 'center';

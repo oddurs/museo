@@ -9,17 +9,27 @@ of the city after dark.
 [![Checks](https://github.com/oddurs/museo/actions/workflows/checks.yml/badge.svg)](https://github.com/oddurs/museo/actions/workflows/checks.yml)
 [![Links](https://github.com/oddurs/museo/actions/workflows/links.yml/badge.svg)](https://github.com/oddurs/museo/actions/workflows/links.yml)
 
-Static HTML, one stylesheet and four scripts. No framework, no build step for
-development, no dependencies at runtime, no tile server and no map key — the
-city is drawn from its own coastline and its own street centrelines.
+SvelteKit, built to static files. Nothing renders on a server because there is
+no server, nothing is tiled and there is no map key — the city is drawn from its
+own coastline and its own street centrelines.
 
 ```
-npm start        # http://localhost:5173
+npm install
+npm run dev      # http://127.0.0.1:2241
+npm run build    # static files in build/
+npm run preview  # serve that build, also on 2241
 npm run check    # validate the dataset, including its typography
 npm run map      # the drawn city still matches the data
+npm run css      # no rule reaches further than it means to
 npm run links    # check every outbound museum link
-npm run site     # assemble the public site in _site/, as Pages serves it
 ```
+
+The dev server is pinned to **2241** with `strictPort`, so it fails rather than
+quietly moving to another port and leaving you looking at the wrong copy.
+
+GitHub Pages serves this project under `/museo/`. Asset paths are relative, so
+the same build works from any prefix; the workflow still passes `BASE_PATH` for
+anything that needs to know.
 
 ## What's here
 
@@ -69,22 +79,23 @@ tag.
 data/museums.json        the dataset (hand-curated, machine-geocoded)
 data/boroughs.json       the five boroughs' shoreline from NYC Planning
 data/README.md           where each file comes from, and its terms
-web/index.html           the page
-web/museo.css            the whole visual system
-web/city.js              generated: boroughs as paths, museums as points
-web/streets-data.js      generated: the street network, delta-encoded
-web/cartography.js       decoding and drawing the streets and the water
-web/app.js               behaviour
-web/mark.svg             the favicon
-scripts/build-city.mjs   data/*.json         -> web/city.js
-scripts/build-streets.mjs NYC Open Data      -> web/streets-data.js
+src/routes/+page.svelte  the page: composition, keyboard, the address bar
+src/lib/components/      Panel and Card
+src/lib/museo.css        the whole visual system
+src/lib/map.js           the map engine — imperative, by design (see DESIGN.md)
+src/lib/cartography.js   decoding and drawing the streets and the water
+src/lib/filter.js        matching, highlighting, distance — all pure
+src/lib/state.svelte.js  what the page is showing
+src/lib/city.js          generated: boroughs as paths, museums as points
+src/lib/streets-data.js  generated: the street network, delta-encoded
+static/mark.svg          the favicon
+scripts/build-city.mjs   data/*.json         -> src/lib/city.js
+scripts/build-streets.mjs NYC Open Data      -> src/lib/streets-data.js
 scripts/build-boroughs.mjs fetches and simplifies the borough shoreline
 scripts/geocode.mjs      fills missing lat/lng from OpenStreetMap Nominatim
 scripts/check-data.mjs   validates the dataset
 scripts/check-map.mjs    catches a generated map that has gone stale
 scripts/check-links.mjs  checks every outbound museum link
-scripts/serve.mjs        zero-dependency static server
-scripts/build-site.mjs   assembles the public site for GitHub Pages
 .github/workflows/       deploy on push to main; checks on every push; links weekly
 ```
 
@@ -114,6 +125,6 @@ One object per museum:
 `url` is optional — an entry without a link beats an entry with a dead one.
 `lat`, `lng` and `geocode` are written by `npm run geocode`.
 
-Both generated files under `web/` are rebuilt from this data:
+Both generated files under `src/lib/` are rebuilt from this data:
 `npm run city` is instant; `npm run streets` re-downloads the centreline from
 NYC Open Data and takes a few minutes, which is why its output is committed.
